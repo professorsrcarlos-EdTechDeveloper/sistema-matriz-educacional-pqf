@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema MATRIZ EDUCACIONAL — Plataforma de Treinamento Escolar por Descritores</title>
+<style>
+:root{
+  --bg:#071524;--card:#0f2335;--blue:#38bdf8;--green:#22c55e;--gold:#fbbf24;
+  --text:#ffffff;--muted:#cbd5e1;--line:rgba(255,255,255,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top left,rgba(56,189,248,.18),transparent 36%),
+    radial-gradient(circle at top right,rgba(34,197,94,.12),transparent 36%),
+    linear-gradient(180deg,var(--bg),#020617 62%,#000);
+  color:var(--text);
+}
+body::before{
+  content:"";
+  position:fixed;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;
+  mask-image:linear-gradient(to bottom,black,transparent 82%);
+}
+a{text-decoration:none;color:inherit}
+.container{width:min(1180px,94%);margin:0 auto;position:relative;z-index:1}
+.topbar{
+  position:sticky;top:0;z-index:20;
+  background:rgba(5,8,22,.78);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+}
+.nav{
+  min-height:74px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  flex-wrap:wrap;
+  padding:10px 0;
+}
+.logo{display:flex;align-items:center;gap:12px;font-weight:1000}
+.school-logo{width:70px;height:70px;object-fit:contain;border-radius:50%;background:#fff;padding:5px;box-shadow:0 0 18px rgba(56,189,248,.18)}
+.logo-mark{
+  width:132px;height:56px;border-radius:18px;
+  background:radial-gradient(circle at 18% 28%,rgba(255,255,255,.20),transparent 22%),linear-gradient(135deg,#0f2b46,#133d63 44%,#12729a 100%);
+  display:grid;place-items:center;color:#fff;font-weight:1000;font-size:.78rem;letter-spacing:.08em;
+  box-shadow:0 0 24px rgba(56,189,248,.20);position:relative;overflow:hidden;border:1px solid rgba(56,189,248,.34);
+  animation:logoFloat 4.8s ease-in-out infinite;
+}
+.logo-mark::before{content:"";position:absolute;width:18px;height:18px;right:10px;top:18px;border:2px solid rgba(251,191,36,.62);transform:rotate(45deg);border-radius:4px}
+.logo-mark::after{content:"";position:absolute;inset:5px;border-radius:13px;border:1px solid rgba(255,255,255,.12)}
+.logo-mark span{position:relative;z-index:1;padding-right:16px;white-space:nowrap}
+.logo small{display:block;color:var(--gold);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.nav-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 17px;border-radius:14px;border:2px solid var(--blue);
+  background:rgba(0,229,255,.06);color:#fff;font-weight:900;cursor:pointer;transition:.18s;
+}
+.btn:hover{background:var(--blue);color:#001018;box-shadow:0 0 20px rgba(0,229,255,.34);transform:translateY(-1px)}
+.btn.gold{border-color:var(--gold);color:var(--gold);background:rgba(250,204,21,.06)}
+.btn.gold:hover{background:var(--gold);color:#090909;box-shadow:0 0 20px rgba(250,204,21,.34)}
+.btn.muted{border-color:rgba(56,189,248,.45);background:rgba(56,189,248,.08);color:#e0f2fe}
+.hero{padding:28px 0 24px}
+.hero-card{
+  background:linear-gradient(135deg,rgba(11,18,36,.95),rgba(16,27,53,.92));
+  border:1px solid rgba(0,229,255,.22);border-radius:28px;padding:30px;
+  box-shadow:0 18px 46px rgba(0,0,0,.36), inset 0 0 36px rgba(255,255,255,.03);
+  position:relative;overflow:hidden;text-align:center;
+}
+.hero-card::before{
+  content:"";position:absolute;inset:-2px;
+  background:linear-gradient(120deg,rgba(56,189,248,.18),transparent 35%,rgba(251,191,36,.12),transparent 70%,rgba(34,197,94,.15));
+  filter:blur(18px);z-index:-1;
+}
+.badge{
+  display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid rgba(250,204,21,.35);
+  color:var(--gold);border-radius:999px;font-size:.78rem;font-weight:1000;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;background:rgba(250,204,21,.08);
+}
+h1{font-size:clamp(2rem,4vw,3.55rem);line-height:1.05;font-weight:1000;letter-spacing:-.03em;margin-bottom:14px;text-shadow:0 0 18px rgba(0,229,255,.25)}
+.lead{color:var(--muted);font-size:clamp(1rem,1.6vw,1.15rem);line-height:1.55;max-width:920px;margin:0 auto}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px;justify-content:center}
+.notice{
+  margin-top:18px;border:1px solid rgba(250,204,21,.34);
+  background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(0,229,255,.06));
+  color:#fff7cc;border-radius:18px;padding:13px;line-height:1.45;font-weight:800;font-size:.88rem;
+}
+.grid-3,.grid-2,.flow{display:grid;gap:16px}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.flow{grid-template-columns:repeat(4,1fr)}
+.section{padding:22px 0}
+.section-title{margin-bottom:14px}
+.section-title h2{font-size:clamp(1.55rem,3vw,2.25rem);margin-bottom:8px}
+.section-title p{color:var(--muted);line-height:1.5}
+.card,.step,.panel{
+  background:linear-gradient(135deg,rgba(56,189,248,.10),rgba(34,197,94,.075));
+  border:1px solid rgba(0,229,255,.18);border-radius:22px;padding:20px;
+  box-shadow:0 14px 34px rgba(0,0,0,.22);
+  transition:transform .24s ease,box-shadow .24s ease,border-color .24s ease,background .24s ease;
+}
+.card:hover,.step:hover,.panel:hover{
+  transform:translateY(-6px);
+  border-color:rgba(56,189,248,.50);
+  box-shadow:0 20px 42px rgba(0,0,0,.32),0 0 26px rgba(56,189,248,.20);
+  background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(34,197,94,.10));
+}
+.card h3,.step h3{color:var(--blue);font-size:1.25rem;margin-bottom:9px}
+.card p,.card li,.step p{color:var(--muted);line-height:1.5}
+.card ul{padding-left:18px;margin-top:8px}
+.card.gold{background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(0,229,255,.07));border-color:rgba(250,204,21,.28)}
+.card.gold h3{color:var(--gold)}
+.step b{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--green));color:#001018;margin-bottom:10px}
+.cta{margin:28px auto;max-width:900px;text-align:center;background:linear-gradient(135deg,rgba(56,189,248,.13),rgba(251,191,36,.10),rgba(34,197,94,.12));border:1px solid rgba(250,204,21,.30);border-radius:28px;padding:28px 20px;box-shadow:0 18px 36px rgba(0,0,0,.28)}
+footer{border-top:1px solid rgba(255,255,255,.10);padding:24px 0 32px;color:#cbd5e1;text-align:center;font-size:.86rem}
+footer strong{color:var(--gold)}
+@media(max-width:900px){
+  .nav{justify-content:center;text-align:center}
+  .nav-actions,.hero-actions{width:100%}
+  .btn{width:100%}
+  .grid-3,.grid-2,.flow{grid-template-columns:1fr}
+  .hero-card{padding:24px 16px}
+}
+</style>
+<script>
+function acessarPainelCoordenador(){
+  window.location.href = "painel-coordenador.html";
+}
+</script>
+</head>
+<body>
+<div class="topbar">
+  <div class="container nav">
+    <div class="logo">
+      <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo-mark"><span>MATRIZ</span></div>
+      <div>
+        Sistema MATRIZ EDUCACIONAL
+        <small>Plataforma de Treinamento Escolar por Descritores</small>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <a class="btn gold" href="treinamento.html">Iniciar Treinamento</a>
+      <button class="btn muted" onclick="acessarPainelCoordenador()">Acessar Painel do Coordenador</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <section class="hero">
+    <div class="container">
+      <div class="hero-card">
+        <div class="badge">Treinamento escolar • BNCC • Avaliações externas</div>
+        <h1>Sistema MATRIZ EDUCACIONAL — Plataforma de Treinamento Escolar por Descritores</h1>
+        <p class="lead">Treinamentos digitais escolares para Português e Matemática — 2º, 5º e 9º ano. Ambiente de estudo, diagnóstico e preparação escolar com provas codificadas, descritores e acompanhamento pelo coordenador.</p>
+        <div class="hero-actions">
+          <a class="btn gold" href="treinamento.html">▶ Iniciar Treinamento</a>
+          <button class="btn muted" onclick="acessarPainelCoordenador()">🔒 Acessar Painel do Coordenador</button>
+        </div>
+        <div class="notice"><strong>Aviso legal:</strong> Ferramenta independente de treinamento escolar. Não oficial, não vinculada à SEDUC/CE, CAEd/UFJF ou Governo do Estado do Ceará. SPAECE é citado apenas como referência à avaliação educacional. Todos os direitos da plataforma, código, organização pedagógica e interface pertencem aos idealizadores/proprietários do projeto. Uso, cópia, revenda, modificação ou distribuição sem autorização é proibido.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-3">
+      <div class="card">
+        <h3>2º Ano</h3>
+        <p>Treino de alfabetização, leitura inicial, números, operações simples e interpretação.</p>
+        <ul><li>Português</li><li>Matemática</li><li>20 provas por componente curricular</li></ul>
+      </div>
+      <div class="card">
+        <h3>5º Ano</h3>
+        <p>Treino de leitura, gêneros textuais, operações, frações, medidas, geometria e resolução de problemas.</p>
+        <ul><li>Português</li><li>Matemática</li><li>20 provas por componente curricular</li></ul>
+      </div>
+      <div class="card">
+        <h3>9º Ano</h3>
+        <p>Treino de leitura crítica, argumentação, álgebra, geometria, estatística e proporcionalidade.</p>
+        <ul><li>Português</li><li>Matemática</li><li>20 provas por componente curricular</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Como funciona</h2>
+        <p>O professor/coordenador escolhe um código de prova fixa. O aluno realiza sempre as mesmas 10 questões daquele código e o resultado fica reservado ao painel do coordenador.</p>
+      </div>
+      <div class="flow">
+        <div class="step"><b>1</b><h3>Identificação</h3><p>Aluno informa nome ou código, escola, série e código da prova.</p></div>
+        <div class="step"><b>2</b><h3>Prova codificada</h3><p>Cada componente curricular possui 20 provas fixas por série, cada uma com seu próprio código.</p></div>
+        <div class="step"><b>3</b><h3>Treinamento</h3><p>O aluno responde 10 questões sem receber gabarito imediato.</p></div>
+        <div class="step"><b>4</b><h3>Painel</h3><p>O coordenador acompanha desempenho, descritores e evolução mensal.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2">
+      <div class="card gold">
+        <h3>Códigos de prova</h3>
+        <p>Exemplos: 2P01 a 2P20, 2M01 a 2M20, 5P01 a 5P20, 5M01 a 5M20, 9P01 a 9P20 e 9M01 a 9M20.</p>
+      </div>
+      <div class="card">
+        <h3>Componente Curricular</h3>
+        <p>A plataforma usa a nomenclatura “Componente Curricular” no lugar de “Componente Curricular”, alinhando melhor a linguagem escolar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container cta">
+    <h2>Pronto para demonstração</h2>
+    <p>Use o botão abaixo para testar o treinamento ou abrir o painel do coordenador.</p>
+    <div class="hero-actions" style="justify-content:center">
+      <a class="btn gold" href="treinamento.html">INICIAR TREINAMENTO</a>
+      <button class="btn muted" onclick="acessarPainelCoordenador()">ACESSAR PAINEL DO COORDENADOR</button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <p><strong>Idealizadores professores/coordenadores:</strong> Cleilsom Paiva-História e Carlos Tavares- Geografia</p>
+    <p>E.M.E.F. Pedro de Queiroz Ferreira • Sítio Lucas • Beberibe</p>
+    <p style="margin-top:10px;font-size:.78rem;line-height:1.45;max-width:980px;margin-left:auto;margin-right:auto;">© 2026 Sistema MATRIZ EDUCACIONAL. Ferramenta independente de treinamento escolar. Não oficial, não vinculada à SEDUC/CE, CAEd/UFJF ou Governo do Estado do Ceará. SPAECE é citado apenas como referência à avaliação educacional. Todos os direitos da plataforma, código, organização pedagógica e interface pertencem aos idealizadores/proprietários do projeto.</p>
+  </div>
+</footer>
+</body>
+</html>
