@@ -387,23 +387,22 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
       </div>
       <div>
         <label>Turma</label>
-        <input id="avalTurma" placeholder="Ex.: 5º ano A">
+        <select id="avalTurma" onchange="atualizarProvasPorTurma()" title="Clique ou passe o mouse para escolher uma das 3 turmas/séries liberadas">
+          <option value="">Selecione a turma</option>
+          <option value="2º ano">2º ano</option>
+          <option value="5º ano">5º ano</option>
+          <option value="9º ano">9º ano</option>
+        </select>
       </div>
       <div>
         <label>Escola</label>
         <input id="avalEscola" value="EMEF Pedro de Queiroz Ferreira" placeholder="Ex.: EMEF Pedro de Queiroz Ferreira">
       </div>
       <div>
-        <label>Série</label>
-        <select id="avalSerie">
-          <option value="2">2º ano</option>
-          <option value="5">5º ano</option>
-          <option value="9">9º ano</option>
-        </select>
-      </div>
-      <div>
         <label>Prova fixa</label>
-        <input id="avalProva" placeholder="Ex.: 2P01, 5M10, 9P20">
+        <select id="avalProva" disabled title="Escolha primeiro a turma para liberar somente as provas daquela série">
+          <option value="">Escolha primeiro a turma</option>
+        </select>
       </div>
       <div>
         <label>Código gerado</label>
@@ -415,7 +414,7 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
       </div>
     </div>
     <div class="notice" style="margin-top:10px">
-      O código fica registrado com nome completo do aluno, turma, escola, série e prova. O aluno digita somente o código no treinamento; o sistema identifica o aluno automaticamente e bloqueia novo acesso após finalizar.
+      O código fica registrado com nome completo do aluno, turma, escola e prova. A prova fixa é filtrada automaticamente pela turma escolhida, impedindo erro de aplicar prova de outra série.
     </div>
     <div id="avaliacoesCriadas" class="report-box" style="margin-top:10px;max-height:300px">Nenhuma avaliação criada.</div>
   </div>
@@ -508,7 +507,7 @@ function renderAvaliacoesCriadas(){
     return `<div class="plan-item">
       <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
       Tipo: ${a.tipo} • Destino: ${a.destinatario}<br>
-      Escola: ${a.escola} • Série: ${a.serie}º ano • Prova: ${a.codigoProva}<br>
+      Escola: ${a.escola} • Turma: ${a.turma||nomeSerieCurta(a.serie)||"—"} • Prova: ${a.codigoProva}<br>
       <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
       <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
     </div>`;
@@ -582,7 +581,7 @@ function renderAvaliacoesCriadas(){
     return `<div class="plan-item">
       <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
       Tipo: ${a.tipo} • Destino: ${a.destinatario}<br>
-      Escola: ${a.escola} • Série: ${a.serie}º ano • Prova: ${a.codigoProva}<br>
+      Escola: ${a.escola} • Turma: ${a.turma||nomeSerieCurta(a.serie)||"—"} • Prova: ${a.codigoProva}<br>
       <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
       <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
     </div>`;
@@ -656,7 +655,7 @@ function renderAvaliacoesCriadas(){
     return `<div class="plan-item">
       <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
       Tipo: ${a.tipo} • Destino: ${a.destinatario}<br>
-      Escola: ${a.escola} • Série: ${a.serie}º ano • Prova: ${a.codigoProva}<br>
+      Escola: ${a.escola} • Turma: ${a.turma||nomeSerieCurta(a.serie)||"—"} • Prova: ${a.codigoProva}<br>
       <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
       <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
     </div>`;
@@ -730,7 +729,7 @@ function renderAvaliacoesCriadas(){
     return `<div class="plan-item">
       <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
       Tipo: ${a.tipo} • Destino: ${a.destinatario}<br>
-      Escola: ${a.escola} • Série: ${a.serie}º ano • Prova: ${a.codigoProva}<br>
+      Escola: ${a.escola} • Turma: ${a.turma||nomeSerieCurta(a.serie)||"—"} • Prova: ${a.codigoProva}<br>
       <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
       <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
     </div>`;
@@ -974,7 +973,7 @@ function renderAvaliacoesCriadas(){
     return `<div class="plan-item">
       <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
       Tipo: ${a.tipo} • Destino: ${a.destinatario}<br>
-      Escola: ${a.escola} • Série: ${a.serie}º ano • Prova: ${a.codigoProva}<br>
+      Escola: ${a.escola} • Turma: ${a.turma||nomeSerieCurta(a.serie)||"—"} • Prova: ${a.codigoProva}<br>
       <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
       <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
     </div>`;
@@ -997,6 +996,55 @@ carregar = async function(){
 
 
 /* V31 - ajustes de avaliação vinculada a aluno/turma e ferramentas recolhíveis */
+function serieDaTurma(turma){
+  const t=String(turma||"").toLowerCase();
+  if(t.includes("2")) return "2";
+  if(t.includes("5")) return "5";
+  if(t.includes("9")) return "9";
+  return "";
+}
+function nomeSerieCurta(serie){
+  if(String(serie)==="2") return "2º ano";
+  if(String(serie)==="5") return "5º ano";
+  if(String(serie)==="9") return "9º ano";
+  return "";
+}
+function codigosProvaDaSerie(serie){
+  serie=String(serie||"");
+  let codigos=[];
+  if(window.SIMULADOS_FIXOS){
+    codigos=Object.keys(window.SIMULADOS_FIXOS).filter(c=>String(c).startsWith(serie));
+  }
+  if(!codigos.length){
+    for(const comp of ["P","M"]){
+      for(let i=1;i<=20;i++) codigos.push(`${serie}${comp}${String(i).padStart(2,"0")}`);
+    }
+  }
+  return codigos.sort((a,b)=>{
+    const ca=a[1]||"", cb=b[1]||"";
+    if(ca!==cb) return ca.localeCompare(cb);
+    return Number(a.slice(2))-Number(b.slice(2));
+  });
+}
+function atualizarProvasPorTurma(){
+  const turma=document.getElementById("avalTurma")?.value || "";
+  const serie=serieDaTurma(turma);
+  const prova=document.getElementById("avalProva");
+  if(!prova) return;
+  if(!serie){
+    prova.disabled=true;
+    prova.innerHTML='<option value="">Escolha primeiro a turma</option>';
+    return;
+  }
+  const codigos=codigosProvaDaSerie(serie);
+  prova.disabled=false;
+  prova.innerHTML=`<option value="">Selecione a prova do ${nomeSerieCurta(serie)}</option>`+
+    codigos.map(c=>`<option value="${c}">${c}</option>`).join("");
+}
+function provaCompativelComTurma(codigoProva,turma){
+  const serie=serieDaTurma(turma);
+  return !!serie && String(codigoProva||"").toUpperCase().startsWith(serie);
+}
 function ajustarTipoAvaliacao(){
   const tipo=document.getElementById("avalTipo")?.value || "aluno";
   const campoAluno=document.getElementById("avalAlunoNome");
@@ -1009,11 +1057,12 @@ function gerarCodigoAvaliacao(){
   const tipo=(document.getElementById("avalTipo")?.value || "aluno").toUpperCase();
   const alunoNome=(document.getElementById("avalAlunoNome")?.value || "").trim();
   const turma=(document.getElementById("avalTurma")?.value || "").trim();
-  const serie=document.getElementById("avalSerie")?.value || "X";
+  const serie=serieDaTurma(turma);
   const prova=(document.getElementById("avalProva")?.value || "").trim().toUpperCase();
   if(tipo.startsWith("AL") && alunoNome.length < 3){alert("Digite o nome completo do aluno antes de gerar o código.");return}
-  if(!turma){alert("Informe a turma antes de gerar o código.");return}
-  if(!prova){alert("Digite o código da prova fixa antes de gerar.");return}
+  if(!turma || !serie){alert("Escolha a turma antes de gerar o código.");return}
+  if(!prova){alert("Escolha a prova fixa da turma selecionada.");return}
+  if(!provaCompativelComTurma(prova,turma)){alert("A prova escolhida não pertence à turma selecionada. Escolha uma prova do "+nomeSerieCurta(serie)+".");return}
   const rand=Math.random().toString(36).substring(2,7).toUpperCase();
   const cod=`${tipo.startsWith("AL")?"AL":"TU"}${serie}${prova}${rand}`;
   document.getElementById("avalCodigo").value=cod;
@@ -1022,13 +1071,14 @@ function salvarAvaliacaoCriada(){
   const tipo=document.getElementById("avalTipo").value;
   const alunoNome=(document.getElementById("avalAlunoNome")?.value || "").trim();
   const turma=(document.getElementById("avalTurma")?.value || "").trim();
+  const serie=serieDaTurma(turma);
   const escola=document.getElementById("avalEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira";
-  const serie=document.getElementById("avalSerie").value;
   const codigoProva=document.getElementById("avalProva").value.trim().toUpperCase();
   const codigo=document.getElementById("avalCodigo").value.trim().toUpperCase();
   if(tipo==="aluno" && alunoNome.length < 3){alert("Informe o nome completo do aluno.");return}
-  if(!turma){alert("Informe a turma.");return}
-  if(!codigoProva){alert("Informe a prova fixa vinculada.");return}
+  if(!turma || !serie){alert("Escolha a turma.");return}
+  if(!codigoProva){alert("Escolha a prova fixa vinculada.");return}
+  if(!provaCompativelComTurma(codigoProva,turma)){alert("Erro bloqueado: esta prova não pertence à turma escolhida. Selecione uma prova do "+nomeSerieCurta(serie)+".");return}
   if(!codigo){alert("Clique em gerar código.");return}
   if(typeof obterProva === "function" && !obterProva(codigoProva)){alert("Código de prova fixa não encontrado.");return}
   const lista=obterAvaliacoesCriadas();
@@ -1058,7 +1108,7 @@ function renderAvaliacoesCriadas(){
     return `<div class="plan-item">
       <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
       Tipo: ${a.tipo} • ${nome?`Aluno: <b>${nome}</b> • `:""}Turma: <b>${a.turma||a.destinatario||"—"}</b><br>
-      Escola: ${a.escola} • Série: ${a.serie}º ano • Prova: ${a.codigoProva}<br>
+      Escola: ${a.escola} • Turma: ${a.turma||nomeSerieCurta(a.serie)||"—"} • Prova: ${a.codigoProva}<br>
       Criada em: ${formatarData?formatarData(a.created_at):a.created_at}<br>
       <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
       <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
@@ -1067,7 +1117,7 @@ function renderAvaliacoesCriadas(){
 }
 function normalizarRegistro(d){return {...d,aluno_nome:d.aluno_nome||d.aluno||d.nome||"",turma:d.turma||d.turma_nome||d.destinatario_turma||"",serie:d.serie||d.ano||"",serie_codigo:d.serie_codigo||serieNumero(d.serie||d.ano||""),materia:componenteRegistro(d),escola:d.escola||d.nome_escola||"Não informada",localidade:d.localidade||d.bairro||d.comunidade||"Não informada",ano_letivo:anoLetivo(d),mes_ano:d.mes_ano||mesAno(d.created_at||d.data||new Date()),codigo_prova:d.codigo_prova||d.codigoProva||"",codigo_avaliacao:d.codigo_avaliacao||d.codigoAvaliacao||"",acertos:Number(d.acertos||0),total_questoes:Number(d.total_questoes||d.total||10),percentual:Number(d.percentual||0),erros:Number(d.erros??((d.total_questoes||d.total||10)-(d.acertos||0))),created_at:d.created_at||d.data||new Date().toISOString(),habilidades_revisar:d.habilidades_revisar||[],habilidades_detalhadas:d.habilidades_detalhadas||[],respostas:d.respostas||[]}}
 function prepararFerramentasExpansiveis(){
-  document.querySelectorAll("section.card.no-print").forEach((sec)=>{
+  document.querySelectorAll(".card").forEach((sec)=>{
     if(sec.dataset.expandReady==="1") return;
     const header=sec.querySelector(":scope > .card-tools");
     if(!header) return;
@@ -1091,7 +1141,7 @@ function prepararFerramentasExpansiveis(){
     sec.dataset.expandReady="1";
   });
 }
-document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{prepararFerramentasExpansiveis();ajustarTipoAvaliacao();renderAvaliacoesCriadas();},300)});
+document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{prepararFerramentasExpansiveis();ajustarTipoAvaliacao();atualizarProvasPorTurma();renderAvaliacoesCriadas();},300)});
 
 </script>
 </body>
