@@ -101,6 +101,14 @@ ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS componente_vinculado
 ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS mes_referencia text;
 ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS ano_letivo text;
 
+-- Correção V33.1: campos que o treinamento envia ao finalizar
+ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS avaliacao_unica boolean DEFAULT false;
+ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS tipo_avaliacao text;
+ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS destinatario_avaliacao text;
+ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS turma_avaliacao text;
+ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS uso_pedagogico_interno boolean DEFAULT true;
+ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS lgpd_orientacao_confirmada boolean DEFAULT true;
+
 CREATE INDEX IF NOT EXISTS idx_resultados_professor_usuario ON resultados_treinamento(professor_usuario);
 CREATE INDEX IF NOT EXISTS idx_resultados_turma ON resultados_treinamento(turma);
 CREATE INDEX IF NOT EXISTS idx_resultados_codigo_avaliacao ON resultados_treinamento(codigo_avaliacao);

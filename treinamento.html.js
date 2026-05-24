@@ -1,74 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema MATRIZ EDUCACIONAL — Treinamento</title>
-<style>
-:root{--bg:#071524;--card:#0f2335;--blue:#38bdf8;--green:#22c55e;--gold:#fbbf24;--text:#fff;--muted:#cbd5e1;--line:rgba(255,255,255,.12)}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
-body{min-height:100vh;background:radial-gradient(circle at top left,rgba(56,189,248,.16),transparent 36%),radial-gradient(circle at top right,rgba(34,197,94,.12),transparent 36%),linear-gradient(180deg,var(--bg),#020617 62%,#000);color:var(--text);padding:10px}
-body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;mask-image:linear-gradient(to bottom,black,transparent 80%)}
-.wrap{max-width:1120px;margin:0 auto;position:relative;z-index:1}
-.header{border:1px solid rgba(56,189,248,.24);border-radius:18px;padding:14px;background:linear-gradient(135deg,rgba(11,18,36,.95),rgba(16,27,53,.92));box-shadow:0 0 16px rgba(56,189,248,.10), inset 0 0 20px rgba(255,255,255,.03);text-align:center;margin-bottom:10px}
-.school-logo{width:82px;height:82px;object-fit:contain;border-radius:50%;background:#fff;padding:5px;margin:0 auto 8px;display:block;box-shadow:0 0 18px rgba(56,189,248,.18)}
-.logo{width:132px;height:56px;border-radius:18px;margin:0 auto 8px;background:radial-gradient(circle at 18% 28%,rgba(255,255,255,.20),transparent 22%),linear-gradient(135deg,#0f2b46,#133d63 44%,#12729a 100%);display:grid;place-items:center;color:#fff;font-weight:1000;font-size:.78rem;letter-spacing:.08em;box-shadow:0 0 24px rgba(56,189,248,.20);position:relative;overflow:hidden;border:1px solid rgba(56,189,248,.34)}
-.logo::before{content:"";position:absolute;width:18px;height:18px;right:10px;top:18px;border:2px solid rgba(251,191,36,.62);transform:rotate(45deg);border-radius:4px}
-.logo span{position:relative;z-index:1;padding-right:16px}
-.badge{display:inline-flex;padding:5px 10px;border:1px solid rgba(250,204,21,.32);color:var(--gold);border-radius:999px;font-size:.68rem;font-weight:1000;letter-spacing:.08em;text-transform:uppercase;background:rgba(250,204,21,.08);margin-bottom:8px}
-h1{font-size:clamp(1.35rem,3vw,2.15rem);line-height:1.05;text-shadow:0 0 12px rgba(0,229,255,.28)}
-.header p{color:var(--muted);font-size:.9rem;margin-top:6px;line-height:1.35}
-.legal{border:1px solid rgba(251,191,36,.32);border-radius:14px;background:rgba(251,191,36,.08);color:#fef3c7;padding:9px 10px;font-size:.76rem;line-height:1.35;text-align:center;margin-bottom:10px}
-.box{background:linear-gradient(180deg,rgba(11,18,36,.96),rgba(8,13,28,.98));border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.32)}
-.form{max-width:760px;margin:0 auto;text-align:left}
-label{display:block;margin:12px 0 6px;color:var(--gold);font-weight:900}
-input,select{width:100%;padding:14px 13px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:#061126;color:#fff;font-weight:800;outline:none}
-input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.10)}
-.notice{border:1px solid rgba(250,204,21,.34);background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(0,229,255,.06));color:#fff7cc;border-radius:14px;padding:10px;margin:12px 0;line-height:1.35;font-weight:700}
-.btn{display:inline-flex;align-items:center;justify-content:center;width:100%;gap:8px;margin:8px 0;padding:12px 14px;border:2px solid var(--blue);background:rgba(0,229,255,.05);color:#fff;border-radius:12px;cursor:pointer;font-weight:900;font-size:.95rem;line-height:1.3;transition:.18s}
-.btn:hover:not(:disabled){background:var(--blue);color:#001018;box-shadow:0 0 18px rgba(0,229,255,.36);transform:translateY(-1px)}
-.btn.gold{border-color:var(--gold);color:var(--gold);background:rgba(250,204,21,.06)}
-.btn.gold:hover:not(:disabled){background:var(--gold);color:#090909}
-.btn.muted{border-color:#64748b;color:#e2e8f0;background:rgba(100,116,139,.10)}
-.status{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;color:var(--gold);font-weight:900}
-.progress{height:9px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:12px}
-.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));width:0%}
-.qbox{display:grid;grid-template-columns:1fr 190px;gap:14px;align-items:start}
-.qactions{position:sticky;top:10px;display:flex;flex-direction:column;gap:8px}
-.qactions .btn{margin:0}
-.question-label{display:block;color:var(--blue);font-weight:1000;margin:10px 0 6px;text-transform:uppercase;letter-spacing:.04em;font-size:.78rem}
-.text-base{display:block;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:12px;margin:6px 0 10px;color:#e5e7eb;line-height:1.45}
-.visual{margin:8px 0;padding:10px;border:1px solid rgba(56,189,248,.20);border-radius:14px;background:rgba(56,189,248,.05);text-align:center}
-.visual svg{max-width:100%;height:auto}
-.options{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-.option{width:100%;text-align:left;justify-content:flex-start;margin:0;border-color:rgba(56,189,248,.28);background:rgba(255,255,255,.035);color:#fff}
-.option.selected{border-color:var(--gold);background:rgba(251,191,36,.12);color:#fff}
-.final{text-align:center;padding:20px}
-.final h2{color:var(--blue);font-size:2rem;margin-bottom:10px}
-.final p{color:var(--muted);line-height:1.55;margin-bottom:10px}
-footer{text-align:center;color:#cbd5e1;padding:14px;font-size:.78rem}
-footer strong{color:var(--gold)}
-@media(max-width:860px){.qbox{grid-template-columns:1fr}.qactions{position:static}.header p{display:none}}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header class="header">
-    <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo"><span>MATRIZ</span></div>
-    <div class="badge">Treinamento Escolar • BNCC • Avaliações Externas</div>
-    <h1>Sistema MATRIZ EDUCACIONAL</h1>
-    <p>Plataforma de Treinamento Escolar por Descritores — 2º, 5º e 9º ano.</p>
-  </header>
-  <div class="legal"><strong>Aviso legal:</strong> Ferramenta independente de treinamento escolar. Não oficial, não vinculada à SEDUC/CE, CAEd/UFJF ou Governo do Estado do Ceará. SPAECE é citado apenas como referência à avaliação educacional.</div>
-  <main id="app" class="box"></main>
-  <footer><strong>Idealizadores professores/coordenadores:</strong> Cleilsom Paiva-História e Carlos Tavares- Geografia</footer>
-</div>
 
-<script src="questoes.js"></script>
-<script src="simulados-fixos.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script>
 let aluno={nome:"", escola:"", serie:"", codigoProva:""};
 let questoes=[], indice=0, respostas=[], provaAtual=null, audioCtx=null;
 
@@ -184,10 +114,6 @@ async function buscarAvaliacaoPorCodigoOnline(codigo){
           codigoProva:data.codigo_prova || data.codigoProva || "",
           finalizado:!!data.finalizado,
           status:data.status || "liberada",
-          professor_nome:data.professor_nome || "",
-          professor_usuario:data.professor_usuario || "",
-          professor_perfil:data.professor_perfil || "",
-          componente_vinculado:data.componente_vinculado || "",
           created_at:data.created_at
         };
       }
@@ -385,52 +311,10 @@ async function salvarSupabase(resultado){
   try{
     if(window.MATRIZ_SUPABASE && window.MATRIZ_SUPABASE.enabled && window.supabase){
       const sb=window.supabase.createClient(window.MATRIZ_SUPABASE.url, window.MATRIZ_SUPABASE.anonKey);
-      const payload={
-        created_at: resultado.created_at,
-        aluno_nome: resultado.aluno_nome,
-        escola: resultado.escola,
-        turma: resultado.turma,
-        serie: resultado.serie,
-        serie_codigo: resultado.serie_codigo,
-        componente_curricular: resultado.materia,
-        materia: resultado.materia,
-        codigo_prova: resultado.codigo_prova,
-        codigo_avaliacao: resultado.codigo_avaliacao,
-        professor_nome: resultado.professor_nome || "",
-        professor_usuario: resultado.professor_usuario || "",
-        professor_perfil: resultado.professor_perfil || "",
-        componente_vinculado: resultado.componente_vinculado || resultado.materia || "",
-        avaliacao_unica: !!resultado.avaliacao_unica,
-        tipo_avaliacao: resultado.tipo_avaliacao || "teste_livre",
-        destinatario_avaliacao: resultado.destinatario_avaliacao || "",
-        turma_avaliacao: resultado.turma_avaliacao || resultado.turma || "",
-        acertos: resultado.acertos,
-        erros: resultado.erros,
-        total_questoes: resultado.total_questoes,
-        percentual: resultado.percentual,
-        respostas: resultado.respostas || [],
-        habilidades_detalhadas: resultado.habilidades_detalhadas || [],
-        habilidades_revisar: resultado.habilidades_revisar || [],
-        uso_pedagogico_interno: true,
-        lgpd_orientacao_confirmada: true,
-        ano_letivo: String(new Date().getFullYear()),
-        mes_referencia: String(new Date().getMonth()+1).padStart(2,"0")+"/"+String(new Date().getFullYear())
-      };
-      const {error}=await sb.from("resultados_treinamento").insert([payload]);
-      if(error){
-        console.error("ERRO AO SALVAR RESULTADO NO SUPABASE:", error);
-        localStorage.setItem("matriz_ultimo_erro_supabase", JSON.stringify({quando:new Date().toISOString(), erro:error.message || error, payload}));
-        return false;
-      }
-      return true;
+      await sb.from("resultados_treinamento").insert([resultado]);
     }
-  }catch(e){
-    console.error("Erro Supabase:", e);
-    localStorage.setItem("matriz_ultimo_erro_supabase", JSON.stringify({quando:new Date().toISOString(), erro:String(e)}));
-  }
-  return false;
+  }catch(e){console.warn("Erro Supabase:", e);}
 }
-
 
 
 function mostrarConferencia(){
@@ -503,6 +387,3 @@ async function finalizar(){
     </div>`;
 }
 mostrarEntrada();
-</script>
-</body>
-</html>
