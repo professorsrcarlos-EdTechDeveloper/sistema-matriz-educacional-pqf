@@ -1,6 +1,4 @@
-// CONFIGURAÇÃO SUPABASE — SISTEMA MATRIZ EDUCACIONAL
-// Projeto: Sistema Matriz Educacional PQF
-
+// CONFIGURAÇÃO SUPABASE — SISTEMA MATRIZ EDUCACIONAL PQF
 window.MATRIZ_SUPABASE = {
   enabled: true,
   url: "https://wdhuuponurrqgcaohlzm.supabase.co",

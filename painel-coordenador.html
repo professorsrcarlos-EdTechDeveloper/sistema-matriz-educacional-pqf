@@ -267,15 +267,20 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
 .code-table th,.code-table td{font-size:.82rem;padding:8px;border-bottom:1px solid rgba(255,255,255,.08)}
 @media(max-width:760px){.student-picker-grid{grid-template-columns:1fr}}
 
+
+.profile-hidden{display:none!important}
+.login-card input+input{margin-top:8px}
+.permissao-chip{display:inline-flex;border:1px solid rgba(56,189,248,.35);background:rgba(56,189,248,.08);border-radius:999px;padding:5px 9px;margin:3px;color:#dbeafe;font-weight:900;font-size:.78rem}
 </style>
 </head>
 <body>
 <div id="loginOverlay" class="login-overlay">
   <div class="login-card">
     <div class="brand-mark" style="margin:0 auto 12px"><span>MATRIZ</span></div>
-    <h2>Acesso do Coordenador</h2>
-    <p>Área restrita para acompanhamento pedagógico dos resultados.</p>
-    <input id="senhaPainel" type="password" inputmode="numeric" placeholder="Digite a senha" autocomplete="off">
+    <h2>Acesso PQF</h2>
+    <p>Entre com usuário e senha. Professores veem somente sua turma e componente; Carlos e Cleilson têm acesso geral.</p>
+    <input id="usuarioPainel" type="text" placeholder="Usuário" autocomplete="username" style="letter-spacing:0;text-transform:lowercase">
+    <input id="senhaPainel" type="password" placeholder="Senha" autocomplete="current-password">
     <button onclick="validarSenhaPainel()">Entrar no painel</button>
     <div id="loginErro" class="login-erro"></div>
     <button style="margin-top:8px;background:rgba(100,116,139,.12);border-color:#64748b;color:#e2e8f0" onclick="window.location.href='index.html'">Voltar ao início</button>
@@ -288,18 +293,19 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
     <div class="brand">
       <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="brand-mark"><span>MATRIZ</span></div>
       <div>
-        <h1>Painel do Coordenador</h1>
-        <div class="subtitle">Sistema MATRIZ EDUCACIONAL — Plataforma de Treinamento Escolar por Descritores</div>
+        <h1>Painel PQF — Professor, Coordenador e Gestor</h1>
+        <div class="subtitle">Sistema MATRIZ EDUCACIONAL — Controle por usuário, turma, componente e resultados</div>
       </div>
     </div>
     <nav class="nav">
       <a class="btn" href="index.html">🏠 Início</a>
       <a class="btn" href="treinamento.html">📚 Treinamento</a>
-      <button class="danger" onclick="sessionStorage.removeItem('matriz_painel_professor_autorizado');location.href='index.html'">Sair do painel</button>
+      <button class="danger" onclick="sairPainel()">Sair do painel</button>
     </nav>
   </div>
   <div class="legal"><strong>Aviso legal:</strong> Ferramenta independente de treinamento escolar. Não oficial, não vinculada à SEDUC/CE, CAEd/UFJF ou Governo do Estado do Ceará.</div>
   <div class="restricted-warning"><strong>Área restrita.</strong> Não compartilhar prints, nomes ou resultados individuais dos alunos em grupos públicos. Uso pedagógico interno.</div>
+  <div id="usuarioLogadoBox" class="legal" style="display:none"></div>
 </header>
 
 <section class="panel no-print">
@@ -1330,5 +1336,202 @@ function prepararFerramentasExpansiveis(){
 document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{prepararFerramentasExpansiveis();ajustarTipoAvaliacao();atualizarProvasPorTurma();renderAvaliacoesCriadas();},300)});
 
 </script>
+
+<script>
+/* V33 PQF - login por usuário, permissão por turma/componente e histórico Supabase */
+const USUARIOS_PQF = [
+  {nome:"Carlos Tavares", usuario:"carlos.tavares", senha:"7890uiop", perfil:"gestor", turma_vinculada:"Todas", componente_vinculado:"Todos", acesso_geral:true},
+  {nome:"Cleilson Paiva", usuario:"cleilson.paiva", senha:"1234qwer", perfil:"coordenador", turma_vinculada:"Todas", componente_vinculado:"Todos", acesso_geral:true},
+  {nome:"Ana Ribeiro", usuario:"ana.ribeiro", senha:"2026abcd", perfil:"professor", turma_vinculada:"2º ano", componente_vinculado:"Português", acesso_geral:false},
+  {nome:"Paulo Mendes", usuario:"paulo.mendes", senha:"2027efgh", perfil:"professor", turma_vinculada:"2º ano", componente_vinculado:"Matemática", acesso_geral:false},
+  {nome:"Maria Duarte", usuario:"maria.duarte", senha:"2028ijkl", perfil:"professor", turma_vinculada:"5º ano", componente_vinculado:"Português", acesso_geral:false},
+  {nome:"João Alencar", usuario:"joao.alencar", senha:"2029mnop", perfil:"professor", turma_vinculada:"5º ano", componente_vinculado:"Matemática", acesso_geral:false},
+  {nome:"Helena Freire", usuario:"helena.freire", senha:"2030qrst", perfil:"professor", turma_vinculada:"9º ano", componente_vinculado:"Português", acesso_geral:false},
+  {nome:"Antônio Vieira", usuario:"antonio.vieira", senha:"2031uvwx", perfil:"professor", turma_vinculada:"9º ano", componente_vinculado:"Matemática", acesso_geral:false}
+];
+function usuarioAtual(){try{return JSON.parse(sessionStorage.getItem("matriz_usuario_painel")||"null")}catch(e){return null}}
+function componenteParaLetra(c){return String(c||"").toLowerCase().startsWith("port")?"P":String(c||"").toLowerCase().startsWith("mat")?"M":""}
+function letraParaComponente(l){return String(l||"").toUpperCase()==="P"?"Português":String(l||"").toUpperCase()==="M"?"Matemática":""}
+function serieDaTurmaUsuario(t){return serieDaTurma(t)}
+function filtrarPorUsuario(lista){
+  const u=usuarioAtual();
+  if(!u || u.acesso_geral) return lista;
+  const serie=serieDaTurmaUsuario(u.turma_vinculada);
+  const comp=String(u.componente_vinculado||"").toLowerCase();
+  return (lista||[]).filter(d=>{
+    const ds=serieNumero(d.serie_codigo||d.serie||d.turma);
+    const dc=String(d.materia||d.componente_curricular||d.componente_vinculado||"").toLowerCase();
+    const pc=String(d.codigo_prova||d.codigoProva||"").toUpperCase().charAt(1);
+    const compOk = dc ? dc.includes(comp.slice(0,4)) : letraParaComponente(pc).toLowerCase().includes(comp.slice(0,4));
+    return (!serie || ds===serie) && compOk;
+  });
+}
+function filtrarAvaliacoesPorUsuario(lista){
+  const u=usuarioAtual();
+  if(!u || u.acesso_geral) return lista;
+  const serie=serieDaTurmaUsuario(u.turma_vinculada);
+  const letra=componenteParaLetra(u.componente_vinculado);
+  return (lista||[]).filter(a=>{
+    const turma=a.turma || nomeSerieCurta(a.serie);
+    const prova=String(a.codigoProva||a.codigo_prova||"").toUpperCase();
+    return serieDaTurma(turma)===serie && (!letra || prova.charAt(1)===letra);
+  });
+}
+function sairPainel(){
+  sessionStorage.removeItem('matriz_painel_professor_autorizado');
+  sessionStorage.removeItem('matriz_usuario_painel');
+  location.href='index.html';
+}
+function aplicarPermissoesUsuario(){
+  const u=usuarioAtual();
+  const box=document.getElementById("usuarioLogadoBox");
+  if(!u) return;
+  if(box){
+    box.style.display="block";
+    box.innerHTML=`<strong>Usuário:</strong> ${u.nome} <span class="permissao-chip">${u.perfil}</span><span class="permissao-chip">Turma: ${u.turma_vinculada}</span><span class="permissao-chip">Componente: ${u.componente_vinculado}</span>${u.acesso_geral?'<span class="permissao-chip">Acesso geral</span>':'<span class="permissao-chip">Acesso restrito</span>'}`;
+  }
+  if(!u.acesso_geral){
+    const serie=serieDaTurmaUsuario(u.turma_vinculada);
+    const turmaNome=nomeSerieCurta(serie);
+    const filtroSerie=document.getElementById("filtroSerie");
+    const filtroComponente=document.getElementById("filtroComponente");
+    if(filtroSerie){filtroSerie.value=serie; filtroSerie.disabled=true;}
+    if(filtroComponente){filtroComponente.value=u.componente_vinculado; filtroComponente.disabled=true;}
+    const avalTurma=document.getElementById("avalTurma");
+    if(avalTurma){avalTurma.value=turmaNome; avalTurma.disabled=true;}
+    const tipo=document.getElementById("avalTipo");
+    if(tipo) tipo.value=tipo.value||"aluno";
+    const escola=document.getElementById("avalEscola");
+    if(escola) escola.value="EMEF Pedro de Queiroz Ferreira";
+  }
+  atualizarProvasPorTurma();
+}
+async function validarSenhaPainel(){
+  const usuario=(document.getElementById("usuarioPainel")?.value || "").trim().toLowerCase();
+  const senha=(document.getElementById("senhaPainel")?.value || "").trim();
+  let u=USUARIOS_PQF.find(x=>x.usuario===usuario && x.senha===senha);
+  if(!u){
+    try{
+      if(window.MATRIZ_SUPABASE && window.MATRIZ_SUPABASE.enabled && window.supabase){
+        const sb=window.supabase.createClient(window.MATRIZ_SUPABASE.url, window.MATRIZ_SUPABASE.anonKey);
+        const {data,error}=await sb.from("usuarios_painel").select("*").eq("email",usuario).eq("senha",senha).eq("ativo",true).limit(1).maybeSingle();
+        if(!error && data){
+          u={nome:data.nome, usuario:data.email, senha:data.senha, perfil:data.perfil, turma_vinculada:data.turma_vinculada||"Todas", componente_vinculado:data.componente_vinculado||"Todos", acesso_geral:!!data.acesso_geral};
+        }
+      }
+    }catch(e){console.warn("Erro ao validar usuário online",e)}
+  }
+  if(u){
+    sessionStorage.setItem("matriz_usuario_painel", JSON.stringify(u));
+    sessionStorage.setItem("matriz_painel_professor_autorizado","sim");
+    liberarPainel();
+    aplicarPermissoesUsuario();
+    carregar();
+  }else{
+    document.getElementById("loginErro").textContent="Usuário ou senha incorretos.";
+  }
+}
+// Reescreve abertura do login para focar usuário
+function abrirLoginPainel(){document.body.classList.add("painel-bloqueado");document.getElementById("loginOverlay").style.display="flex";setTimeout(()=>document.getElementById("usuarioPainel")?.focus(),250)}
+// Substitui carregamento com filtro de perfil
+const carregarBaseV33 = carregar;
+carregar = async function(){
+  if(supabaseAtivo()){
+    const {data,error}=await sb().from("resultados_treinamento").select("*").order("created_at",{ascending:false}).limit(3000);
+    dadosOriginais=error?[]:(data||[]).map(normalizarRegistro);
+  }else{
+    const l1=JSON.parse(localStorage.getItem("matriz_spaece_resultados_locais")||"[]");
+    const l2=JSON.parse(localStorage.getItem("resultados_treinamento")||"[]");
+    const key=new Set();
+    dadosOriginais=[...l1,...l2].map(normalizarRegistro).filter(d=>{const k=d.created_at+"|"+d.aluno_nome+"|"+d.codigo_prova;if(key.has(k))return false;key.add(k);return true});
+  }
+  dadosOriginais=filtrarPorUsuario(dadosOriginais);
+  preencherFiltros();
+  aplicarPermissoesUsuario();
+  aplicarFiltros();
+  renderAvaliacoesCriadas();
+};
+// Override provas: professor só vê componente dele
+const codigosProvaDaSerieBaseV33=codigosProvaDaSerie;
+codigosProvaDaSerie=function(serie){
+  let codigos=codigosProvaDaSerieBaseV33(serie);
+  const u=usuarioAtual();
+  if(u && !u.acesso_geral){
+    const letra=componenteParaLetra(u.componente_vinculado);
+    if(letra) codigos=codigos.filter(c=>String(c).toUpperCase().charAt(1)===letra);
+  }
+  return codigos;
+};
+const atualizarProvasBaseV33=atualizarProvasPorTurma;
+atualizarProvasPorTurma=function(){
+  const u=usuarioAtual();
+  if(u && !u.acesso_geral){
+    const turma=document.getElementById("avalTurma");
+    if(turma){turma.value=nomeSerieCurta(serieDaTurmaUsuario(u.turma_vinculada)); turma.disabled=true;}
+  }
+  atualizarProvasBaseV33();
+};
+const montarAvaliacaoBaseV33=montarAvaliacao;
+montarAvaliacao=function(codigo,tipo,nome,turma,escola,serie,codigoProva){
+  const a=montarAvaliacaoBaseV33(codigo,tipo,nome,turma,escola,serie,codigoProva);
+  const u=usuarioAtual() || {};
+  a.professor_nome = u.nome || "Professor/Coordenador";
+  a.professor_usuario = u.usuario || "";
+  a.professor_perfil = u.perfil || "";
+  a.componente_vinculado = letraParaComponente(String(codigoProva||"").charAt(1));
+  return a;
+};
+const salvarAvaliacoesSupabaseBaseV33=salvarAvaliacoesSupabase;
+salvarAvaliacoesSupabase=async function(rows){
+  try{
+    if(window.MATRIZ_SUPABASE && window.MATRIZ_SUPABASE.enabled && window.supabase){
+      const sb=window.supabase.createClient(window.MATRIZ_SUPABASE.url, window.MATRIZ_SUPABASE.anonKey);
+      const u=usuarioAtual() || {};
+      const payload=rows.map(a=>({
+        codigo:a.codigo, tipo:a.tipo, aluno_nome:a.aluno_nome_completo, turma:a.turma,
+        destinatario:a.destinatario, escola:a.escola, serie:a.serie, codigo_prova:a.codigoProva,
+        professor_nome:a.professor_nome || u.nome || "Professor/Coordenador",
+        professor_usuario:a.professor_usuario || u.usuario || "",
+        professor_perfil:a.professor_perfil || u.perfil || "",
+        componente_vinculado:a.componente_vinculado || letraParaComponente(String(a.codigoProva||"").charAt(1)),
+        status:a.status || "liberada", finalizado:false
+      }));
+      const {error}=await sb.from("avaliacoes_criadas").insert(payload);
+      if(error) console.warn("Erro ao salvar avaliações no Supabase:", error);
+    }
+  }catch(e){console.warn("Erro Supabase avaliações:", e);}
+};
+const renderAvaliacoesCriadasBaseV33=renderAvaliacoesCriadas;
+renderAvaliacoesCriadas=function(){
+  const el=document.getElementById("avaliacoesCriadas");
+  if(!el) return;
+  const lista=filtrarAvaliacoesPorUsuario(obterAvaliacoesCriadas());
+  const finalizados=obterCodigosFinalizados();
+  if(!lista.length){el.textContent="Nenhuma avaliação criada para seu perfil.";return}
+  el.innerHTML=lista.slice(0,250).map(a=>{
+    const fim=finalizados.includes(a.codigo);
+    const nome=a.aluno_nome_completo || a.aluno_nome || (a.tipo==="aluno"?a.destinatario:"");
+    const prova=a.codigoProva || a.codigo_prova || "—";
+    return `<div class="plan-item">
+      <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
+      Aluno: <b>${nome||"—"}</b> • Turma: <b>${a.turma||nomeSerieCurta(a.serie)||"—"}</b> • Componente: <b>${a.componente_vinculado || letraParaComponente(String(prova).charAt(1)) || "—"}</b><br>
+      Professor: ${a.professor_nome||"—"} • Escola: ${a.escola||"—"} • Prova: ${prova}<br>
+      Criada em: ${typeof formatarData==="function"?formatarData(a.created_at):a.created_at}<br>
+      <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
+      <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
+    </div>`;
+  }).join("");
+};
+// Garante listeners certos após carregar
+window.addEventListener("DOMContentLoaded",()=>{
+  const u=usuarioAtual();
+  if(u){sessionStorage.setItem("matriz_painel_professor_autorizado","sim"); aplicarPermissoesUsuario();}
+  const userInput=document.getElementById("usuarioPainel");
+  const passInput=document.getElementById("senhaPainel");
+  [userInput,passInput].forEach(el=>el&&el.addEventListener("keydown",e=>{if(e.key==="Enter")validarSenhaPainel()}));
+  setTimeout(aplicarPermissoesUsuario,600);
+});
+</script>
+
 </body>
 </html>

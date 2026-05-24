@@ -314,6 +314,10 @@ async function iniciar(){
     provaAtual.tipoAvaliacao=avaliacaoCriada.tipo || "aluno";
     provaAtual.destinatario=avaliacaoCriada.destinatario || avaliacaoCriada.aluno_nome_completo || "";
     provaAtual.turma=avaliacaoCriada.turma || "";
+    provaAtual.professor_nome=avaliacaoCriada.professor_nome || "";
+    provaAtual.professor_usuario=avaliacaoCriada.professor_usuario || "";
+    provaAtual.professor_perfil=avaliacaoCriada.professor_perfil || "";
+    provaAtual.componente_vinculado=avaliacaoCriada.componente_vinculado || "";
   }
   questoes=prova.questoes.slice(0,10);
   respostas=[]; indice=0;
@@ -421,6 +425,10 @@ async function finalizar(){
     serie_codigo:aluno.serie,
     codigo_prova:provaAtual.codigo,
     codigo_avaliacao:provaAtual.codigoAvaliacaoUnica || "",
+    professor_nome:provaAtual.professor_nome || "",
+    professor_usuario:provaAtual.professor_usuario || "",
+    professor_perfil:provaAtual.professor_perfil || "",
+    componente_vinculado:provaAtual.componente_vinculado || provaAtual.componente || "",
     avaliacao_unica:!!provaAtual.codigoAvaliacaoUnica,
     tipo_avaliacao:provaAtual.tipoAvaliacao || "teste_livre",
     destinatario_avaliacao:provaAtual.destinatario || "",
@@ -442,7 +450,7 @@ async function finalizar(){
   document.getElementById("app").innerHTML=`
     <div class="final">
       <h2>Treinamento concluído</h2>
-      <p>Suas respostas foram registradas e enviadas para acompanhamento do coordenador/professor.</p>
+      <p>Suas respostas foram registradas e enviadas para acompanhamento do professor responsável e da coordenação.</p>
       <p>O resultado individual não será exibido nesta tela.</p><p>Se esta avaliação foi liberada por código individual/turma, o acesso fica bloqueado após o envio.</p>
       <button class="btn gold" onclick="mostrarEntrada()">FAZER OUTRO TREINAMENTO</button>
       <button class="btn muted" onclick="location.href='index.html'">VOLTAR À PÁGINA INICIAL</button>
