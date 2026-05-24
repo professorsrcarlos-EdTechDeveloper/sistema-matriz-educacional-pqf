@@ -258,6 +258,14 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
 .student-form-grid input,.student-form-grid select{width:100%;min-width:0}
 @media(max-width:980px){.student-form-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.student-form-grid{grid-template-columns:1fr}}
+.student-picker-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.student-picker-grid{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:8px}
+.student-check{display:flex;gap:8px;align-items:flex-start;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);border-radius:12px;padding:8px;line-height:1.25}
+.student-check input{width:auto;min-width:auto;margin-top:2px}
+.student-check small{color:#cbd5e1}
+.code-table{width:100%;border-collapse:collapse;margin-top:8px}
+.code-table th,.code-table td{font-size:.82rem;padding:8px;border-bottom:1px solid rgba(255,255,255,.08)}
+@media(max-width:760px){.student-picker-grid{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -381,7 +389,7 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
           <option value="turma">Turma</option>
         </select>
       </div>
-      <div>
+      <div id="campoAlunoUnico">
         <label>Nome completo do aluno</label>
         <input id="avalAlunoNome" placeholder="Ex.: Maria Clara da Silva">
       </div>
@@ -409,12 +417,15 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
         <input id="avalCodigo" placeholder="Clique em gerar" readonly>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="secondary" onclick="gerarCodigoAvaliacao()">Gerar código</button>
-        <button class="secondary" onclick="salvarAvaliacaoCriada()">Salvar avaliação</button>
+        <button class="secondary" onclick="abrirListaTurma()">Lista da turma</button>
+        <button class="secondary" onclick="gerarCodigoAvaliacao()">Gerar código(s)</button>
+        <button class="secondary" onclick="salvarAvaliacaoCriada()">Salvar avaliação(ões)</button>
       </div>
     </div>
+    <div id="seletorAlunosTurma" class="report-box" style="display:none;margin-top:10px;max-height:360px"></div>
+    <div id="codigosGeradosLista" class="report-box" style="display:none;margin-top:10px;max-height:360px"></div>
     <div class="notice" style="margin-top:10px">
-      O código fica registrado com nome completo do aluno, turma, escola e prova. A prova fixa é filtrada automaticamente pela turma escolhida, impedindo erro de aplicar prova de outra série.
+      Para avaliação de turma, selecione todos ou alguns alunos. O sistema gera um código individual para cada aluno, vinculado ao nome, turma, escola e prova. A prova fixa é filtrada pela turma escolhida, impedindo erro de aplicar prova de outra série.
     </div>
     <div id="avaliacoesCriadas" class="report-box" style="margin-top:10px;max-height:300px">Nenhuma avaliação criada.</div>
   </div>
@@ -995,7 +1006,7 @@ carregar = async function(){
 };
 
 
-/* V31 - ajustes de avaliação vinculada a aluno/turma e ferramentas recolhíveis */
+/* V32 - avaliação por aluno/turma com lista individual de 50 alunos e códigos individuais */
 function serieDaTurma(turma){
   const t=String(turma||"").toLowerCase();
   if(t.includes("2")) return "2";
@@ -1040,61 +1051,235 @@ function atualizarProvasPorTurma(){
   prova.disabled=false;
   prova.innerHTML=`<option value="">Selecione a prova do ${nomeSerieCurta(serie)}</option>`+
     codigos.map(c=>`<option value="${c}">${c}</option>`).join("");
+  renderizarListaAlunosTurma();
 }
 function provaCompativelComTurma(codigoProva,turma){
   const serie=serieDaTurma(turma);
   return !!serie && String(codigoProva||"").toUpperCase().startsWith(serie);
 }
+
+const ALUNOS_FICTICIOS_PQF={
+  "2":[
+    "Ana Nísia Floresta","Paulo Freire Júnior","Cecília Meireles Alves","Darcy Ribeiro Neto","Anísio Teixeira Filho","Ruth Rocha Lima","Monteiro Lobato Santos","Tarsila Amaral Costa","Heitor Villa-Lobos Silva","Chiquinha Gonzaga Pereira",
+    "Machado Assis Oliveira","Carolina Maria Jesus","Maria Montessori Ramos","Jean Piaget Araújo","Lev Vygotsky Martins","Emília Ferreiro Sousa","Rubem Alves Cardoso","Lygia Bojunga Duarte","Clarice Lispector Melo","Ariano Suassuna Barbosa",
+    "Mário Andrade Nunes","Oswaldo Cruz Bezerra","Carlos Chagas Ribeiro","Bertha Lutz Fernandes","Santos Dumont Azevedo","Cora Coralina Reis","Patativa Assaré Gomes","Raquel Queiroz Lima","José Alencar Vieira","Rachel Carson Moura",
+    "Frida Kahlo Batista","Nelson Mandela Rocha","Malala Yousafzai Nascimento","Mahatma Gandhi Moreira","Albert Einstein Duarte","Marie Curie Lopes","Galileu Galilei Matos","Isaac Newton Cavalcante","Ada Lovelace Pinheiro","Katherine Johnson Freitas",
+    "Cesar Lattes Coelho","Milton Santos Ferreira","Lélia Gonzalez Dias","Dandara Palmares Sousa","Zumbi Palmares Costa","Tiradentes Xavier Brito","Princesa Isabel Castro","Dom Pedro Alcântara","Maria Quitéria Almeida","Duque Caxias Gomes"
+  ],
+  "5":[
+    "Sócrates Vieira","Platão Mendonça","Aristóteles Farias","Hipátia Alexandria Silva","Euclides Cunha Matos","Arquimedes Oliveira","Pitagoras Santos","Heródoto Lima","Tucídides Pereira","Cícero Romano Costa",
+    "Virgínia Woolf Almeida","Simone Beauvoir Rocha","Hannah Arendt Gomes","Angela Davis Martins","Conceição Evaristo Sousa","Sueli Carneiro Duarte","Ailton Krenak Ribeiro","Davi Kopenawa Nascimento","Paulo Leminski Freitas","Manuel Bandeira Alves",
+    "João Cabral Melo Neto","Graciliano Ramos Bezerra","Jorge Amado Castro","Guimarães Rosa Pinheiro","Érico Veríssimo Cardoso","Fernando Pessoa Brito","Camões Ferreira","Eça Queiroz Nunes","Mia Couto Barbosa","Pepetela Moreira",
+    "Abdias Nascimento Reis","Milton Nascimento Lima","Elis Regina Moura","Luiz Gonzaga Silva","Dorival Caymmi Rocha","Pixinguinha Costa","Cartola Santos","Noel Rosa Almeida","Tom Jobim Cavalcante","Vinicius Moraes Gomes",
+    "Ayrton Senna Oliveira","Pelé Nascimento","Marta Silva Vieira","Maria Esther Bueno","Joaquim Nabuco Araújo","Rui Barbosa Mendes","Benjamin Constant Dias","José Bonifácio Andrade","Barão Rio Branco","Castro Alves Pereira"
+  ],
+  "9":[
+    "Immanuel Kant Souza","René Descartes Lima","Francis Bacon Alves","John Locke Pereira","Jean Rousseau Costa","Montesquieu Rocha","Voltaire Martins","Karl Marx Oliveira","Friedrich Engels Santos","Max Weber Duarte",
+    "Émile Durkheim Ferreira","Auguste Comte Nunes","Norbert Elias Gomes","Florestan Fernandes Silva","Sérgio Buarque Holanda","Gilberto Freyre Matos","Caio Prado Júnior","Celso Furtado Cardoso","Josué Castro Bezerra","Paulo Freire Moreira",
+    "Dermeval Saviani Ramos","Gaudêncio Frigotto Almeida","Magda Soares Moura","Ana Mae Barbosa","Elza Soares Reis","Elisabeth Badinter Freitas","Rosa Luxemburgo Pinheiro","Clara Zetkin Dias","Harriet Tubman Castro","Martin Luther King",
+    "Rosa Parks Cavalcante","Nelson Rodrigues Melo","Ariano Vilar Suassuna","Benedito Nunes Brito","Antônio Candido Ferreira","Silvio Almeida Costa","Kabengele Munanga","Milton Santos Júnior","Edison Carneiro Sousa","Darcy Ribeiro Filho",
+    "Celestino Freinet Rocha","John Dewey Martins","Jerome Bruner Alves","Howard Gardner Lima","David Ausubel Pereira","Burrhus Skinner Santos","Henri Wallon Duarte","Friedrich Froebel Gomes","Johann Pestalozzi Vieira","Janusz Korczak Nascimento"
+  ]
+};
+let avaliacoesLotePendentes=[];
+
+function alunosDaTurmaAtual(){
+  const serie=serieDaTurma(document.getElementById("avalTurma")?.value||"");
+  return ALUNOS_FICTICIOS_PQF[serie] || [];
+}
+function abrirListaTurma(){
+  const tipo=document.getElementById("avalTipo")?.value || "aluno";
+  const turma=document.getElementById("avalTurma")?.value || "";
+  if(tipo!=="turma"){
+    alert("A lista de alunos é usada quando o tipo for Turma. Para aluno específico, preencha o nome completo do aluno.");
+    return;
+  }
+  if(!turma){alert("Escolha a turma primeiro.");return;}
+  renderizarListaAlunosTurma(true);
+}
+function renderizarListaAlunosTurma(forcarAbrir=false){
+  const box=document.getElementById("seletorAlunosTurma");
+  if(!box) return;
+  const tipo=document.getElementById("avalTipo")?.value || "aluno";
+  if(tipo!=="turma"){
+    box.style.display="none";
+    box.innerHTML="";
+    return;
+  }
+  const turma=document.getElementById("avalTurma")?.value || "";
+  const alunos=alunosDaTurmaAtual();
+  if(!turma || !alunos.length){
+    box.style.display=forcarAbrir?"block":"none";
+    box.innerHTML='<b>Escolha a turma para carregar a lista de alunos.</b>';
+    return;
+  }
+  box.style.display=forcarAbrir?"block":(box.style.display==="block"?"block":"none");
+  box.innerHTML=`
+    <div class="student-picker-actions">
+      <button class="secondary" onclick="selecionarTodosAlunosTurma(true)">Selecionar todos os 50</button>
+      <button class="secondary" onclick="selecionarTodosAlunosTurma(false)">Limpar seleção</button>
+      <button class="secondary" onclick="copiarListaAlunosTurma()">Copiar nomes</button>
+    </div>
+    <b>Lista fictícia da ${turma} — selecione os alunos que receberão código individual:</b>
+    <div class="student-picker-grid" style="margin-top:10px">
+      ${alunos.map((nome,i)=>`
+        <label class="student-check">
+          <input type="checkbox" class="aluno-turma-check" value="${nome.replace(/"/g,'&quot;')}" checked>
+          <span><b>${String(i+1).padStart(2,"0")}. ${nome}</b><br><small>${turma} • EMEF Pedro de Queiroz Ferreira</small></span>
+        </label>`).join("")}
+    </div>`;
+}
+function selecionarTodosAlunosTurma(marcar){
+  document.querySelectorAll(".aluno-turma-check").forEach(c=>c.checked=!!marcar);
+}
+function copiarListaAlunosTurma(){
+  const texto=alunosDaTurmaAtual().map((n,i)=>`${String(i+1).padStart(2,"0")} - ${n}`).join("\n");
+  navigator.clipboard?.writeText(texto);
+  alert("Lista de alunos copiada.");
+}
+function alunosSelecionadosTurma(){
+  return [...document.querySelectorAll(".aluno-turma-check:checked")].map(c=>c.value);
+}
+function codigoUnicoAluno(prefixo, listaExistente){
+  let codigo="";
+  do{
+    const rand=Math.random().toString(36).substring(2,7).toUpperCase();
+    codigo=`${prefixo}${rand}`;
+  }while(listaExistente.some(a=>String(a.codigo).toUpperCase()===codigo) || avaliacoesLotePendentes.some(a=>String(a.codigo).toUpperCase()===codigo));
+  return codigo;
+}
 function ajustarTipoAvaliacao(){
   const tipo=document.getElementById("avalTipo")?.value || "aluno";
-  const campoAluno=document.getElementById("avalAlunoNome");
-  if(campoAluno){
-    campoAluno.disabled = tipo === "turma";
-    campoAluno.placeholder = tipo === "turma" ? "Opcional para avaliação da turma" : "Ex.: Maria Clara da Silva";
+  const campoAluno=document.getElementById("campoAlunoUnico");
+  const inputAluno=document.getElementById("avalAlunoNome");
+  if(campoAluno) campoAluno.style.display = tipo === "turma" ? "none" : "block";
+  if(inputAluno){
+    inputAluno.disabled = tipo === "turma";
+    inputAluno.placeholder = tipo === "turma" ? "Será escolhido na lista da turma" : "Ex.: Maria Clara da Silva";
   }
+  document.getElementById("avalCodigo").value="";
+  avaliacoesLotePendentes=[];
+  const saida=document.getElementById("codigosGeradosLista");
+  if(saida){saida.style.display="none";saida.innerHTML="";}
+  renderizarListaAlunosTurma(tipo==="turma");
+}
+function montarAvaliacao(codigo,tipo,nome,turma,escola,serie,codigoProva){
+  return {
+    codigo,
+    tipo,
+    destinatario:nome,
+    aluno_nome:nome,
+    aluno_nome_completo:nome,
+    turma,
+    escola,
+    serie,
+    codigoProva,
+    codigo_prova:codigoProva,
+    professor_nome:"Professor/Coordenador",
+    status:"liberada",
+    finalizado:false,
+    created_at:new Date().toISOString()
+  };
 }
 function gerarCodigoAvaliacao(){
-  const tipo=(document.getElementById("avalTipo")?.value || "aluno").toUpperCase();
-  const alunoNome=(document.getElementById("avalAlunoNome")?.value || "").trim();
-  const turma=(document.getElementById("avalTurma")?.value || "").trim();
-  const serie=serieDaTurma(turma);
-  const prova=(document.getElementById("avalProva")?.value || "").trim().toUpperCase();
-  if(tipo.startsWith("AL") && alunoNome.length < 3){alert("Digite o nome completo do aluno antes de gerar o código.");return}
-  if(!turma || !serie){alert("Escolha a turma antes de gerar o código.");return}
-  if(!prova){alert("Escolha a prova fixa da turma selecionada.");return}
-  if(!provaCompativelComTurma(prova,turma)){alert("A prova escolhida não pertence à turma selecionada. Escolha uma prova do "+nomeSerieCurta(serie)+".");return}
-  const rand=Math.random().toString(36).substring(2,7).toUpperCase();
-  const cod=`${tipo.startsWith("AL")?"AL":"TU"}${serie}${prova}${rand}`;
-  document.getElementById("avalCodigo").value=cod;
-}
-function salvarAvaliacaoCriada(){
-  const tipo=document.getElementById("avalTipo").value;
+  const tipo=document.getElementById("avalTipo")?.value || "aluno";
   const alunoNome=(document.getElementById("avalAlunoNome")?.value || "").trim();
   const turma=(document.getElementById("avalTurma")?.value || "").trim();
   const serie=serieDaTurma(turma);
   const escola=document.getElementById("avalEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira";
-  const codigoProva=document.getElementById("avalProva").value.trim().toUpperCase();
-  const codigo=document.getElementById("avalCodigo").value.trim().toUpperCase();
-  if(tipo==="aluno" && alunoNome.length < 3){alert("Informe o nome completo do aluno.");return}
-  if(!turma || !serie){alert("Escolha a turma.");return}
-  if(!codigoProva){alert("Escolha a prova fixa vinculada.");return}
-  if(!provaCompativelComTurma(codigoProva,turma)){alert("Erro bloqueado: esta prova não pertence à turma escolhida. Selecione uma prova do "+nomeSerieCurta(serie)+".");return}
-  if(!codigo){alert("Clique em gerar código.");return}
-  if(typeof obterProva === "function" && !obterProva(codigoProva)){alert("Código de prova fixa não encontrado.");return}
+  const prova=(document.getElementById("avalProva")?.value || "").trim().toUpperCase();
+  if(!turma || !serie){alert("Escolha a turma antes de gerar o código.");return}
+  if(!prova){alert("Escolha a prova fixa da turma selecionada.");return}
+  if(!provaCompativelComTurma(prova,turma)){alert("A prova escolhida não pertence à turma selecionada. Escolha uma prova do "+nomeSerieCurta(serie)+".");return}
   const lista=obterAvaliacoesCriadas();
-  if(lista.some(a=>a.codigo===codigo)){alert("Este código já existe. Gere outro.");return}
-  const destinatario = tipo === "aluno" ? alunoNome : turma;
-  lista.unshift({
-    codigo,tipo,destinatario,
-    aluno_nome_completo: alunoNome,
-    turma,
-    escola,serie,codigoProva,
-    created_at:new Date().toISOString(),
-    finalizado:false
-  });
-  salvarAvaliacoesCriadas(lista);
+  avaliacoesLotePendentes=[];
+  if(tipo==="turma"){
+    if(document.getElementById("seletorAlunosTurma")?.style.display!=="block") renderizarListaAlunosTurma(true);
+    const selecionados=alunosSelecionadosTurma();
+    if(!selecionados.length){alert("Selecione pelo menos um aluno da turma.");return;}
+    selecionados.forEach(nome=>{
+      const codigo=codigoUnicoAluno(`AL${serie}${prova}`, lista);
+      avaliacoesLotePendentes.push(montarAvaliacao(codigo,"aluno",nome,turma,escola,serie,prova));
+    });
+    document.getElementById("avalCodigo").value=`${avaliacoesLotePendentes.length} códigos gerados`;
+    renderCodigosGerados();
+    return;
+  }
+  if(alunoNome.length < 3){alert("Digite o nome completo do aluno antes de gerar o código.");return}
+  const codigo=codigoUnicoAluno(`AL${serie}${prova}`, lista);
+  avaliacoesLotePendentes=[montarAvaliacao(codigo,"aluno",alunoNome,turma,escola,serie,prova)];
+  document.getElementById("avalCodigo").value=codigo;
+  renderCodigosGerados();
+}
+function renderCodigosGerados(){
+  const box=document.getElementById("codigosGeradosLista");
+  if(!box) return;
+  if(!avaliacoesLotePendentes.length){box.style.display="none";box.innerHTML="";return;}
+  box.style.display="block";
+  const linhas=avaliacoesLotePendentes.map(a=>`${a.aluno_nome_completo};${a.turma};${a.codigoProva};${a.codigo}`).join("\n");
+  box.innerHTML=`
+    <div class="student-picker-actions">
+      <button class="secondary" onclick="copiarCodigosGerados()">Copiar lista para WhatsApp/e-mail</button>
+      <button class="secondary" onclick="baixarCodigosCSV()">Baixar CSV</button>
+    </div>
+    <b>Códigos gerados — entregue cada código ao aluno correspondente:</b>
+    <table class="code-table">
+      <thead><tr><th>Aluno</th><th>Turma</th><th>Prova</th><th>Código individual</th></tr></thead>
+      <tbody>${avaliacoesLotePendentes.map(a=>`<tr><td>${a.aluno_nome_completo}</td><td>${a.turma}</td><td>${a.codigoProva}</td><td><b>${a.codigo}</b></td></tr>`).join("")}</tbody>
+    </table>
+    <textarea id="textoCodigosGerados" style="position:absolute;left:-9999px">Aluno;Turma;Prova;Código\n${linhas}</textarea>`;
+}
+function copiarCodigosGerados(){
+  const texto=(document.getElementById("textoCodigosGerados")?.value || avaliacoesLotePendentes.map(a=>`${a.aluno_nome_completo} - ${a.codigo}`).join("\n"));
+  navigator.clipboard?.writeText(texto);
+  alert("Lista de códigos copiada. Agora o professor pode enviar por WhatsApp, e-mail ou imprimir.");
+}
+function baixarCodigosCSV(){
+  const texto="Aluno;Turma;Prova;Código\n"+avaliacoesLotePendentes.map(a=>`${a.aluno_nome_completo};${a.turma};${a.codigoProva};${a.codigo}`).join("\n");
+  const blob=new Blob([texto],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="codigos_avaliacao_turma.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+async function salvarAvaliacoesSupabase(rows){
+  try{
+    if(window.MATRIZ_SUPABASE && window.MATRIZ_SUPABASE.enabled && window.supabase){
+      const sb=window.supabase.createClient(window.MATRIZ_SUPABASE.url, window.MATRIZ_SUPABASE.anonKey);
+      const payload=rows.map(a=>({
+        codigo:a.codigo,
+        tipo:a.tipo,
+        aluno_nome:a.aluno_nome_completo,
+        turma:a.turma,
+        destinatario:a.destinatario,
+        escola:a.escola,
+        serie:a.serie,
+        codigo_prova:a.codigoProva,
+        professor_nome:a.professor_nome || "Professor/Coordenador",
+        status:a.status || "liberada",
+        finalizado:false
+      }));
+      const {error}=await sb.from("avaliacoes_criadas").insert(payload);
+      if(error) console.warn("Erro ao salvar avaliações no Supabase:", error);
+    }
+  }catch(e){console.warn("Erro Supabase avaliações:", e);}
+}
+async function salvarAvaliacaoCriada(){
+  if(!avaliacoesLotePendentes.length){
+    alert("Clique em Gerar código(s) antes de salvar.");
+    return;
+  }
+  const lista=obterAvaliacoesCriadas();
+  const repetido=avaliacoesLotePendentes.find(a=>lista.some(x=>String(x.codigo).toUpperCase()===String(a.codigo).toUpperCase()));
+  if(repetido){alert("Código repetido encontrado. Gere novamente.");return;}
+  const novaLista=[...avaliacoesLotePendentes, ...lista];
+  salvarAvaliacoesCriadas(novaLista);
+  await salvarAvaliacoesSupabase(avaliacoesLotePendentes);
   renderAvaliacoesCriadas();
-  alert("Avaliação criada e vinculada. Entregue ao aluno somente o código: "+codigo);
+  copiarCodigosGerados();
+  alert(`${avaliacoesLotePendentes.length} avaliação(ões) salva(s). Cada aluno tem seu próprio código.`);
+  avaliacoesLotePendentes=[];
 }
 function renderAvaliacoesCriadas(){
   const el=document.getElementById("avaliacoesCriadas");
@@ -1102,14 +1287,15 @@ function renderAvaliacoesCriadas(){
   const lista=obterAvaliacoesCriadas();
   const finalizados=obterCodigosFinalizados();
   if(!lista.length){el.textContent="Nenhuma avaliação criada.";return}
-  el.innerHTML=lista.map(a=>{
+  el.innerHTML=lista.slice(0,250).map(a=>{
     const fim=finalizados.includes(a.codigo);
-    const nome=a.aluno_nome_completo || (a.tipo==="aluno"?a.destinatario:"");
+    const nome=a.aluno_nome_completo || a.aluno_nome || (a.tipo==="aluno"?a.destinatario:"");
+    const prova=a.codigoProva || a.codigo_prova || "—";
     return `<div class="plan-item">
       <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
-      Tipo: ${a.tipo} • ${nome?`Aluno: <b>${nome}</b> • `:""}Turma: <b>${a.turma||a.destinatario||"—"}</b><br>
-      Escola: ${a.escola} • Turma: ${a.turma||nomeSerieCurta(a.serie)||"—"} • Prova: ${a.codigoProva}<br>
-      Criada em: ${formatarData?formatarData(a.created_at):a.created_at}<br>
+      Aluno: <b>${nome||"—"}</b> • Turma: <b>${a.turma||nomeSerieCurta(a.serie)||"—"}</b><br>
+      Escola: ${a.escola||"—"} • Prova: ${prova}<br>
+      Criada em: ${typeof formatarData==="function"?formatarData(a.created_at):a.created_at}<br>
       <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
       <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
     </div>`;

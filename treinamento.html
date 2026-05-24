@@ -156,6 +156,72 @@ function obterAvaliacaoPorCodigo(codigo){
   codigo = normalizarCodigo(codigo);
   return obterAvaliacoesCriadas().find(a => normalizarCodigo(a.codigo) === codigo) || null;
 }
+function supabaseAtivoTreinamento(){
+  return !!(window.MATRIZ_SUPABASE && window.MATRIZ_SUPABASE.enabled && window.MATRIZ_SUPABASE.url && window.MATRIZ_SUPABASE.anonKey && window.supabase);
+}
+function clienteSupabaseTreinamento(){
+  return window.supabase.createClient(window.MATRIZ_SUPABASE.url, window.MATRIZ_SUPABASE.anonKey);
+}
+async function buscarAvaliacaoPorCodigoOnline(codigo){
+  codigo=normalizarCodigo(codigo);
+  const local=obterAvaliacaoPorCodigo(codigo);
+  if(local) return local;
+  try{
+    if(supabaseAtivoTreinamento()){
+      const sb=clienteSupabaseTreinamento();
+      const {data,error}=await sb.from("avaliacoes_criadas").select("*").eq("codigo",codigo).limit(1).maybeSingle();
+      if(error) console.warn("Erro ao buscar avaliação online:", error);
+      if(data){
+        return {
+          codigo:data.codigo,
+          tipo:data.tipo || "aluno",
+          aluno_nome:data.aluno_nome || data.destinatario || "",
+          aluno_nome_completo:data.aluno_nome || data.destinatario || "",
+          destinatario:data.destinatario || data.aluno_nome || "",
+          turma:data.turma || "",
+          escola:data.escola || "",
+          serie:data.serie || "",
+          codigoProva:data.codigo_prova || data.codigoProva || "",
+          finalizado:!!data.finalizado,
+          status:data.status || "liberada",
+          created_at:data.created_at
+        };
+      }
+    }
+  }catch(e){console.warn("Falha ao consultar código no Supabase:", e);}
+  return null;
+}
+async function codigoJaFinalizadoOnline(codigo){
+  codigo=normalizarCodigo(codigo);
+  if(codigoJaFinalizado(codigo)) return true;
+  try{
+    if(supabaseAtivoTreinamento()){
+      const sb=clienteSupabaseTreinamento();
+      const {data}=await sb.from("codigos_finalizados").select("codigo").eq("codigo",codigo).limit(1).maybeSingle();
+      if(data) return true;
+      const {data:av}=await sb.from("avaliacoes_criadas").select("finalizado").eq("codigo",codigo).limit(1).maybeSingle();
+      if(av && av.finalizado) return true;
+    }
+  }catch(e){console.warn("Falha ao verificar código finalizado:", e);}
+  return false;
+}
+async function marcarCodigoFinalizadoOnline(codigo){
+  codigo=normalizarCodigo(codigo);
+  marcarCodigoFinalizado(codigo);
+  try{
+    if(supabaseAtivoTreinamento()){
+      const sb=clienteSupabaseTreinamento();
+      await sb.from("codigos_finalizados").insert([{
+        codigo,
+        aluno_nome:aluno.nome,
+        escola:aluno.escola,
+        turma:aluno.turma || "",
+        codigo_prova:aluno.codigoProva || provaAtual.codigo
+      }]);
+      await sb.from("avaliacoes_criadas").update({finalizado:true,status:"finalizada"}).eq("codigo",codigo);
+    }
+  }catch(e){console.warn("Falha ao marcar código finalizado online:", e);}
+}
 function codigoJaFinalizado(codigo){
   const finalizados = JSON.parse(localStorage.getItem("matriz_codigos_finalizados") || "[]");
   return finalizados.includes(normalizarCodigo(codigo));
@@ -219,18 +285,18 @@ function mostrarEntrada(){
     </div>`;
 }
 
-function iniciar(){
+async function iniciar(){
   const nomeDigitado=document.getElementById("nomeAluno").value.trim();
   const codigoAlunoOuAvaliacao=normalizarCodigo(nomeDigitado);
-  const avaliacaoCriada=obterAvaliacaoPorCodigo(codigoAlunoOuAvaliacao);
-  if(avaliacaoCriada && codigoJaFinalizado(avaliacaoCriada.codigo)){
+  const avaliacaoCriada=await buscarAvaliacaoPorCodigoOnline(codigoAlunoOuAvaliacao);
+  if(avaliacaoCriada && await codigoJaFinalizadoOnline(avaliacaoCriada.codigo)){
     alert("Esta avaliação já foi finalizada. Procure o professor/coordenador para nova liberação.");
     return;
   }
-  const nome=avaliacaoCriada ? (avaliacaoCriada.aluno_nome_completo || avaliacaoCriada.destinatario || avaliacaoCriada.codigo) : nomeDigitado;
+  const nome=avaliacaoCriada ? (avaliacaoCriada.aluno_nome_completo || avaliacaoCriada.aluno_nome || avaliacaoCriada.destinatario || avaliacaoCriada.codigo) : nomeDigitado;
   const turma=(avaliacaoCriada && avaliacaoCriada.turma) ? avaliacaoCriada.turma : "";
   const escola=(avaliacaoCriada && avaliacaoCriada.escola) ? avaliacaoCriada.escola : document.getElementById("nomeEscola").value.trim();
-  const serie=(avaliacaoCriada && avaliacaoCriada.serie) ? avaliacaoCriada.serie : document.getElementById("serieAluno").value;
+  const serie=(avaliacaoCriada && avaliacaoCriada.serie) ? String(avaliacaoCriada.serie) : document.getElementById("serieAluno").value;
   const codigo=normalizarCodigo((avaliacaoCriada && avaliacaoCriada.codigoProva) ? avaliacaoCriada.codigoProva : document.getElementById("codigoProva").value);
   const aceite=document.getElementById("aceiteLgpd").checked;
   if(nome.length<2){alert("Digite o nome ou código do aluno.");return;}
@@ -243,7 +309,12 @@ function iniciar(){
   if(!prova || !Array.isArray(prova.questoes) || !prova.questoes.length){alert("Código de prova não encontrado.");return;}
   aluno={nome, turma, escola, serie, codigoProva:codigo};
   provaAtual=prova;
-  if(avaliacaoCriada){provaAtual.codigoAvaliacaoUnica=avaliacaoCriada.codigo; provaAtual.tipoAvaliacao=avaliacaoCriada.tipo || "aluno/turma"; provaAtual.destinatario=avaliacaoCriada.destinatario || ""; provaAtual.turma=avaliacaoCriada.turma || "";}
+  if(avaliacaoCriada){
+    provaAtual.codigoAvaliacaoUnica=avaliacaoCriada.codigo;
+    provaAtual.tipoAvaliacao=avaliacaoCriada.tipo || "aluno";
+    provaAtual.destinatario=avaliacaoCriada.destinatario || avaliacaoCriada.aluno_nome_completo || "";
+    provaAtual.turma=avaliacaoCriada.turma || "";
+  }
   questoes=prova.questoes.slice(0,10);
   respostas=[]; indice=0;
   mostrarQuestao();
@@ -367,7 +438,7 @@ async function finalizar(){
   };
   salvarLocal(resultado);
   await salvarSupabase(resultado);
-  if(provaAtual.codigoAvaliacaoUnica){ marcarCodigoFinalizado(provaAtual.codigoAvaliacaoUnica); }
+  if(provaAtual.codigoAvaliacaoUnica){ await marcarCodigoFinalizadoOnline(provaAtual.codigoAvaliacaoUnica); }
   document.getElementById("app").innerHTML=`
     <div class="final">
       <h2>Treinamento concluído</h2>
