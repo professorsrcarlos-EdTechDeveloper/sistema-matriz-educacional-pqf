@@ -20,6 +20,13 @@ function sb(){return window.supabase.createClient(window.MATRIZ_SUPABASE.url,win
 async function carregar(){if(supabaseAtivo()){const {data,error}=await sb().from("resultados_treinamento").select("*").order("created_at",{ascending:false}).limit(3000);dadosOriginais=error?[]:(data||[]).map(normalizarRegistro)}else{const l1=JSON.parse(localStorage.getItem("matriz_spaece_resultados_locais")||"[]");const l2=JSON.parse(localStorage.getItem("resultados_treinamento")||"[]");const key=new Set();dadosOriginais=[...l1,...l2].map(normalizarRegistro).filter(d=>{const k=d.created_at+"|"+d.aluno_nome+"|"+d.codigo_prova;if(key.has(k))return false;key.add(k);return true})}preencherFiltros();aplicarFiltros()}
 function preencherFiltros(){const anos=[...new Set(dadosOriginais.map(d=>anoLetivo(d)).filter(Boolean))].sort().reverse();const meses=[...new Set(dadosOriginais.map(d=>d.mes_ano).filter(Boolean))].sort().reverse();document.getElementById("filtroAno").innerHTML='<option value="">Todos</option>'+anos.map(a=>`<option>${a}</option>`).join("");document.getElementById("filtroMes").innerHTML='<option value="">Todos</option>'+meses.map(a=>`<option>${a}</option>`).join("")}
 function aplicarFiltros(){const aluno=document.getElementById("buscaAluno").value.trim().toLowerCase();const serie=document.getElementById("filtroSerie").value;const comp=document.getElementById("filtroComponente").value;const escola=document.getElementById("filtroEscola").value.trim().toLowerCase();const ano=document.getElementById("filtroAno").value;const mes=document.getElementById("filtroMes").value;dados=dadosOriginais.filter(d=>(!aluno||d.aluno_nome.toLowerCase().includes(aluno))&&(!serie||serieNumero(d.serie_codigo||d.serie)===serie)&&(!comp||d.materia===comp)&&(!escola||d.escola.toLowerCase().includes(escola))&&(!ano||anoLetivo(d)===ano)&&(!mes||d.mes_ano===mes));renderizar()}
+
+function limparFiltrosPainel(){
+  ["buscaAluno","filtroEscola"].forEach(id=>{const el=document.getElementById(id); if(el) el.value="";});
+  ["filtroSerie","filtroComponente","filtroAno","filtroMes"].forEach(id=>{const el=document.getElementById(id); if(el && !el.disabled) el.value="";});
+  aplicarFiltros();
+}
+
 function limparResultadosLocais(){if(confirm("Apagar resultados locais deste navegador?")){localStorage.removeItem("matriz_spaece_resultados_locais");localStorage.removeItem("resultados_treinamento");carregar()}}
 function media(arr){return arr.length?Math.round(arr.reduce((s,d)=>s+(d.percentual||0),0)/arr.length):0}
 function deltaUltimas(arr){const ord=[...arr].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));if(ord.length<2)return 0;return Math.round((ord[0].percentual||0)-(ord[1].percentual||0))}
@@ -667,7 +674,12 @@ const carregarBaseV33 = carregar;
 carregar = async function(){
   if(supabaseAtivo()){
     const {data,error}=await sb().from("resultados_treinamento").select("*").order("created_at",{ascending:false}).limit(3000);
-    dadosOriginais=error?[]:(data||[]).map(normalizarRegistro);
+    if(error){
+      console.error("Erro ao carregar resultados do Supabase:", error);
+      dadosOriginais=[];
+    }else{
+      dadosOriginais=(data||[]).map(normalizarRegistro);
+    }
   }else{
     const l1=JSON.parse(localStorage.getItem("matriz_spaece_resultados_locais")||"[]");
     const l2=JSON.parse(localStorage.getItem("resultados_treinamento")||"[]");

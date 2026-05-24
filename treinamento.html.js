@@ -114,6 +114,10 @@ async function buscarAvaliacaoPorCodigoOnline(codigo){
           codigoProva:data.codigo_prova || data.codigoProva || "",
           finalizado:!!data.finalizado,
           status:data.status || "liberada",
+          professor_nome:data.professor_nome || "",
+          professor_usuario:data.professor_usuario || "",
+          professor_perfil:data.professor_perfil || "",
+          componente_vinculado:data.componente_vinculado || "",
           created_at:data.created_at
         };
       }
@@ -311,10 +315,52 @@ async function salvarSupabase(resultado){
   try{
     if(window.MATRIZ_SUPABASE && window.MATRIZ_SUPABASE.enabled && window.supabase){
       const sb=window.supabase.createClient(window.MATRIZ_SUPABASE.url, window.MATRIZ_SUPABASE.anonKey);
-      await sb.from("resultados_treinamento").insert([resultado]);
+      const payload={
+        created_at: resultado.created_at,
+        aluno_nome: resultado.aluno_nome,
+        escola: resultado.escola,
+        turma: resultado.turma,
+        serie: resultado.serie,
+        serie_codigo: resultado.serie_codigo,
+        componente_curricular: resultado.materia,
+        materia: resultado.materia,
+        codigo_prova: resultado.codigo_prova,
+        codigo_avaliacao: resultado.codigo_avaliacao,
+        professor_nome: resultado.professor_nome || "",
+        professor_usuario: resultado.professor_usuario || "",
+        professor_perfil: resultado.professor_perfil || "",
+        componente_vinculado: resultado.componente_vinculado || resultado.materia || "",
+        avaliacao_unica: !!resultado.avaliacao_unica,
+        tipo_avaliacao: resultado.tipo_avaliacao || "teste_livre",
+        destinatario_avaliacao: resultado.destinatario_avaliacao || "",
+        turma_avaliacao: resultado.turma_avaliacao || resultado.turma || "",
+        acertos: resultado.acertos,
+        erros: resultado.erros,
+        total_questoes: resultado.total_questoes,
+        percentual: resultado.percentual,
+        respostas: resultado.respostas || [],
+        habilidades_detalhadas: resultado.habilidades_detalhadas || [],
+        habilidades_revisar: resultado.habilidades_revisar || [],
+        uso_pedagogico_interno: true,
+        lgpd_orientacao_confirmada: true,
+        ano_letivo: String(new Date().getFullYear()),
+        mes_referencia: String(new Date().getMonth()+1).padStart(2,"0")+"/"+String(new Date().getFullYear())
+      };
+      const {error}=await sb.from("resultados_treinamento").insert([payload]);
+      if(error){
+        console.error("ERRO AO SALVAR RESULTADO NO SUPABASE:", error);
+        localStorage.setItem("matriz_ultimo_erro_supabase", JSON.stringify({quando:new Date().toISOString(), erro:error.message || error, payload}));
+        return false;
+      }
+      return true;
     }
-  }catch(e){console.warn("Erro Supabase:", e);}
+  }catch(e){
+    console.error("Erro Supabase:", e);
+    localStorage.setItem("matriz_ultimo_erro_supabase", JSON.stringify({quando:new Date().toISOString(), erro:String(e)}));
+  }
+  return false;
 }
+
 
 
 function mostrarConferencia(){

@@ -382,56 +382,107 @@ function salvarLocal(resultado){
   });
 }
 async function salvarSupabase(resultado){
-  try{
-    if(window.MATRIZ_SUPABASE && window.MATRIZ_SUPABASE.enabled && window.supabase){
-      const sb=window.supabase.createClient(window.MATRIZ_SUPABASE.url, window.MATRIZ_SUPABASE.anonKey);
-      const payload={
-        created_at: resultado.created_at,
-        aluno_nome: resultado.aluno_nome,
-        escola: resultado.escola,
-        turma: resultado.turma,
-        serie: resultado.serie,
-        serie_codigo: resultado.serie_codigo,
-        componente_curricular: resultado.materia,
-        materia: resultado.materia,
-        codigo_prova: resultado.codigo_prova,
-        codigo_avaliacao: resultado.codigo_avaliacao,
-        professor_nome: resultado.professor_nome || "",
-        professor_usuario: resultado.professor_usuario || "",
-        professor_perfil: resultado.professor_perfil || "",
-        componente_vinculado: resultado.componente_vinculado || resultado.materia || "",
-        avaliacao_unica: !!resultado.avaliacao_unica,
-        tipo_avaliacao: resultado.tipo_avaliacao || "teste_livre",
-        destinatario_avaliacao: resultado.destinatario_avaliacao || "",
-        turma_avaliacao: resultado.turma_avaliacao || resultado.turma || "",
-        acertos: resultado.acertos,
-        erros: resultado.erros,
-        total_questoes: resultado.total_questoes,
-        percentual: resultado.percentual,
-        respostas: resultado.respostas || [],
-        habilidades_detalhadas: resultado.habilidades_detalhadas || [],
-        habilidades_revisar: resultado.habilidades_revisar || [],
-        uso_pedagogico_interno: true,
-        lgpd_orientacao_confirmada: true,
-        ano_letivo: String(new Date().getFullYear()),
-        mes_referencia: String(new Date().getMonth()+1).padStart(2,"0")+"/"+String(new Date().getFullYear())
-      };
-      const {error}=await sb.from("resultados_treinamento").insert([payload]);
-      if(error){
-        console.error("ERRO AO SALVAR RESULTADO NO SUPABASE:", error);
-        localStorage.setItem("matriz_ultimo_erro_supabase", JSON.stringify({quando:new Date().toISOString(), erro:error.message || error, payload}));
-        return false;
-      }
+  const cfg = window.MATRIZ_SUPABASE || {};
+  if(!(cfg.enabled && cfg.url && cfg.anonKey && window.supabase)){
+    localStorage.setItem("matriz_ultimo_erro_supabase", JSON.stringify({quando:new Date().toISOString(), erro:"Supabase desativado ou configuração ausente."}));
+    return false;
+  }
+
+  const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+  const base = {
+    created_at: resultado.created_at || new Date().toISOString(),
+    aluno_nome: resultado.aluno_nome || "",
+    escola: resultado.escola || "EMEF Pedro de Queiroz Ferreira",
+    turma: resultado.turma || resultado.turma_avaliacao || "",
+    serie: resultado.serie || "",
+    serie_codigo: resultado.serie_codigo || "",
+    componente_curricular: resultado.materia || resultado.componente_vinculado || "",
+    materia: resultado.materia || resultado.componente_vinculado || "",
+    codigo_prova: resultado.codigo_prova || "",
+    codigo_avaliacao: resultado.codigo_avaliacao || "",
+    professor_nome: resultado.professor_nome || "",
+    professor_usuario: resultado.professor_usuario || "",
+    professor_perfil: resultado.professor_perfil || "",
+    componente_vinculado: resultado.componente_vinculado || resultado.materia || "",
+    avaliacao_unica: !!resultado.avaliacao_unica,
+    tipo_avaliacao: resultado.tipo_avaliacao || "teste_livre",
+    destinatario_avaliacao: resultado.destinatario_avaliacao || resultado.aluno_nome || "",
+    turma_avaliacao: resultado.turma_avaliacao || resultado.turma || "",
+    acertos: Number(resultado.acertos || 0),
+    erros: Number(resultado.erros || 0),
+    total_questoes: Number(resultado.total_questoes || 10),
+    percentual: Number(resultado.percentual || 0),
+    respostas: resultado.respostas || [],
+    habilidades_detalhadas: resultado.habilidades_detalhadas || [],
+    habilidades_revisar: resultado.habilidades_revisar || [],
+    uso_pedagogico_interno: true,
+    lgpd_orientacao_confirmada: true,
+    ano_letivo: String(new Date(resultado.created_at || Date.now()).getFullYear()),
+    mes_referencia: String(new Date(resultado.created_at || Date.now()).getMonth()+1).padStart(2,"0")+"/"+String(new Date(resultado.created_at || Date.now()).getFullYear())
+  };
+
+  const tentativas = [
+    base,
+    {
+      created_at: base.created_at,
+      aluno_nome: base.aluno_nome,
+      escola: base.escola,
+      turma: base.turma,
+      serie: base.serie,
+      serie_codigo: base.serie_codigo,
+      componente_curricular: base.componente_curricular,
+      materia: base.materia,
+      codigo_prova: base.codigo_prova,
+      codigo_avaliacao: base.codigo_avaliacao,
+      professor_nome: base.professor_nome,
+      professor_usuario: base.professor_usuario,
+      professor_perfil: base.professor_perfil,
+      componente_vinculado: base.componente_vinculado,
+      acertos: base.acertos,
+      erros: base.erros,
+      total_questoes: base.total_questoes,
+      percentual: base.percentual,
+      respostas: base.respostas,
+      habilidades_detalhadas: base.habilidades_detalhadas,
+      habilidades_revisar: base.habilidades_revisar,
+      ano_letivo: base.ano_letivo,
+      mes_referencia: base.mes_referencia
+    },
+    {
+      created_at: base.created_at,
+      aluno_nome: base.aluno_nome,
+      escola: base.escola,
+      turma: base.turma,
+      serie: base.serie,
+      componente_curricular: base.componente_curricular,
+      materia: base.materia,
+      codigo_prova: base.codigo_prova,
+      acertos: base.acertos,
+      erros: base.erros,
+      total_questoes: base.total_questoes,
+      percentual: base.percentual,
+      respostas: base.respostas,
+      habilidades_detalhadas: base.habilidades_detalhadas,
+      habilidades_revisar: base.habilidades_revisar
+    }
+  ];
+
+  let ultimoErro = null;
+  for(const payload of tentativas){
+    const limpo = Object.fromEntries(Object.entries(payload).filter(([_,v]) => v !== undefined));
+    const {error} = await sb.from("resultados_treinamento").insert([limpo]);
+    if(!error){
+      localStorage.removeItem("matriz_ultimo_erro_supabase");
+      localStorage.setItem("matriz_ultimo_envio_supabase", JSON.stringify({quando:new Date().toISOString(), status:"ok", aluno:base.aluno_nome, prova:base.codigo_prova}));
       return true;
     }
-  }catch(e){
-    console.error("Erro Supabase:", e);
-    localStorage.setItem("matriz_ultimo_erro_supabase", JSON.stringify({quando:new Date().toISOString(), erro:String(e)}));
+    ultimoErro = error;
   }
+
+  console.error("ERRO AO SALVAR RESULTADO NO SUPABASE:", ultimoErro);
+  localStorage.setItem("matriz_ultimo_erro_supabase", JSON.stringify({quando:new Date().toISOString(), erro:ultimoErro?.message || String(ultimoErro), details:ultimoErro?.details || "", hint:ultimoErro?.hint || "", payload:base}));
   return false;
 }
-
-
 
 function mostrarConferencia(){
   const itens = questoes.map((q,i)=>`

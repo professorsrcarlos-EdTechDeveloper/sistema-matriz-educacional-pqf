@@ -16,5 +16,5 @@ ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS codigo_avaliacao tex
 ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS mes_referencia text;
 ALTER TABLE resultados_treinamento ADD COLUMN IF NOT EXISTS ano_letivo text;
 
-CREATE POLICY IF NOT EXISTS "PQF inserir resultados" ON resultados_treinamento FOR INSERT WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "PQF leitura resultados" ON resultados_treinamento FOR SELECT USING (true);
+-- As políticas RLS já foram criadas no schema anterior.
+-- Se precisar recriar, rode o supabase-schema-v33-pqf.sql completo.
