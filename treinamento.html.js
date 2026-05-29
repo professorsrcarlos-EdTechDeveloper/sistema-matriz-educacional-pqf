@@ -48,6 +48,31 @@ function obterProvaPorCodigo(codigo){
   return null;
 }
 
+function obterProvasPersonalizadasLocais(){
+  try{return JSON.parse(localStorage.getItem("matriz_provas_personalizadas")||"[]")}catch(e){return []}
+}
+async function buscarProvaPersonalizadaOnline(codigo){
+  codigo=normalizarCodigo(codigo);
+  const local=obterProvasPersonalizadasLocais().find(p=>normalizarCodigo(p.codigo)===codigo);
+  if(local){
+    return {codigo:local.codigo, serie:local.serie, componente:local.componente, questoes:(local.questoes||[]).slice(0,10)};
+  }
+  try{
+    if(supabaseAtivoTreinamento()){
+      const sb=clienteSupabaseTreinamento();
+      const {data,error}=await sb.from("provas_personalizadas").select("*").eq("codigo",codigo).limit(1).maybeSingle();
+      if(error) console.warn("Erro ao buscar prova personalizada online. Verifique se o SQL V36 foi aplicado:", error);
+      if(data){
+        return {codigo:data.codigo, serie:data.serie, componente:data.componente, questoes:(data.questoes||[]).slice(0,10)};
+      }
+    }
+  }catch(e){console.warn("Falha ao buscar prova personalizada:", e);}
+  return null;
+}
+async function obterProvaPorCodigoAsync(codigo){
+  return obterProvaPorCodigo(codigo) || await buscarProvaPersonalizadaOnline(codigo);
+}
+
 function svgCasa(){return `<svg viewBox="0 0 360 220" width="320" role="img" aria-label="Casa"><rect width="360" height="220" rx="22" fill="#0b2438"/><rect x="86" y="92" width="188" height="96" rx="8" fill="#f8fafc"/><polygon points="70,98 180,28 290,98" fill="#ef4444"/><rect x="158" y="126" width="46" height="62" rx="6" fill="#8b5e3c"/><rect x="108" y="118" width="34" height="28" rx="4" fill="#93c5fd"/><rect x="218" y="118" width="34" height="28" rx="4" fill="#93c5fd"/><rect x="42" y="186" width="278" height="10" rx="5" fill="#22c55e"/><circle cx="304" cy="56" r="16" fill="#fbbf24"/></svg>`}
 function svgPato(){return `<svg viewBox="0 0 360 220" width="320" role="img" aria-label="Pato"><rect width="360" height="220" rx="22" fill="#0b2438"/><ellipse cx="160" cy="120" rx="70" ry="44" fill="#fbbf24"/><circle cx="230" cy="94" r="34" fill="#fbbf24"/><polygon points="252,95 304,82 304,108" fill="#fb923c"/><circle cx="240" cy="86" r="5" fill="#111"/><path d="M42 154 Q180 188 318 154" stroke="#38bdf8" stroke-width="10" fill="none"/><path d="M116 156 L102 180 M152 158 L142 181" stroke="#f59e0b" stroke-width="6"/></svg>`}
 function svgBola(){return `<svg viewBox="0 0 360 220" width="320"><rect width="360" height="220" rx="22" fill="#0b2438"/><circle cx="180" cy="110" r="64" fill="#3b82f6"/><path d="M180 46 Q146 78 142 114 Q146 150 180 174 Q214 150 218 114 Q214 78 180 46Z" fill="none" stroke="#fff" stroke-width="6"/><path d="M118 88 L142 114 L118 140 M242 88 L218 114 L242 140 M180 46 L180 72 M180 156 L180 174" stroke="#fff" stroke-width="6" fill="none"/></svg>`}
@@ -59,7 +84,22 @@ function svgRegua(){return `<svg viewBox="0 0 360 220" width="320"><rect width="
 function svgRelogio(){return `<svg viewBox="0 0 360 220" width="320"><rect width="360" height="220" rx="22" fill="#0b2438"/><circle cx="180" cy="110" r="72" fill="#f8fafc" stroke="#38bdf8" stroke-width="8"/><line x1="180" y1="110" x2="180" y2="72" stroke="#111827" stroke-width="7"/><line x1="180" y1="110" x2="214" y2="110" stroke="#111827" stroke-width="7"/></svg>`}
 function svgMoedas(){return `<svg viewBox="0 0 360 220" width="320"><rect width="360" height="220" rx="22" fill="#0b2438"/><ellipse cx="136" cy="126" rx="46" ry="18" fill="#fbbf24"/><ellipse cx="202" cy="104" rx="46" ry="18" fill="#f59e0b"/><ellipse cx="242" cy="138" rx="46" ry="18" fill="#fde68a"/></svg>`}
 
+function limparHtmlIconeTreino(v){return String(v||"").replace(/[<>&"']/g, m=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;","'":"&#39;"}[m]));}
+function iconeTreinoEhImagem(valor){
+  const v=String(valor||"").trim().toLowerCase();
+  return /^(https?:\/\/|\.\/|\/|icones\/)/.test(v) || /\.(png|jpg|jpeg|webp|svg|gif)(\?.*)?$/.test(v);
+}
+function htmlIconeTreino(valor){
+  const v=String(valor||"").trim();
+  if(!v) return "";
+  const safe=limparHtmlIconeTreino(v);
+  if(iconeTreinoEhImagem(v)){
+    return `<div style="text-align:center;padding:12px"><img src="${safe}" alt="ícone da questão" style="max-width:170px;max-height:170px;width:38%;object-fit:contain" onerror="this.outerHTML='<div style=&quot;font-size:4rem&quot;>📘</div>'"></div>`;
+  }
+  return `<div style="font-size:4rem;text-align:center;padding:12px">${safe}</div>`;
+}
 function visualPorQuestao(q){
+  if(q && q.icone){return htmlIconeTreino(q.icone);}
   const t=((q.base||"")+" "+(q.q||"")).toLowerCase();
   if(t.includes("casa")) return svgCasa();
   if(t.includes("pato")) return svgPato();
@@ -239,7 +279,7 @@ async function iniciar(){
   if(!codigo){alert("Digite o código da prova.");return;}
   if(!aceite){alert("Confirme o uso com orientação da escola/professor.");return;}
   if(serieDoCodigo(codigo) && serieDoCodigo(codigo)!==serie){alert("O código da prova não corresponde à série selecionada.");return;}
-  const prova = obterProvaPorCodigo(codigo);
+  const prova = await obterProvaPorCodigoAsync(codigo);
   if(!prova || !Array.isArray(prova.questoes) || !prova.questoes.length){alert("Código de prova não encontrado.");return;}
   aluno={nome, turma, escola, serie, codigoProva:codigo};
   provaAtual=prova;

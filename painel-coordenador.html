@@ -322,6 +322,10 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
     <button class="secondary" onclick="alternarNomes()" id="btnNomes">Ocultar nomes</button>
     <button class="secondary" onclick="exportarCSV(false)">CSV</button>
     <button class="secondary" onclick="exportarCSV(true)">CSV anonimizado</button>
+    <button class="secondary" onclick="exportarPlanilhaCompleta(false)">Planilha com gráficos</button>
+    <label>De</label><input id="dataInicioRecuperar" type="date" style="max-width:155px">
+    <label>Até</label><input id="dataFimRecuperar" type="date" style="max-width:155px">
+    <button class="secondary" onclick="recuperarDadosPorData()">Recuperar dados por data</button>
     <button class="danger" onclick="limparResultadosLocais()">Limpar locais</button>
   </div>
 </section>
@@ -454,6 +458,91 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
       <button class="secondary" onclick="gerarProvaDev(true)">Imprimir prova DEV</button>
     </div>
     <div id="saidaDev" class="report-box" style="margin-top:10px;max-height:360px">A prova DEV aparecerá aqui.</div>
+  </div>
+</section>
+
+<section class="card no-print" id="areaDevAvaliacaoManual">
+  <div class="card-tools">
+    <h2>Área DEV — Criar avaliação personalizada por professor</h2>
+    <small>2º, 5º e 9º ano • Português e Matemática • banco de ícones para questões</small>
+  </div>
+  <div class="dev-box">
+    <div class="student-form-grid">
+      <div>
+        <label>Professor responsável</label>
+        <input id="manualProfessor" placeholder="Nome do professor">
+      </div>
+      <div>
+        <label>Série</label>
+        <select id="manualSerie">
+          <option value="2">2º ano</option>
+          <option value="5">5º ano</option>
+          <option value="9">9º ano</option>
+        </select>
+      </div>
+      <div>
+        <label>Componente</label>
+        <select id="manualComponente">
+          <option>Português</option>
+          <option>Matemática</option>
+        </select>
+      </div>
+      <div>
+        <label>Título da avaliação</label>
+        <input id="manualTitulo" placeholder="Ex.: Avaliação diagnóstica D01">
+      </div>
+      <div>
+        <label>Código da prova</label>
+        <input id="manualCodigo" placeholder="Ex.: 5PDEV01">
+      </div>
+      <div>
+        <label>Ícone padrão</label>
+        <select id="manualIconePadrao"></select>
+      </div>
+    </div>
+
+    <div class="notice" style="margin-top:10px">
+      O banco de ícones agora pode ser carregado do Supabase. Cadastre novos ícones aqui e eles ficarão disponíveis nas questões da Área DEV.
+    </div>
+
+    <div class="student-form-grid" style="margin-top:10px">
+      <div>
+        <label>Novo ícone</label>
+        <input id="novoIconeSimbolo" placeholder="Ex.: 🐟">
+      </div>
+      <div>
+        <label>Nome do ícone</label>
+        <input id="novoIconeNome" placeholder="Ex.: Peixe">
+      </div>
+      <div>
+        <label>Categoria</label>
+        <select id="novoIconeCategoria">
+          <option value="geral">Geral</option>
+          <option value="portugues">Português</option>
+          <option value="matematica">Matemática</option>
+          <option value="ciencias">Ciências</option>
+          <option value="historia">História</option>
+          <option value="geografia">Geografia</option>
+          <option value="escola">Escola</option>
+          <option value="prova">Prova</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:end">
+        <button class="secondary" onclick="adicionarIconeBancoDev()" style="width:100%">Adicionar ícone ao banco</button>
+      </div>
+    </div>
+    <div id="bancoIconesStatus" class="report-box" style="margin-top:10px;max-height:180px">Carregando banco de ícones...</div>
+
+    <div class="notice" style="margin-top:10px">
+      Cada questão pode usar um ícone do banco. As alternativas já saem com A), B), C) e D). Depois de salvar, use o código da prova na criação de avaliação para aluno/turma.
+    </div>
+    <div id="manualQuestoesBox" class="report-box" style="margin-top:10px;max-height:520px"></div>
+    <div class="tools" style="margin-top:10px">
+      <button class="secondary" onclick="montarFormularioQuestoesManual()">Montar 10 questões</button>
+      <button class="secondary" onclick="salvarProvaManualDev()">Salvar prova personalizada</button>
+      <button class="secondary" onclick="listarProvasManuaisDev()">Listar provas salvas</button>
+    </div>
+    <div id="manualSaida" class="report-box" style="margin-top:10px;max-height:300px">Clique em “Montar 10 questões”.</div>
   </div>
 </section>
 
@@ -1543,6 +1632,380 @@ window.addEventListener("DOMContentLoaded",()=>{
   const passInput=document.getElementById("senhaPainel");
   [userInput,passInput].forEach(el=>el&&el.addEventListener("keydown",e=>{if(e.key==="Enter")validarSenhaPainel()}));
   setTimeout(aplicarPermissoesUsuario,600);
+});
+</script>
+
+
+<script>
+/* V36 - Correções solicitadas: data, planilha, descritores detalhados, provas personalizadas e diagnóstico de envio */
+
+// CSV corrigido: antes estava usando "\\r\\n" literal; isso abre tudo em uma linha em alguns programas.
+function exportarCSV(anon=false){
+  if(!dados.length){alert("Sem dados para exportar.");return}
+  const linhas=[["Data","Aluno","Série","Turma","Componente Curricular","Escola","Código Prova","Código Avaliação","Professor","Ano","Mês","Acertos","Total","Percentual","Descritores para revisar"]];
+  dados.forEach(d=>{
+    const rev=Array.isArray(d.habilidades_revisar)?d.habilidades_revisar.map(x=>`${x.habilidade} (${x.erros??0})`).join("; "):"";
+    linhas.push([
+      formatarData(d.created_at),
+      anon?nomeSeguroTexto(d.aluno_nome):d.aluno_nome,
+      d.serie,
+      d.turma||d.turma_nome||"",
+      d.materia,
+      d.escola,
+      d.codigo_prova,
+      d.codigo_avaliacao||"",
+      d.professor_nome||d.professor_usuario||"",
+      d.ano_letivo,
+      d.mes_ano,
+      d.acertos,
+      d.total_questoes,
+      d.percentual,
+      rev
+    ]);
+  });
+  const csv=linhas.map(l=>l.map(csvEscape).join(";")).join("\r\n");
+  const blob=new Blob(["\ufeffsep=;\r\n"+csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=anon?"resultados_anonimizados.csv":"resultados_matriz_educacional.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function recuperarDadosPorData(){
+  const ini=document.getElementById("dataInicioRecuperar")?.value;
+  const fim=document.getElementById("dataFimRecuperar")?.value;
+  if(!ini || !fim){alert("Informe a data inicial e a data final.");return;}
+  const inicio=new Date(ini+"T00:00:00");
+  const final=new Date(fim+"T23:59:59");
+  if(inicio>final){alert("A data inicial não pode ser maior que a data final.");return;}
+  try{
+    if(supabaseAtivo()){
+      let query=sb().from("resultados_treinamento").select("*").gte("created_at",inicio.toISOString()).lte("created_at",final.toISOString()).order("created_at",{ascending:false}).limit(5000);
+      const {data,error}=await query;
+      if(error){console.error(error);alert("Erro ao recuperar dados no Supabase. Veja o console.");return;}
+      dadosOriginais=filtrarPorUsuario((data||[]).map(normalizarRegistro));
+    }else{
+      const l1=JSON.parse(localStorage.getItem("matriz_spaece_resultados_locais")||"[]");
+      const l2=JSON.parse(localStorage.getItem("resultados_treinamento")||"[]");
+      dadosOriginais=[...l1,...l2].map(normalizarRegistro).filter(d=>{
+        const dt=new Date(d.created_at);
+        return dt>=inicio && dt<=final;
+      });
+    }
+    preencherFiltros();
+    aplicarFiltros();
+    alert("Dados recuperados de "+ini.split("-").reverse().join("/")+" até "+fim.split("-").reverse().join("/")+". Registros: "+dados.length);
+  }catch(e){
+    console.error(e);
+    alert("Falha ao recuperar dados por data.");
+  }
+}
+
+function gerarTabelaResumoExcel(){
+  const porComp=["Português","Matemática"].map(m=>{
+    const arr=dados.filter(d=>d.materia===m);
+    return {label:m, valor:media(arr), total:arr.length};
+  });
+  const faixas=[
+    {label:"Intervenção prioritária", valor:dados.filter(d=>d.percentual<50).length},
+    {label:"Em desenvolvimento", valor:dados.filter(d=>d.percentual>=50&&d.percentual<70).length},
+    {label:"Adequado", valor:dados.filter(d=>d.percentual>=70).length}
+  ];
+  const desc=agruparDescritores().sort((a,b)=>b.percErro-a.percErro||b.erros-a.erros).slice(0,12);
+  const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+  return `
+    <h2>Resumo geral</h2>
+    <table><tr><th>Indicador</th><th>Valor</th></tr>
+      <tr><td>Total de registros</td><td>${dados.length}</td></tr>
+      <tr><td>Média geral</td><td>${media(dados)}%</td></tr>
+      <tr><td>Abaixo de 50%</td><td>${dados.filter(d=>d.percentual<50).length}</td></tr>
+      <tr><td>50% a 69%</td><td>${dados.filter(d=>d.percentual>=50&&d.percentual<70).length}</td></tr>
+      <tr><td>70% ou mais</td><td>${dados.filter(d=>d.percentual>=70).length}</td></tr>
+    </table>
+    <h2>Gráfico em tabela — Componentes</h2>
+    <table><tr><th>Componente</th><th>Média</th><th>Registros</th><th>Barra</th></tr>${porComp.map(x=>`<tr><td>${esc(x.label)}</td><td>${x.valor}%</td><td>${x.total}</td><td>${"█".repeat(Math.max(1,Math.round(x.valor/5)))}</td></tr>`).join("")}</table>
+    <h2>Gráfico em tabela — Faixas</h2>
+    <table><tr><th>Faixa</th><th>Registros</th><th>Barra</th></tr>${faixas.map(x=>`<tr><td>${esc(x.label)}</td><td>${x.valor}</td><td>${"█".repeat(Math.max(1,x.valor))}</td></tr>`).join("")}</table>
+    <h2>Descritores com maior erro</h2>
+    <table><tr><th>Descritor</th><th>Erros</th><th>Total</th><th>% erro</th><th>Barra</th></tr>${desc.map(x=>`<tr><td>${esc(x.habilidade)}</td><td>${x.erros}</td><td>${x.total}</td><td>${x.percErro}%</td><td>${"█".repeat(Math.max(1,Math.round(x.percErro/5)))}</td></tr>`).join("")}</table>
+  `;
+}
+
+function exportarPlanilhaCompleta(anon=false){
+  if(!dados.length){alert("Sem dados para exportar.");return}
+  const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+  const linhas=dados.map(d=>`<tr>
+    <td>${esc(formatarData(d.created_at))}</td>
+    <td>${esc(anon?nomeSeguroTexto(d.aluno_nome):d.aluno_nome)}</td>
+    <td>${esc(d.serie)}</td><td>${esc(d.turma||d.turma_nome||"")}</td><td>${esc(d.materia)}</td><td>${esc(d.escola)}</td>
+    <td>${esc(d.codigo_prova)}</td><td>${esc(d.codigo_avaliacao||"")}</td><td>${esc(d.professor_nome||d.professor_usuario||"")}</td>
+    <td>${esc(d.acertos)}</td><td>${esc(d.total_questoes)}</td><td>${esc(d.percentual)}%</td>
+  </tr>`).join("");
+  const html=`<html><head><meta charset="UTF-8"><style>
+    table{border-collapse:collapse;font-family:Arial;font-size:12px}td,th{border:1px solid #999;padding:6px;vertical-align:top}th{background:#d9eaf7}h1,h2{font-family:Arial}
+  </style></head><body>
+    <h1>Sistema Matriz Educacional — Planilha com gráficos em tabela</h1>
+    ${gerarTabelaResumoExcel()}
+    <h2>Resultados detalhados</h2>
+    <table><tr><th>Data</th><th>Aluno</th><th>Série</th><th>Turma</th><th>Componente</th><th>Escola</th><th>Prova</th><th>Código avaliação</th><th>Professor</th><th>Acertos</th><th>Total</th><th>%</th></tr>${linhas}</table>
+  </body></html>`;
+  const blob=new Blob(["\ufeff"+html],{type:"application/vnd.ms-excel;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="planilha_matriz_com_graficos.xls";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function formatarAlternativas(q){
+  return (q.o||[]).map((op,i)=>`${String.fromCharCode(65+i)}) ${op}`).join("\n");
+}
+
+function listarDescritoresDev(){
+  const serie=devSerie.value, comp=devComponente.value;
+  const banco=(window.BANCO_QUESTOES||{})[serie+"|"+comp]||[];
+  const desc=[...new Set(banco.map(q=>q.hab).filter(Boolean))];
+  if(!desc.length){descritoresDev.textContent="Sem descritores.";return;}
+  descritoresDev.innerHTML=desc.map((d,i)=>{
+    const qtd=banco.filter(q=>q.hab===d).length;
+    return `<button class="secondary" style="margin:4px" onclick="mostrarQuestoesDoDescritorDev(${i})">${d} — ${qtd} opções</button>`;
+  }).join("")+`<div class="notice" style="margin-top:8px">Clique no descritor para ver todas as questões e alternativas dele.</div>`;
+  window.__descritoresDevLista=desc;
+}
+
+function mostrarQuestoesDoDescritorDev(i){
+  const serie=devSerie.value, comp=devComponente.value, desc=(window.__descritoresDevLista||[])[i];
+  const banco=(window.BANCO_QUESTOES||{})[serie+"|"+comp]||[];
+  const qs=banco.filter(q=>q.hab===desc);
+  devDescritores.value=desc;
+  saidaDev.textContent=qs.map((q,idx)=>`QUESTÃO ${idx+1}\nDescritor: ${q.hab}\nTexto/base: ${q.base||"—"}\nPergunta: ${q.q}\n${formatarAlternativas(q)}\nGabarito: ${String.fromCharCode(65+(q.c||0))}`).join("\n\n");
+}
+
+function gerarProvaDev(imprimir=false){
+  const serie=devSerie.value, comp=devComponente.value;
+  const termos=devDescritores.value.split(/\n|;/).map(x=>x.trim().toLowerCase()).filter(Boolean);
+  const banco=(window.BANCO_QUESTOES||{})[serie+"|"+comp]||[];
+  let qs=banco.filter(q=>!termos.length||termos.some(t=>(q.hab||"").toLowerCase().includes(t))).slice(0,10);
+  if(qs.length<10) qs=[...qs,...banco.filter(q=>!qs.includes(q)).slice(0,10-qs.length)];
+  const prova={codigo:"DEV",meta:{serie,materia:comp},questoes:qs};
+  saidaDev.textContent=qs.map((q,i)=>`${i+1}. ${q.q}\nDescritor: ${q.hab}\n${formatarAlternativas(q)}\nGabarito: ${String.fromCharCode(65+(q.c||0))}`).join("\n\n");
+  if(imprimir){printArea.innerHTML=htmlProva(prova,false);printArea.style.display="block";window.print();printArea.style.display="none";}
+}
+
+let BANCO_ICONES_MATRIZ=[
+  ["📘","Texto","portugues"],["🏠","Casa","geral"],["🦆","Pato","geral"],["⚽","Bola","geral"],["🍌","Banana","geral"],["🐱","Gato","geral"],["🌧️","Chuva","geral"],["🧮","Matemática","matematica"],
+  ["📏","Régua","matematica"],["⏰","Relógio","matematica"],["🚌","Ônibus","geral"],["🗺️","Mapa","geografia"],["🌳","Árvore","ciencias"],["⭐","Estrela","geral"],["❤️","Coração","geral"],["👥","Pessoas","escola"],
+  ["📊","Gráfico","matematica"],["🧩","Peças","geral"],["🔢","Números","matematica"],["✏️","Lápis","portugues"],["📖","Leitura","portugues"],["📝","Redação","portugues"],["🏫","Escola","escola"],["👩‍🏫","Professor","escola"]
+];
+
+function limparTextoSeguro(v){return String(v||"").replace(/[<>&"\']/g, m=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;","\'":"&#39;"}[m]));}
+function iconeEhImagem(valor){
+  const v=String(valor||"").trim().toLowerCase();
+  return /^(https?:\/\/|\.\/|\/|icones\/)/.test(v) || /\.(png|jpg|jpeg|webp|svg|gif)(\?.*)?$/.test(v);
+}
+function htmlIconeVisual(valor, tamanho="42px"){
+  const v=String(valor||"").trim();
+  if(!v) return `<span style="font-size:${tamanho}">📘</span>`;
+  const safe=limparTextoSeguro(v);
+  if(iconeEhImagem(v)){
+    return `<img src="${safe}" alt="ícone" style="width:${tamanho};height:${tamanho};object-fit:contain;vertical-align:middle" onerror="this.outerHTML='📘'">`;
+  }
+  return `<span style="font-size:${tamanho};vertical-align:middle">${safe}</span>`;
+}
+function rotuloIconeSelect(ico,nome){
+  return `${iconeEhImagem(ico)?"🖼️":ico} ${nome}${iconeEhImagem(ico)?" — "+ico:""}`;
+}
+function normalizarIconeBanco(row){
+  if(Array.isArray(row)) return [row[0]||"📘", row[1]||"Ícone", row[2]||"geral"];
+  return [row.icone||"📘", row.nome||"Ícone", row.categoria||"geral"];
+}
+function deduplicarIcones(lista){
+  const map=new Map();
+  (lista||[]).map(normalizarIconeBanco).forEach(([ico,nome,categoria])=>{
+    const key=(ico+"|"+nome).toLowerCase();
+    if(!map.has(key)) map.set(key,[ico,nome,categoria||"geral"]);
+  });
+  return Array.from(map.values()).sort((a,b)=>String(a[2]).localeCompare(String(b[2]))||String(a[1]).localeCompare(String(b[1])));
+}
+function salvarBancoIconesLocal(){localStorage.setItem("matriz_banco_icones", JSON.stringify(BANCO_ICONES_MATRIZ));}
+function carregarBancoIconesLocal(){
+  try{
+    const local=JSON.parse(localStorage.getItem("matriz_banco_icones")||"[]");
+    if(Array.isArray(local)&&local.length) BANCO_ICONES_MATRIZ=deduplicarIcones([...BANCO_ICONES_MATRIZ,...local]);
+  }catch(e){}
+}
+function iconOptionsHtml(valorAtual=""){
+  const grupos={};
+  BANCO_ICONES_MATRIZ.forEach(([ico,nome,categoria])=>{
+    (grupos[categoria||"geral"]||(grupos[categoria||"geral"]=[])).push([ico,nome,categoria]);
+  });
+  return Object.keys(grupos).sort().map(cat=>`<optgroup label="${limparTextoSeguro(cat)}">${grupos[cat].map(([ico,nome])=>{
+    const selected=ico===valorAtual?"selected":"";
+    return `<option value="${limparTextoSeguro(ico)}" ${selected}>${limparTextoSeguro(rotuloIconeSelect(ico,nome))}</option>`;
+  }).join("")}</optgroup>`).join("");
+}
+function popularIconesManual(){
+  carregarBancoIconesLocal();
+  const html=iconOptionsHtml();
+  const sel=document.getElementById("manualIconePadrao");
+  if(sel){const atual=sel.value; sel.innerHTML=iconOptionsHtml(atual); if(atual) sel.value=atual;}
+  document.querySelectorAll('select[id^="mqIcone"]').forEach(select=>{const atual=select.value; select.innerHTML=iconOptionsHtml(atual); if(atual) select.value=atual;});
+  renderBancoIconesDev();
+}
+function renderBancoIconesDev(msg=""){
+  const el=document.getElementById("bancoIconesStatus");
+  if(!el) return;
+  const total=BANCO_ICONES_MATRIZ.length;
+  const ultimos=BANCO_ICONES_MATRIZ.slice(0,80).map(([ico,nome,categoria])=>
+    `<span style="display:inline-flex;align-items:center;gap:6px;margin:3px;padding:5px 8px;border:1px solid rgba(255,255,255,.18);border-radius:999px">${htmlIconeVisual(ico,"28px")} ${limparTextoSeguro(nome)} <small>(${limparTextoSeguro(categoria||"geral")})</small></span>`
+  ).join("");
+  el.innerHTML=`${msg?`<b>${limparTextoSeguro(msg)}</b><br>`:""}<b>${total} ícones disponíveis.</b><br>${ultimos}`;
+}
+async function carregarBancoIconesSupabase(){
+  carregarBancoIconesLocal();
+  if(!supabaseAtivo()){popularIconesManual(); renderBancoIconesDev("Supabase não configurado. Usando banco local do navegador."); return;}
+  try{
+    const {data,error}=await sb().from("banco_icones").select("id,nome,icone,categoria,descricao,ativo").eq("ativo",true).order("categoria",{ascending:true}).order("nome",{ascending:true});
+    if(error){console.warn("Banco de ícones ainda não existe no Supabase. Rode o SQL V37.", error); popularIconesManual(); renderBancoIconesDev("Rode o SQL V37 para ativar o banco online de ícones. Por enquanto, usando ícones locais."); return;}
+    if(Array.isArray(data)&&data.length){BANCO_ICONES_MATRIZ=deduplicarIcones([...data,...BANCO_ICONES_MATRIZ]); salvarBancoIconesLocal();}
+    popularIconesManual(); renderBancoIconesDev("Banco de ícones carregado do Supabase.");
+  }catch(e){console.warn("Falha ao carregar banco de ícones:", e); popularIconesManual(); renderBancoIconesDev("Falha ao carregar Supabase. Usando banco local.");}
+}
+async function adicionarIconeBancoDev(){
+  const ico=(document.getElementById("novoIconeSimbolo")?.value||"").trim();
+  const nome=(document.getElementById("novoIconeNome")?.value||"").trim();
+  const categoria=(document.getElementById("novoIconeCategoria")?.value||"geral").trim();
+  if(!ico || !nome){alert("Digite o símbolo do ícone e o nome.");return;}
+  const novo=[ico,nome,categoria];
+  BANCO_ICONES_MATRIZ=deduplicarIcones([novo,...BANCO_ICONES_MATRIZ]);
+  salvarBancoIconesLocal();
+  popularIconesManual();
+  let msg="Ícone adicionado ao banco local.";
+  if(supabaseAtivo()){
+    try{
+      const {error}=await sb().from("banco_icones").upsert([{icone:ico,nome,categoria,ativo:true}],{onConflict:"icone,nome"});
+      if(error){console.warn("Erro ao salvar ícone no Supabase. Rode o SQL V37.", error); msg="Ícone salvo localmente. Rode o SQL V37 para salvar online.";}
+      else msg="Ícone salvo no Supabase e disponível para as questões.";
+    }catch(e){console.warn("Falha ao salvar ícone online:", e); msg="Ícone salvo localmente. Falha ao salvar online.";}
+  }
+  document.getElementById("novoIconeSimbolo").value="";
+  document.getElementById("novoIconeNome").value="";
+  renderBancoIconesDev(msg);
+}
+
+function montarFormularioQuestoesManual(){
+  popularIconesManual();
+  const box=document.getElementById("manualQuestoesBox");
+  if(!box) return;
+  const iconOptions=iconOptionsHtml(document.getElementById("manualIconePadrao")?.value||"");
+  box.innerHTML=Array.from({length:10}).map((_,idx)=>`
+    <div class="plan-item" style="margin-bottom:12px">
+      <b>Questão ${idx+1}</b>
+      <label>Ícone da questão</label>
+      <select id="mqIcone${idx}">${iconOptions}</select>
+      <label>Descritor</label>
+      <input id="mqHab${idx}" placeholder="Ex.: D01 — Localizar informações explícitas">
+      <label>Texto/base</label>
+      <textarea id="mqBase${idx}" placeholder="Texto curto, situação-problema ou comando visual"></textarea>
+      <label>Pergunta</label>
+      <input id="mqPergunta${idx}" placeholder="Digite a pergunta">
+      <div class="student-form-grid">
+        <div><label>A)</label><input id="mqA${idx}" placeholder="Alternativa A"></div>
+        <div><label>B)</label><input id="mqB${idx}" placeholder="Alternativa B"></div>
+        <div><label>C)</label><input id="mqC${idx}" placeholder="Alternativa C"></div>
+        <div><label>D)</label><input id="mqD${idx}" placeholder="Alternativa D"></div>
+        <div><label>Gabarito</label><select id="mqG${idx}"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select></div>
+      </div>
+    </div>`).join("");
+  document.getElementById("manualSaida").textContent="Formulário pronto. Preencha as 10 questões e clique em salvar.";
+}
+
+function obterProvasManuais(){
+  return JSON.parse(localStorage.getItem("matriz_provas_personalizadas")||"[]");
+}
+function salvarProvasManuais(lista){
+  localStorage.setItem("matriz_provas_personalizadas", JSON.stringify(lista));
+}
+function gerarCodigoManualDev(){
+  const serie=document.getElementById("manualSerie")?.value||"5";
+  const comp=(document.getElementById("manualComponente")?.value||"Português").startsWith("Port")?"P":"M";
+  return `${serie}${comp}DEV${String(Date.now()).slice(-4)}`;
+}
+async function salvarProvaManualOnline(prova){
+  try{
+    if(supabaseAtivo()){
+      const {error}=await sb().from("provas_personalizadas").upsert([{
+        codigo:prova.codigo,
+        titulo:prova.titulo,
+        serie:prova.serie,
+        componente:prova.componente,
+        professor_nome:prova.professor_nome,
+        questoes:prova.questoes,
+        created_at:prova.created_at
+      }],{onConflict:"codigo"});
+      if(error) console.warn("Tabela provas_personalizadas não encontrada ou sem permissão. Use o SQL V36.", error);
+    }
+  }catch(e){console.warn("Falha ao salvar prova personalizada online:", e);}
+}
+async function salvarProvaManualDev(){
+  const codigo=(document.getElementById("manualCodigo")?.value||"").trim().toUpperCase() || gerarCodigoManualDev();
+  const professor=(document.getElementById("manualProfessor")?.value||usuarioAtual()?.nome||"Professor").trim();
+  const serie=document.getElementById("manualSerie")?.value||"5";
+  const componente=document.getElementById("manualComponente")?.value||"Português";
+  const titulo=(document.getElementById("manualTitulo")?.value||"Avaliação personalizada").trim();
+  const questoes=[];
+  for(let i=0;i<10;i++){
+    const q=(document.getElementById("mqPergunta"+i)?.value||"").trim();
+    const ops=["A","B","C","D"].map(l=>(document.getElementById("mq"+l+i)?.value||"").trim());
+    if(!q || ops.some(x=>!x)){alert("Preencha pergunta e as 4 alternativas da questão "+(i+1)+".");return;}
+    questoes.push({
+      base:(document.getElementById("mqBase"+i)?.value||"").trim(),
+      q,
+      o:ops,
+      c:Number(document.getElementById("mqG"+i)?.value||0),
+      hab:(document.getElementById("mqHab"+i)?.value||"Descritor personalizado").trim(),
+      icone:(document.getElementById("mqIcone"+i)?.value||document.getElementById("manualIconePadrao")?.value||"📘")
+    });
+  }
+  const prova={codigo,titulo,serie,componente,professor_nome:professor,questoes,created_at:new Date().toISOString()};
+  const lista=obterProvasManuais().filter(p=>p.codigo!==codigo);
+  lista.unshift(prova);
+  salvarProvasManuais(lista.slice(0,100));
+  await salvarProvaManualOnline(prova);
+  document.getElementById("manualCodigo").value=codigo;
+  document.getElementById("manualSaida").innerHTML=`<b>Prova salva:</b> ${codigo}<br>Use este código na área “Criar avaliação para aluno ou turma”.`;
+  atualizarProvasPorTurma();
+}
+
+function listarProvasManuaisDev(){
+  const lista=obterProvasManuais();
+  const el=document.getElementById("manualSaida");
+  if(!lista.length){el.textContent="Nenhuma prova personalizada salva neste navegador.";return;}
+  el.innerHTML=lista.map(p=>`<div class="plan-item"><b>${p.codigo}</b> — ${p.titulo}<br>${p.serie}º ano • ${p.componente} • Professor: ${p.professor_nome||"—"}<br><button class="secondary" onclick="document.getElementById('manualCodigo').value='${p.codigo}'">Usar código</button></div>`).join("");
+}
+
+const obterProvaBaseV36 = window.obterProva;
+window.obterProva=function(codigo){
+  codigo=String(codigo||"").trim().toUpperCase();
+  const manual=obterProvasManuais().find(p=>String(p.codigo).toUpperCase()===codigo);
+  if(manual) return {codigo:manual.codigo, meta:{serie:manual.serie,materia:manual.componente}, questoes:manual.questoes};
+  if(obterProvaBaseV36) return obterProvaBaseV36(codigo);
+  return null;
+};
+
+const codigosProvaDaSerieBaseV36 = typeof codigosProvaDaSerie==="function" ? codigosProvaDaSerie : null;
+codigosProvaDaSerie=function(serie){
+  let codigos=codigosProvaDaSerieBaseV36 ? codigosProvaDaSerieBaseV36(serie) : [];
+  const manuais=obterProvasManuais().filter(p=>String(p.serie)===String(serie)).map(p=>p.codigo);
+  return [...new Set([...codigos,...manuais])].sort();
+};
+
+window.addEventListener("DOMContentLoaded",async()=>{
+  await carregarBancoIconesSupabase();
+  setTimeout(()=>{if(!document.getElementById("manualQuestoesBox")?.innerHTML) montarFormularioQuestoesManual();},800);
 });
 </script>
 
