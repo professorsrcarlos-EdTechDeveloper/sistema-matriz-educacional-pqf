@@ -335,13 +335,21 @@ function abrirListaTurma(){
   if(!turma){alert("Escolha a turma primeiro.");return;}
   renderizarListaAlunosTurma(true);
 }
-function selecionarAlunoUnico(nome){
+function escolherAlunoDaListaAvaliacao(nome){
   const input=document.getElementById("avalAlunoNome");
-  if(input) input.value=nome;
-  const box=document.getElementById("seletorAlunosTurma");
-  if(box){
-    box.style.display="block";
-    box.innerHTML=`<b>Aluno selecionado:</b> ${nome}<br><small>Agora escolha a prova, gere o código e salve a avaliação.</small>`;
+  if(input){
+    input.value=nome;
+    input.focus();
+  }
+  const tipo=document.getElementById("avalTipo")?.value || "aluno";
+  if(tipo==="aluno"){
+    const box=document.getElementById("seletorAlunosTurma");
+    if(box){
+      box.style.display="block";
+      box.querySelectorAll(".student-check").forEach(el=>el.style.outline="none");
+      const alvo=[...box.querySelectorAll(".student-check")].find(el=>el.textContent.includes(nome));
+      if(alvo){alvo.style.outline="2px solid var(--gold)"; alvo.style.borderRadius="12px";}
+    }
   }
 }
 function renderizarListaAlunosTurma(forcarAbrir=false){
@@ -358,13 +366,10 @@ function renderizarListaAlunosTurma(forcarAbrir=false){
   box.style.display=forcarAbrir?"block":(box.style.display==="block"?"block":"none");
   if(tipo==="aluno"){
     box.innerHTML=`
-      <div class="student-picker-actions">
-        <button class="secondary" onclick="copiarListaAlunosTurma()">Copiar nomes</button>
-      </div>
-      <b>Lista da ${turma} — clique no aluno para preencher automaticamente:</b>
+      <b>Lista da ${turma} — clique no aluno para preencher automaticamente o campo “Nome completo do aluno”:</b>
       <div class="student-picker-grid" style="margin-top:10px">
         ${alunos.map((nome,i)=>`
-          <button type="button" class="student-check" style="text-align:left;cursor:pointer" data-nome="${nome.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" onclick="selecionarAlunoUnico(this.dataset.nome)">
+          <button type="button" class="student-check" style="text-align:left;cursor:pointer" onclick="escolherAlunoDaListaAvaliacao('${String(nome).replace(/'/g,"\\'")}')">
             <span><b>${String(i+1).padStart(2,"0")}. ${nome}</b><br><small>${turma} • EMEF Pedro de Queiroz Ferreira</small></span>
           </button>`).join("")}
       </div>`;

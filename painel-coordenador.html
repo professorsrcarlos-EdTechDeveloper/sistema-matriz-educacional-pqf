@@ -471,6 +471,10 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
       <div>
         <label>Professor responsável</label>
         <input id="manualProfessor" placeholder="Nome do professor">
+        <label>Aluno vinculado (opcional)</label>
+        <input id="manualAlunoNome" placeholder="Preencha apenas se esta prova personalizada for individual">
+        <label>Turma vinculada (opcional)</label>
+        <select id="manualTurma"><option value="">Sem turma vinculada</option><option>2º ano</option><option>5º ano</option><option>9º ano</option></select>
       </div>
       <div>
         <label>Série</label>
@@ -1195,13 +1199,21 @@ function abrirListaTurma(){
   if(!turma){alert("Escolha a turma primeiro.");return;}
   renderizarListaAlunosTurma(true);
 }
-function selecionarAlunoUnico(nome){
+function escolherAlunoDaListaAvaliacao(nome){
   const input=document.getElementById("avalAlunoNome");
-  if(input) input.value=nome;
-  const box=document.getElementById("seletorAlunosTurma");
-  if(box){
-    box.style.display="block";
-    box.innerHTML=`<b>Aluno selecionado:</b> ${nome}<br><small>Agora escolha a prova, gere o código e salve a avaliação.</small>`;
+  if(input){
+    input.value=nome;
+    input.focus();
+  }
+  const tipo=document.getElementById("avalTipo")?.value || "aluno";
+  if(tipo==="aluno"){
+    const box=document.getElementById("seletorAlunosTurma");
+    if(box){
+      box.style.display="block";
+      box.querySelectorAll(".student-check").forEach(el=>el.style.outline="none");
+      const alvo=[...box.querySelectorAll(".student-check")].find(el=>el.textContent.includes(nome));
+      if(alvo){alvo.style.outline="2px solid var(--gold)"; alvo.style.borderRadius="12px";}
+    }
   }
 }
 function renderizarListaAlunosTurma(forcarAbrir=false){
@@ -1218,13 +1230,10 @@ function renderizarListaAlunosTurma(forcarAbrir=false){
   box.style.display=forcarAbrir?"block":(box.style.display==="block"?"block":"none");
   if(tipo==="aluno"){
     box.innerHTML=`
-      <div class="student-picker-actions">
-        <button class="secondary" onclick="copiarListaAlunosTurma()">Copiar nomes</button>
-      </div>
-      <b>Lista da ${turma} — clique no aluno para preencher automaticamente:</b>
+      <b>Lista da ${turma} — clique no aluno para preencher automaticamente o campo “Nome completo do aluno”:</b>
       <div class="student-picker-grid" style="margin-top:10px">
         ${alunos.map((nome,i)=>`
-          <button type="button" class="student-check" style="text-align:left;cursor:pointer" data-nome="${nome.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" onclick="selecionarAlunoUnico(this.dataset.nome)">
+          <button type="button" class="student-check" style="text-align:left;cursor:pointer" onclick="escolherAlunoDaListaAvaliacao('${String(nome).replace(/'/g,"\\'")}')">
             <span><b>${String(i+1).padStart(2,"0")}. ${nome}</b><br><small>${turma} • EMEF Pedro de Queiroz Ferreira</small></span>
           </button>`).join("")}
       </div>`;
@@ -1956,6 +1965,10 @@ async function salvarProvaManualOnline(prova){
         serie:prova.serie,
         componente:prova.componente,
         professor_nome:prova.professor_nome,
+        aluno_nome:prova.aluno_nome || null,
+        turma:prova.turma || null,
+        escola:prova.escola || null,
+        professor_usuario:prova.professor_usuario || null,
         questoes:prova.questoes,
         created_at:prova.created_at
       }],{onConflict:"codigo"});
@@ -1969,6 +1982,9 @@ async function salvarProvaManualDev(){
   const serie=document.getElementById("manualSerie")?.value||"5";
   const componente=document.getElementById("manualComponente")?.value||"Português";
   const titulo=(document.getElementById("manualTitulo")?.value||"Avaliação personalizada").trim();
+  const alunoNomeManual=(document.getElementById("manualAlunoNome")?.value||"").trim();
+  const turmaManual=(document.getElementById("manualTurma")?.value||"").trim();
+  const escolaManual="EMEF Pedro de Queiroz Ferreira";
   const questoes=[];
   for(let i=0;i<10;i++){
     const q=(document.getElementById("mqPergunta"+i)?.value||"").trim();
@@ -1983,13 +1999,13 @@ async function salvarProvaManualDev(){
       icone:(document.getElementById("mqIcone"+i)?.value||document.getElementById("manualIconePadrao")?.value||"📘")
     });
   }
-  const prova={codigo,titulo,serie,componente,professor_nome:professor,questoes,created_at:new Date().toISOString()};
+  const prova={codigo,titulo,serie,componente,professor_nome:professor,professor_usuario:usuarioAtual()?.email||usuarioAtual()?.login||"",aluno_nome:alunoNomeManual,turma:turmaManual,escola:escolaManual,questoes,created_at:new Date().toISOString()};
   const lista=obterProvasManuais().filter(p=>p.codigo!==codigo);
   lista.unshift(prova);
   salvarProvasManuais(lista.slice(0,100));
   await salvarProvaManualOnline(prova);
   document.getElementById("manualCodigo").value=codigo;
-  document.getElementById("manualSaida").innerHTML=`<b>Prova salva:</b> ${codigo}<br>Use este código na área “Criar avaliação para aluno ou turma”.`;
+  document.getElementById("manualSaida").innerHTML=`<b>Prova salva:</b> ${codigo}<br>Use este código na área “Criar avaliação para aluno ou turma”.${alunoNomeManual?`<br><b>Aluno vinculado:</b> ${alunoNomeManual}`:""}`;
   atualizarProvasPorTurma();
 }
 
@@ -1997,14 +2013,14 @@ function listarProvasManuaisDev(){
   const lista=obterProvasManuais();
   const el=document.getElementById("manualSaida");
   if(!lista.length){el.textContent="Nenhuma prova personalizada salva neste navegador.";return;}
-  el.innerHTML=lista.map(p=>`<div class="plan-item"><b>${p.codigo}</b> — ${p.titulo}<br>${p.serie}º ano • ${p.componente} • Professor: ${p.professor_nome||"—"}<br><button class="secondary" onclick="document.getElementById('manualCodigo').value='${p.codigo}'">Usar código</button></div>`).join("");
+  el.innerHTML=lista.map(p=>`<div class="plan-item"><b>${p.codigo}</b> — ${p.titulo}<br>${p.serie}º ano • ${p.componente} • Professor: ${p.professor_nome||"—"}${p.aluno_nome?`<br>Aluno vinculado: <b>${p.aluno_nome}</b>`:""}<br><button class="secondary" onclick="document.getElementById('manualCodigo').value='${p.codigo}'">Usar código</button></div>`).join("");
 }
 
 const obterProvaBaseV36 = window.obterProva;
 window.obterProva=function(codigo){
   codigo=String(codigo||"").trim().toUpperCase();
   const manual=obterProvasManuais().find(p=>String(p.codigo).toUpperCase()===codigo);
-  if(manual) return {codigo:manual.codigo, meta:{serie:manual.serie,materia:manual.componente}, questoes:manual.questoes};
+  if(manual) return {codigo:manual.codigo, meta:{serie:manual.serie,materia:manual.componente}, aluno_nome:manual.aluno_nome||"", turma:manual.turma||"", escola:manual.escola||"", professor_nome:manual.professor_nome||"", professor_usuario:manual.professor_usuario||"", questoes:manual.questoes};
   if(obterProvaBaseV36) return obterProvaBaseV36(codigo);
   return null;
 };
@@ -2016,8 +2032,27 @@ codigosProvaDaSerie=function(serie){
   return [...new Set([...codigos,...manuais])].sort();
 };
 
+
+async function carregarProvasPersonalizadasSupabaseV40(){
+  try{
+    if(!supabaseAtivo()) return;
+    const {data,error}=await sb().from("provas_personalizadas").select("*").order("created_at",{ascending:false}).limit(200);
+    if(error || !data) return;
+    const locais=obterProvasManuais();
+    const mapa=new Map(locais.map(p=>[String(p.codigo).toUpperCase(),p]));
+    data.forEach(p=>mapa.set(String(p.codigo).toUpperCase(),{
+      codigo:p.codigo, titulo:p.titulo, serie:p.serie, componente:p.componente,
+      professor_nome:p.professor_nome||"", professor_usuario:p.professor_usuario||"",
+      aluno_nome:p.aluno_nome||"", turma:p.turma||"", escola:p.escola||"",
+      questoes:p.questoes||[], created_at:p.created_at||new Date().toISOString()
+    }));
+    salvarProvasManuais([...mapa.values()].slice(0,300));
+  }catch(e){console.warn("Não foi possível carregar provas personalizadas do Supabase:", e);}
+}
+
 window.addEventListener("DOMContentLoaded",async()=>{
   await carregarBancoIconesSupabase();
+  await carregarProvasPersonalizadasSupabaseV40();
   setTimeout(()=>{if(!document.getElementById("manualQuestoesBox")?.innerHTML) montarFormularioQuestoesManual();},800);
 });
 </script>

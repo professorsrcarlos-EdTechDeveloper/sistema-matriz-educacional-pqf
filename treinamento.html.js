@@ -55,7 +55,7 @@ async function buscarProvaPersonalizadaOnline(codigo){
   codigo=normalizarCodigo(codigo);
   const local=obterProvasPersonalizadasLocais().find(p=>normalizarCodigo(p.codigo)===codigo);
   if(local){
-    return {codigo:local.codigo, serie:local.serie, componente:local.componente, questoes:(local.questoes||[]).slice(0,10)};
+    return {codigo:local.codigo, serie:local.serie, componente:local.componente, aluno_nome:local.aluno_nome||"", turma:local.turma||"", escola:local.escola||"", professor_nome:local.professor_nome||"", professor_usuario:local.professor_usuario||"", questoes:(local.questoes||[]).slice(0,10)};
   }
   try{
     if(supabaseAtivoTreinamento()){
@@ -63,7 +63,7 @@ async function buscarProvaPersonalizadaOnline(codigo){
       const {data,error}=await sb.from("provas_personalizadas").select("*").eq("codigo",codigo).limit(1).maybeSingle();
       if(error) console.warn("Erro ao buscar prova personalizada online. Verifique se o SQL V36 foi aplicado:", error);
       if(data){
-        return {codigo:data.codigo, serie:data.serie, componente:data.componente, questoes:(data.questoes||[]).slice(0,10)};
+        return {codigo:data.codigo, serie:data.serie, componente:data.componente, aluno_nome:data.aluno_nome||"", turma:data.turma||"", escola:data.escola||"", professor_nome:data.professor_nome||"", professor_usuario:data.professor_usuario||"", questoes:(data.questoes||[]).slice(0,10)};
       }
     }
   }catch(e){console.warn("Falha ao buscar prova personalizada:", e);}
@@ -94,7 +94,7 @@ function htmlIconeTreino(valor){
   if(!v) return "";
   const safe=limparHtmlIconeTreino(v);
   if(iconeTreinoEhImagem(v)){
-    return `<div style="text-align:center;padding:12px"><img src="${safe}" alt="ícone da questão" style="max-width:170px;max-height:170px;width:38%;object-fit:contain" onerror="this.outerHTML='<div style=&quot;font-size:4rem&quot;>📘</div>'"></div>`;
+    return `<div style="text-align:center;padding:12px"><img src="${safe}" alt="ícone da questão" style="width:170px;max-width:45%;height:170px;object-fit:contain" onerror="this.outerHTML='<div style=&quot;font-size:4rem&quot;>📘</div>'"></div>`;
   }
   return `<div style="font-size:4rem;text-align:center;padding:12px">${safe}</div>`;
 }
@@ -261,6 +261,10 @@ function mostrarEntrada(){
     <div class="form">
       <label>Nome ou código do aluno</label>
       <input id="nomeAluno" oninput="tentarReconhecerCodigoAluno()" placeholder="Nome do aluno, código de avaliação ou código da prova personalizada">
+      <div id="campoNomeAlunoDireto" style="display:none">
+        <label>Nome completo do aluno</label>
+        <input id="nomeAlunoDireto" placeholder="Obrigatório quando usar código direto de prova personalizada">
+      </div>
       <label>Nome da escola</label>
       <input id="nomeEscola" placeholder="Ex.: EMEF Pedro de Queiroz Ferreira">
       <label>Série/Ano</label>
@@ -299,14 +303,18 @@ async function iniciar(){
   const codigoProvaBase=(avaliacaoCriada && (avaliacaoCriada.codigoProva || avaliacaoCriada.codigo_prova)) ? (avaliacaoCriada.codigoProva || avaliacaoCriada.codigo_prova) : (provaDireta ? provaDireta.codigo : document.getElementById("codigoProva").value);
   const codigo=normalizarCodigo(codigoProvaBase);
   const serieAuto=(avaliacaoCriada && (avaliacaoCriada.serie || serieDaTurmaTreino(avaliacaoCriada.turma) || serieDoCodigo(codigo))) || (provaDireta && (provaDireta.serie || serieDoCodigo(codigo))) || document.getElementById("serieAluno").value;
-  const nome=avaliacaoCriada ? (avaliacaoCriada.aluno_nome_completo || avaliacaoCriada.aluno_nome || avaliacaoCriada.destinatario || avaliacaoCriada.codigo) : nomeDigitado;
-  const turma=(avaliacaoCriada && avaliacaoCriada.turma) ? avaliacaoCriada.turma : "";
-  const escola=(avaliacaoCriada && avaliacaoCriada.escola) ? avaliacaoCriada.escola : (document.getElementById("nomeEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira");
+  const nomeDireto=(document.getElementById("nomeAlunoDireto")?.value||"").trim();
+  const nome=avaliacaoCriada
+    ? (avaliacaoCriada.aluno_nome_completo || avaliacaoCriada.aluno_nome || avaliacaoCriada.destinatario || avaliacaoCriada.codigo)
+    : (provaDireta && provaDireta.aluno_nome ? provaDireta.aluno_nome : (provaDireta ? nomeDireto : nomeDigitado));
+  const turma=(avaliacaoCriada && avaliacaoCriada.turma) ? avaliacaoCriada.turma : (provaDireta?.turma || "");
+  const escola=(avaliacaoCriada && avaliacaoCriada.escola) ? avaliacaoCriada.escola : (provaDireta?.escola || document.getElementById("nomeEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira");
   const serie=String(serieAuto||"");
   const aceite=document.getElementById("aceiteLgpd").checked;
-  if(nome.length<2){alert("Digite o nome do aluno, o código da avaliação ou o código da prova personalizada.");return;}
   if(!codigo){alert("Digite o código da prova ou use o código individual entregue pela escola/professor.");return;}
   if(!serie){alert("Não foi possível identificar a série/ano. Se for teste livre, selecione a série manualmente.");return;}
+  if(provaDireta && !avaliacaoCriada && !nome){alert("Informe o nome completo do aluno para o resultado aparecer corretamente no painel.");return;}
+  if(!provaDireta && !avaliacaoCriada && nome.length<2){alert("Digite o nome do aluno, o código da avaliação ou o código da prova personalizada.");return;}
   if(!aceite){alert("Confirme o uso com orientação da escola/professor.");return;}
   if(serieDoCodigo(codigo) && serieDoCodigo(codigo)!==serie){alert("O código da prova não corresponde à série selecionada.");return;}
   const prova = provaDireta || await obterProvaPorCodigoAsync(codigo);
@@ -322,10 +330,28 @@ async function iniciar(){
     provaAtual.professor_usuario=avaliacaoCriada.professor_usuario || "";
     provaAtual.professor_perfil=avaliacaoCriada.professor_perfil || "";
     provaAtual.componente_vinculado=avaliacaoCriada.componente_vinculado || prova.componente || "";
+  }else if(provaDireta){
+    provaAtual.codigoAvaliacaoUnica="";
+    provaAtual.tipoAvaliacao="prova_personalizada_direta";
+    provaAtual.destinatario=nome;
+    provaAtual.turma=turma;
+    provaAtual.professor_nome=provaDireta.professor_nome || "";
+    provaAtual.professor_usuario=provaDireta.professor_usuario || "";
+    provaAtual.professor_perfil="professor";
+    provaAtual.componente_vinculado=provaDireta.componente || "";
   }
   questoes=prova.questoes.slice(0,10);
   respostas=[]; indice=0;
+  preCarregarImagemProximaQuestao();
   mostrarQuestao();
+}
+
+
+function preCarregarImagemProximaQuestao(){
+  try{
+    const prox=questoes[indice+1];
+    if(prox && prox.icone && iconeTreinoEhImagem(prox.icone)){ const img=new Image(); img.src=prox.icone; }
+  }catch(e){}
 }
 
 function mostrarQuestao(){
@@ -371,7 +397,7 @@ function selecionar(i){
 
 function avancar(){
   if(respostas[indice]===undefined){alert("Selecione uma alternativa para continuar.");return;}
-  if(indice < questoes.length-1){indice++;mostrarQuestao();}else{mostrarConferencia();}
+  if(indice < questoes.length-1){indice++;preCarregarImagemProximaQuestao();requestAnimationFrame(()=>mostrarQuestao());}else{mostrarConferencia();}
 }
 
 function salvarLocal(resultado){

@@ -33,12 +33,12 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,1
 .status{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;color:var(--gold);font-weight:900}
 .progress{height:9px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:12px}
 .progress span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));width:0%}
-.qbox{display:grid;grid-template-columns:1fr 190px;gap:14px;align-items:start}
+.qbox{display:grid;grid-template-columns:1fr 190px;min-height:520px;gap:14px;align-items:start}
 .qactions{position:sticky;top:10px;display:flex;flex-direction:column;gap:8px}
 .qactions .btn{margin:0}
 .question-label{display:block;color:var(--blue);font-weight:1000;margin:10px 0 6px;text-transform:uppercase;letter-spacing:.04em;font-size:.78rem}
 .text-base{display:block;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:12px;margin:6px 0 10px;color:#e5e7eb;line-height:1.45}
-.visual{margin:8px 0;padding:10px;border:1px solid rgba(56,189,248,.20);border-radius:14px;background:rgba(56,189,248,.05);text-align:center}
+.visual{margin:8px 0;padding:10px;min-height:205px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(56,189,248,.20);border-radius:14px;background:rgba(56,189,248,.05);text-align:center}
 .visual svg{max-width:100%;height:auto}
 .options{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .option{width:100%;text-align:left;justify-content:flex-start;margin:0;border-color:rgba(56,189,248,.28);background:rgba(255,255,255,.035);color:#fff}
@@ -91,6 +91,7 @@ function normalizarCodigo(v){return String(v||"").trim().toUpperCase().replace(/
 function nomeSerie(s){ if(String(s).includes("2")) return "2º ano"; if(String(s).includes("5")) return "5º ano"; if(String(s).includes("9")) return "9º ano"; return s; }
 function componenteDoCodigo(c){ c=normalizarCodigo(c); return c.includes("P") ? "Português" : c.includes("M") ? "Matemática" : ""; }
 function serieDoCodigo(c){ c=normalizarCodigo(c); return c.startsWith("2")?"2":c.startsWith("5")?"5":c.startsWith("9")?"9":""; }
+function serieDaTurmaTreino(turma){ const t=String(turma||""); if(t.includes("2")) return "2"; if(t.includes("5")) return "5"; if(t.includes("9")) return "9"; return ""; }
 
 function obterProvaPorCodigo(codigo){
   codigo = normalizarCodigo(codigo);
@@ -125,7 +126,7 @@ async function buscarProvaPersonalizadaOnline(codigo){
   codigo=normalizarCodigo(codigo);
   const local=obterProvasPersonalizadasLocais().find(p=>normalizarCodigo(p.codigo)===codigo);
   if(local){
-    return {codigo:local.codigo, serie:local.serie, componente:local.componente, questoes:(local.questoes||[]).slice(0,10)};
+    return {codigo:local.codigo, serie:local.serie, componente:local.componente, aluno_nome:local.aluno_nome||"", turma:local.turma||"", escola:local.escola||"", professor_nome:local.professor_nome||"", professor_usuario:local.professor_usuario||"", questoes:(local.questoes||[]).slice(0,10)};
   }
   try{
     if(supabaseAtivoTreinamento()){
@@ -133,7 +134,7 @@ async function buscarProvaPersonalizadaOnline(codigo){
       const {data,error}=await sb.from("provas_personalizadas").select("*").eq("codigo",codigo).limit(1).maybeSingle();
       if(error) console.warn("Erro ao buscar prova personalizada online. Verifique se o SQL V36 foi aplicado:", error);
       if(data){
-        return {codigo:data.codigo, serie:data.serie, componente:data.componente, questoes:(data.questoes||[]).slice(0,10)};
+        return {codigo:data.codigo, serie:data.serie, componente:data.componente, aluno_nome:data.aluno_nome||"", turma:data.turma||"", escola:data.escola||"", professor_nome:data.professor_nome||"", professor_usuario:data.professor_usuario||"", questoes:(data.questoes||[]).slice(0,10)};
       }
     }
   }catch(e){console.warn("Falha ao buscar prova personalizada:", e);}
@@ -164,7 +165,7 @@ function htmlIconeTreino(valor){
   if(!v) return "";
   const safe=limparHtmlIconeTreino(v);
   if(iconeTreinoEhImagem(v)){
-    return `<div style="text-align:center;padding:12px"><img src="${safe}" alt="ícone da questão" style="max-width:170px;max-height:170px;width:38%;object-fit:contain" onerror="this.outerHTML='<div style=&quot;font-size:4rem&quot;>📘</div>'"></div>`;
+    return `<div style="text-align:center;padding:12px"><img src="${safe}" alt="ícone da questão" style="width:170px;max-width:45%;height:170px;object-fit:contain" onerror="this.outerHTML='<div style=&quot;font-size:4rem&quot;>📘</div>'"></div>`;
   }
   return `<div style="font-size:4rem;text-align:center;padding:12px">${safe}</div>`;
 }
@@ -286,51 +287,50 @@ async function tentarReconhecerCodigoAluno(){
   if(!campo) return;
   const codigo = normalizarCodigo(campo.value);
   const box = document.getElementById("avisoCodigoReconhecido");
-  if(!codigo || codigo.length < 3){
-    if(box){box.style.display="none";box.innerHTML="";}
-    return;
-  }
-  const av = await buscarAvaliacaoPorCodigoOnline(codigo);
+  const campoNomeDireto=document.getElementById("campoNomeAlunoDireto");
+  if(campoNomeDireto) campoNomeDireto.style.display="none";
+  if(!codigo){ if(box){box.style.display="none";box.innerHTML="";} return; }
+  let av = obterAvaliacaoPorCodigo(codigo);
+  if(!av) av = await buscarAvaliacaoPorCodigoOnline(codigo);
   if(av){
-    const serieAuto = String(av.serie || serieDaTurmaTreino(av.turma) || serieDoCodigo(av.codigoProva || "") || "");
     if(box){
-      box.innerHTML = `<strong>Código de avaliação reconhecido:</strong> ${av.codigo}<br>${av.aluno_nome_completo ? "Aluno: "+av.aluno_nome_completo+"<br>" : ""}Turma: ${av.turma || "não informada"}<br>Prova: ${av.codigoProva || "não informada"}<br><small>Escola, série e prova serão preenchidas automaticamente ao entrar.</small>`;
+      box.innerHTML = `<strong>Código reconhecido:</strong> avaliação individual ${av.codigo} vinculada à prova ${av.codigoProva || av.codigo_prova}.<br>${av.aluno_nome_completo || av.aluno_nome ? "Aluno: "+(av.aluno_nome_completo||av.aluno_nome)+"<br>" : ""}Turma: ${av.turma || av.destinatario || "não informado"}.`;
       box.style.display = "block";
     }
     if(av.escola) document.getElementById("nomeEscola").value = av.escola;
-    if(serieAuto) document.getElementById("serieAluno").value = serieAuto;
-    if(av.codigoProva) document.getElementById("codigoProva").value = av.codigoProva;
+    if(av.serie) document.getElementById("serieAluno").value = String(av.serie).replace(/\D/g,"") || av.serie;
+    if(av.codigoProva || av.codigo_prova) document.getElementById("codigoProva").value = av.codigoProva || av.codigo_prova;
     return;
   }
   const prova = await obterProvaPorCodigoAsync(codigo);
   if(prova){
-    const serieAuto = String(prova.serie || serieDoCodigo(prova.codigo || codigo) || "");
     if(box){
-      box.innerHTML = `<strong>Código de prova reconhecido:</strong> ${prova.codigo || codigo}<br>Componente: ${prova.componente || "não informado"}<br><small>Para teste livre, a escola será preenchida automaticamente se ficar vazia.</small>`;
+      const temAluno=!!prova.aluno_nome;
+      box.innerHTML = temAluno
+        ? `<strong>Código reconhecido:</strong> prova personalizada ${prova.codigo}.<br>Aluno vinculado: ${prova.aluno_nome}.`
+        : `<strong>Código reconhecido:</strong> prova personalizada ${prova.codigo}.<br><b>Informe o nome completo do aluno no campo que apareceu abaixo.</b>`;
       box.style.display = "block";
     }
-    document.getElementById("codigoProva").value = prova.codigo || codigo;
-    if(serieAuto) document.getElementById("serieAluno").value = serieAuto;
-    if(!document.getElementById("nomeEscola").value.trim()) document.getElementById("nomeEscola").value = "EMEF Pedro de Queiroz Ferreira";
-    return;
-  }
-  if(box){
+    if(prova.escola) document.getElementById("nomeEscola").value=prova.escola;
+    if(prova.serie) document.getElementById("serieAluno").value=String(prova.serie).replace(/\D/g,"") || prova.serie;
+    document.getElementById("codigoProva").value=prova.codigo;
+    if(campoNomeDireto && !prova.aluno_nome) campoNomeDireto.style.display="block";
+  }else if(box){
     box.style.display = "none";
     box.innerHTML = "";
   }
 }
-function serieDaTurmaTreino(turma){
-  const t=String(turma||"");
-  if(t.includes("2")) return "2";
-  if(t.includes("5")) return "5";
-  if(t.includes("9")) return "9";
-  return "";
-}
+
+
 function mostrarEntrada(){
   document.getElementById("app").innerHTML = `
     <div class="form">
       <label>Nome ou código do aluno</label>
-      <input id="nomeAluno" oninput="tentarReconhecerCodigoAluno()" placeholder="Nome do aluno, código de avaliação ou código da prova personalizada">
+      <input id="nomeAluno" oninput="tentarReconhecerCodigoAluno()" placeholder="Nome do aluno ou código da avaliação criada pelo coordenador">
+      <div id="campoNomeAlunoDireto" style="display:none">
+        <label>Nome completo do aluno</label>
+        <input id="nomeAlunoDireto" placeholder="Obrigatório quando usar código direto de prova personalizada">
+      </div>
       <label>Nome da escola</label>
       <input id="nomeEscola" placeholder="Ex.: EMEF Pedro de Queiroz Ferreira">
       <label>Série/Ano</label>
@@ -369,14 +369,18 @@ async function iniciar(){
   const codigoProvaBase=(avaliacaoCriada && (avaliacaoCriada.codigoProva || avaliacaoCriada.codigo_prova)) ? (avaliacaoCriada.codigoProva || avaliacaoCriada.codigo_prova) : (provaDireta ? provaDireta.codigo : document.getElementById("codigoProva").value);
   const codigo=normalizarCodigo(codigoProvaBase);
   const serieAuto=(avaliacaoCriada && (avaliacaoCriada.serie || serieDaTurmaTreino(avaliacaoCriada.turma) || serieDoCodigo(codigo))) || (provaDireta && (provaDireta.serie || serieDoCodigo(codigo))) || document.getElementById("serieAluno").value;
-  const nome=avaliacaoCriada ? (avaliacaoCriada.aluno_nome_completo || avaliacaoCriada.aluno_nome || avaliacaoCriada.destinatario || avaliacaoCriada.codigo) : nomeDigitado;
-  const turma=(avaliacaoCriada && avaliacaoCriada.turma) ? avaliacaoCriada.turma : "";
-  const escola=(avaliacaoCriada && avaliacaoCriada.escola) ? avaliacaoCriada.escola : (document.getElementById("nomeEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira");
+  const nomeDireto=(document.getElementById("nomeAlunoDireto")?.value||"").trim();
+  const nome=avaliacaoCriada
+    ? (avaliacaoCriada.aluno_nome_completo || avaliacaoCriada.aluno_nome || avaliacaoCriada.destinatario || avaliacaoCriada.codigo)
+    : (provaDireta && provaDireta.aluno_nome ? provaDireta.aluno_nome : (provaDireta ? nomeDireto : nomeDigitado));
+  const turma=(avaliacaoCriada && avaliacaoCriada.turma) ? avaliacaoCriada.turma : (provaDireta?.turma || "");
+  const escola=(avaliacaoCriada && avaliacaoCriada.escola) ? avaliacaoCriada.escola : (provaDireta?.escola || document.getElementById("nomeEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira");
   const serie=String(serieAuto||"");
   const aceite=document.getElementById("aceiteLgpd").checked;
-  if(nome.length<2){alert("Digite o nome do aluno, o código da avaliação ou o código da prova personalizada.");return;}
   if(!codigo){alert("Digite o código da prova ou use o código individual entregue pela escola/professor.");return;}
   if(!serie){alert("Não foi possível identificar a série/ano. Se for teste livre, selecione a série manualmente.");return;}
+  if(provaDireta && !avaliacaoCriada && !nome){alert("Informe o nome completo do aluno para o resultado aparecer corretamente no painel.");return;}
+  if(!provaDireta && !avaliacaoCriada && nome.length<2){alert("Digite o nome do aluno, o código da avaliação ou o código da prova personalizada.");return;}
   if(!aceite){alert("Confirme o uso com orientação da escola/professor.");return;}
   if(serieDoCodigo(codigo) && serieDoCodigo(codigo)!==serie){alert("O código da prova não corresponde à série selecionada.");return;}
   const prova = provaDireta || await obterProvaPorCodigoAsync(codigo);
@@ -392,10 +396,28 @@ async function iniciar(){
     provaAtual.professor_usuario=avaliacaoCriada.professor_usuario || "";
     provaAtual.professor_perfil=avaliacaoCriada.professor_perfil || "";
     provaAtual.componente_vinculado=avaliacaoCriada.componente_vinculado || prova.componente || "";
+  }else if(provaDireta){
+    provaAtual.codigoAvaliacaoUnica="";
+    provaAtual.tipoAvaliacao="prova_personalizada_direta";
+    provaAtual.destinatario=nome;
+    provaAtual.turma=turma;
+    provaAtual.professor_nome=provaDireta.professor_nome || "";
+    provaAtual.professor_usuario=provaDireta.professor_usuario || "";
+    provaAtual.professor_perfil="professor";
+    provaAtual.componente_vinculado=provaDireta.componente || "";
   }
   questoes=prova.questoes.slice(0,10);
   respostas=[]; indice=0;
+  preCarregarImagemProximaQuestao();
   mostrarQuestao();
+}
+
+
+function preCarregarImagemProximaQuestao(){
+  try{
+    const prox=questoes[indice+1];
+    if(prox && prox.icone && iconeTreinoEhImagem(prox.icone)){ const img=new Image(); img.src=prox.icone; }
+  }catch(e){}
 }
 
 function mostrarQuestao(){
@@ -441,7 +463,7 @@ function selecionar(i){
 
 function avancar(){
   if(respostas[indice]===undefined){alert("Selecione uma alternativa para continuar.");return;}
-  if(indice < questoes.length-1){indice++;mostrarQuestao();}else{mostrarConferencia();}
+  if(indice < questoes.length-1){indice++;preCarregarImagemProximaQuestao();requestAnimationFrame(()=>mostrarQuestao());}else{mostrarConferencia();}
 }
 
 function salvarLocal(resultado){
