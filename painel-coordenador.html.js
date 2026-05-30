@@ -331,24 +331,23 @@ function alunosDaTurmaAtual(){
   return ALUNOS_FICTICIOS_PQF[serie] || [];
 }
 function abrirListaTurma(){
-  const tipo=document.getElementById("avalTipo")?.value || "aluno";
   const turma=document.getElementById("avalTurma")?.value || "";
-  if(tipo!=="turma"){
-    alert("A lista de alunos é usada quando o tipo for Turma. Para aluno específico, preencha o nome completo do aluno.");
-    return;
-  }
   if(!turma){alert("Escolha a turma primeiro.");return;}
   renderizarListaAlunosTurma(true);
+}
+function selecionarAlunoUnico(nome){
+  const input=document.getElementById("avalAlunoNome");
+  if(input) input.value=nome;
+  const box=document.getElementById("seletorAlunosTurma");
+  if(box){
+    box.style.display="block";
+    box.innerHTML=`<b>Aluno selecionado:</b> ${nome}<br><small>Agora escolha a prova, gere o código e salve a avaliação.</small>`;
+  }
 }
 function renderizarListaAlunosTurma(forcarAbrir=false){
   const box=document.getElementById("seletorAlunosTurma");
   if(!box) return;
   const tipo=document.getElementById("avalTipo")?.value || "aluno";
-  if(tipo!=="turma"){
-    box.style.display="none";
-    box.innerHTML="";
-    return;
-  }
   const turma=document.getElementById("avalTurma")?.value || "";
   const alunos=alunosDaTurmaAtual();
   if(!turma || !alunos.length){
@@ -357,6 +356,20 @@ function renderizarListaAlunosTurma(forcarAbrir=false){
     return;
   }
   box.style.display=forcarAbrir?"block":(box.style.display==="block"?"block":"none");
+  if(tipo==="aluno"){
+    box.innerHTML=`
+      <div class="student-picker-actions">
+        <button class="secondary" onclick="copiarListaAlunosTurma()">Copiar nomes</button>
+      </div>
+      <b>Lista da ${turma} — clique no aluno para preencher automaticamente:</b>
+      <div class="student-picker-grid" style="margin-top:10px">
+        ${alunos.map((nome,i)=>`
+          <button type="button" class="student-check" style="text-align:left;cursor:pointer" data-nome="${nome.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" onclick="selecionarAlunoUnico(this.dataset.nome)">
+            <span><b>${String(i+1).padStart(2,"0")}. ${nome}</b><br><small>${turma} • EMEF Pedro de Queiroz Ferreira</small></span>
+          </button>`).join("")}
+      </div>`;
+    return;
+  }
   box.innerHTML=`
     <div class="student-picker-actions">
       <button class="secondary" onclick="selecionarTodosAlunosTurma(true)">Selecionar todos os 50</button>

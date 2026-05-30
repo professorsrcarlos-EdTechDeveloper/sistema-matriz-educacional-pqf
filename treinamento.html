@@ -281,31 +281,56 @@ function marcarCodigoFinalizado(codigo){
 function avaliacaoEhCodigoUnico(){
   return !!(provaAtual && provaAtual.codigoAvaliacaoUnica);
 }
-function tentarReconhecerCodigoAluno(){
+async function tentarReconhecerCodigoAluno(){
   const campo = document.getElementById("nomeAluno");
   if(!campo) return;
   const codigo = normalizarCodigo(campo.value);
-  const av = obterAvaliacaoPorCodigo(codigo);
   const box = document.getElementById("avisoCodigoReconhecido");
+  if(!codigo || codigo.length < 3){
+    if(box){box.style.display="none";box.innerHTML="";}
+    return;
+  }
+  const av = await buscarAvaliacaoPorCodigoOnline(codigo);
   if(av){
+    const serieAuto = String(av.serie || serieDaTurmaTreino(av.turma) || serieDoCodigo(av.codigoProva || "") || "");
     if(box){
-      box.innerHTML = `<strong>Código reconhecido:</strong> avaliação ${av.codigo} vinculada à prova ${av.codigoProva}.<br>${av.aluno_nome_completo ? "Aluno: "+av.aluno_nome_completo+"<br>" : ""}Turma: ${av.turma || av.destinatario || "não informado"}.`;
+      box.innerHTML = `<strong>Código de avaliação reconhecido:</strong> ${av.codigo}<br>${av.aluno_nome_completo ? "Aluno: "+av.aluno_nome_completo+"<br>" : ""}Turma: ${av.turma || "não informada"}<br>Prova: ${av.codigoProva || "não informada"}<br><small>Escola, série e prova serão preenchidas automaticamente ao entrar.</small>`;
       box.style.display = "block";
     }
     if(av.escola) document.getElementById("nomeEscola").value = av.escola;
-    if(av.serie) document.getElementById("serieAluno").value = av.serie;
+    if(serieAuto) document.getElementById("serieAluno").value = serieAuto;
     if(av.codigoProva) document.getElementById("codigoProva").value = av.codigoProva;
-  }else if(box){
+    return;
+  }
+  const prova = await obterProvaPorCodigoAsync(codigo);
+  if(prova){
+    const serieAuto = String(prova.serie || serieDoCodigo(prova.codigo || codigo) || "");
+    if(box){
+      box.innerHTML = `<strong>Código de prova reconhecido:</strong> ${prova.codigo || codigo}<br>Componente: ${prova.componente || "não informado"}<br><small>Para teste livre, a escola será preenchida automaticamente se ficar vazia.</small>`;
+      box.style.display = "block";
+    }
+    document.getElementById("codigoProva").value = prova.codigo || codigo;
+    if(serieAuto) document.getElementById("serieAluno").value = serieAuto;
+    if(!document.getElementById("nomeEscola").value.trim()) document.getElementById("nomeEscola").value = "EMEF Pedro de Queiroz Ferreira";
+    return;
+  }
+  if(box){
     box.style.display = "none";
     box.innerHTML = "";
   }
 }
-
+function serieDaTurmaTreino(turma){
+  const t=String(turma||"");
+  if(t.includes("2")) return "2";
+  if(t.includes("5")) return "5";
+  if(t.includes("9")) return "9";
+  return "";
+}
 function mostrarEntrada(){
   document.getElementById("app").innerHTML = `
     <div class="form">
       <label>Nome ou código do aluno</label>
-      <input id="nomeAluno" oninput="tentarReconhecerCodigoAluno()" placeholder="Nome do aluno ou código da avaliação criada pelo coordenador">
+      <input id="nomeAluno" oninput="tentarReconhecerCodigoAluno()" placeholder="Nome do aluno, código de avaliação ou código da prova personalizada">
       <label>Nome da escola</label>
       <input id="nomeEscola" placeholder="Ex.: EMEF Pedro de Queiroz Ferreira">
       <label>Série/Ano</label>
@@ -333,23 +358,28 @@ async function iniciar(){
   const nomeDigitado=document.getElementById("nomeAluno").value.trim();
   const codigoAlunoOuAvaliacao=normalizarCodigo(nomeDigitado);
   const avaliacaoCriada=await buscarAvaliacaoPorCodigoOnline(codigoAlunoOuAvaliacao);
+  let provaDireta=null;
+  if(!avaliacaoCriada && codigoAlunoOuAvaliacao){
+    provaDireta=await obterProvaPorCodigoAsync(codigoAlunoOuAvaliacao);
+  }
   if(avaliacaoCriada && await codigoJaFinalizadoOnline(avaliacaoCriada.codigo)){
     alert("Esta avaliação já foi finalizada. Procure o professor/coordenador para nova liberação.");
     return;
   }
+  const codigoProvaBase=(avaliacaoCriada && (avaliacaoCriada.codigoProva || avaliacaoCriada.codigo_prova)) ? (avaliacaoCriada.codigoProva || avaliacaoCriada.codigo_prova) : (provaDireta ? provaDireta.codigo : document.getElementById("codigoProva").value);
+  const codigo=normalizarCodigo(codigoProvaBase);
+  const serieAuto=(avaliacaoCriada && (avaliacaoCriada.serie || serieDaTurmaTreino(avaliacaoCriada.turma) || serieDoCodigo(codigo))) || (provaDireta && (provaDireta.serie || serieDoCodigo(codigo))) || document.getElementById("serieAluno").value;
   const nome=avaliacaoCriada ? (avaliacaoCriada.aluno_nome_completo || avaliacaoCriada.aluno_nome || avaliacaoCriada.destinatario || avaliacaoCriada.codigo) : nomeDigitado;
   const turma=(avaliacaoCriada && avaliacaoCriada.turma) ? avaliacaoCriada.turma : "";
-  const escola=(avaliacaoCriada && avaliacaoCriada.escola) ? avaliacaoCriada.escola : document.getElementById("nomeEscola").value.trim();
-  const serie=(avaliacaoCriada && avaliacaoCriada.serie) ? String(avaliacaoCriada.serie) : document.getElementById("serieAluno").value;
-  const codigo=normalizarCodigo((avaliacaoCriada && avaliacaoCriada.codigoProva) ? avaliacaoCriada.codigoProva : document.getElementById("codigoProva").value);
+  const escola=(avaliacaoCriada && avaliacaoCriada.escola) ? avaliacaoCriada.escola : (document.getElementById("nomeEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira");
+  const serie=String(serieAuto||"");
   const aceite=document.getElementById("aceiteLgpd").checked;
-  if(nome.length<2){alert("Digite o nome ou código do aluno.");return;}
-  if(!escola){alert("Digite o nome da escola.");return;}
-  if(!serie){alert("Selecione a série/ano.");return;}
-  if(!codigo){alert("Digite o código da prova.");return;}
+  if(nome.length<2){alert("Digite o nome do aluno, o código da avaliação ou o código da prova personalizada.");return;}
+  if(!codigo){alert("Digite o código da prova ou use o código individual entregue pela escola/professor.");return;}
+  if(!serie){alert("Não foi possível identificar a série/ano. Se for teste livre, selecione a série manualmente.");return;}
   if(!aceite){alert("Confirme o uso com orientação da escola/professor.");return;}
   if(serieDoCodigo(codigo) && serieDoCodigo(codigo)!==serie){alert("O código da prova não corresponde à série selecionada.");return;}
-  const prova = await obterProvaPorCodigoAsync(codigo);
+  const prova = provaDireta || await obterProvaPorCodigoAsync(codigo);
   if(!prova || !Array.isArray(prova.questoes) || !prova.questoes.length){alert("Código de prova não encontrado.");return;}
   aluno={nome, turma, escola, serie, codigoProva:codigo};
   provaAtual=prova;
@@ -361,7 +391,7 @@ async function iniciar(){
     provaAtual.professor_nome=avaliacaoCriada.professor_nome || "";
     provaAtual.professor_usuario=avaliacaoCriada.professor_usuario || "";
     provaAtual.professor_perfil=avaliacaoCriada.professor_perfil || "";
-    provaAtual.componente_vinculado=avaliacaoCriada.componente_vinculado || "";
+    provaAtual.componente_vinculado=avaliacaoCriada.componente_vinculado || prova.componente || "";
   }
   questoes=prova.questoes.slice(0,10);
   respostas=[]; indice=0;
