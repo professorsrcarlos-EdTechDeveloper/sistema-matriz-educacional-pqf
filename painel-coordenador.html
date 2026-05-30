@@ -500,13 +500,14 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
         <input id="manualCodigo" placeholder="Ex.: 5PDEV01">
       </div>
       <div>
-        <label>Ícone padrão</label>
-        <select id="manualIconePadrao"></select>
+        <label>Ícone padrão da prova (opcional)</label>
+        <select id="manualIconePadrao" onchange="aplicarPreviewIconePadrao()"></select>
+        <div id="previewIconePadrao" style="margin-top:8px;display:flex;align-items:center;gap:8px;font-weight:800;color:#f8fafc"></div>
       </div>
     </div>
 
     <div class="notice" style="margin-top:10px">
-      O banco de ícones agora pode ser carregado do Supabase. Cadastre novos ícones aqui e eles ficarão disponíveis nas questões da Área DEV.
+      O banco de ícones agora pode ser carregado do Supabase. Cadastre novos ícones aqui e eles ficarão disponíveis nas questões da Área DEV. Use imagem PNG/WebP ou emoji.
     </div>
 
     <div class="student-form-grid" style="margin-top:10px">
@@ -538,11 +539,12 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
     <div id="bancoIconesStatus" class="report-box" style="margin-top:10px;max-height:180px">Carregando banco de ícones...</div>
 
     <div class="notice" style="margin-top:10px">
-      Cada questão pode usar um ícone do banco. As alternativas já saem com A), B), C) e D). Depois de salvar, use o código da prova na criação de avaliação para aluno/turma.
+      <b>Regra pedagógica V42:</b> cada questão deve ter seu próprio ícone. O ícone padrão da prova é apenas uma sugestão inicial; o que aparece para o aluno é o ícone escolhido em cada questão. As alternativas já saem com A), B), C) e D).
     </div>
     <div id="manualQuestoesBox" class="report-box" style="margin-top:10px;max-height:520px"></div>
     <div class="tools" style="margin-top:10px">
-      <button class="secondary" onclick="montarFormularioQuestoesManual()">Montar 10 questões</button>
+      <button class="secondary" onclick="montarFormularioQuestoesManual()">Montar 10 questões com ícones</button>
+      <button class="secondary" onclick="aplicarIconePadraoTodasQuestoes()">Aplicar ícone padrão nas 10 questões</button>
       <button class="secondary" onclick="salvarProvaManualDev()">Salvar prova personalizada</button>
       <button class="secondary" onclick="listarProvasManuaisDev()">Listar provas salvas</button>
     </div>
@@ -1871,11 +1873,32 @@ function iconOptionsHtml(valorAtual=""){
 }
 function popularIconesManual(){
   carregarBancoIconesLocal();
-  const html=iconOptionsHtml();
   const sel=document.getElementById("manualIconePadrao");
   if(sel){const atual=sel.value; sel.innerHTML=iconOptionsHtml(atual); if(atual) sel.value=atual;}
-  document.querySelectorAll('select[id^="mqIcone"]').forEach(select=>{const atual=select.value; select.innerHTML=iconOptionsHtml(atual); if(atual) select.value=atual;});
+  document.querySelectorAll('select[id^="mqIcone"]').forEach(select=>{const atual=select.value || document.getElementById("manualIconePadrao")?.value || ""; select.innerHTML=iconOptionsHtml(atual); if(atual) select.value=atual;});
+  aplicarPreviewIconePadrao();
+  atualizarPreviewsQuestoes();
   renderBancoIconesDev();
+}
+function aplicarPreviewIconePadrao(){
+  const sel=document.getElementById("manualIconePadrao");
+  const prev=document.getElementById("previewIconePadrao");
+  if(!sel||!prev) return;
+  prev.innerHTML=`Prévia do ícone padrão: ${htmlIconeVisual(sel.value,"38px")}`;
+}
+function atualizarPreviewIconeQuestao(i){
+  const sel=document.getElementById("mqIcone"+i);
+  const prev=document.getElementById("mqIconePreview"+i);
+  if(sel&&prev) prev.innerHTML=htmlIconeVisual(sel.value,"46px");
+}
+function atualizarPreviewsQuestoes(){
+  for(let i=0;i<10;i++) atualizarPreviewIconeQuestao(i);
+}
+function aplicarIconePadraoTodasQuestoes(){
+  const padrao=document.getElementById("manualIconePadrao")?.value||"";
+  if(!padrao){alert("Escolha primeiro um ícone padrão.");return;}
+  document.querySelectorAll('select[id^="mqIcone"]').forEach((select,idx)=>{select.value=padrao; atualizarPreviewIconeQuestao(idx);});
+  alert("Ícone padrão aplicado às 10 questões. Você ainda pode alterar questão por questão.");
 }
 function renderBancoIconesDev(msg=""){
   const el=document.getElementById("bancoIconesStatus");
@@ -1926,8 +1949,14 @@ function montarFormularioQuestoesManual(){
   box.innerHTML=Array.from({length:10}).map((_,idx)=>`
     <div class="plan-item" style="margin-bottom:12px">
       <b>Questão ${idx+1}</b>
-      <label>Ícone da questão</label>
-      <select id="mqIcone${idx}">${iconOptions}</select>
+      <div class="notice" style="margin:6px 0 8px 0"><b>Ícone desta questão:</b> escolha o sinal visual que o aluno verá antes da pergunta.</div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div style="min-width:260px;flex:1">
+          <label>Ícone da questão ${idx+1}</label>
+          <select id="mqIcone${idx}" onchange="atualizarPreviewIconeQuestao(${idx})">${iconOptions}</select>
+        </div>
+        <div id="mqIconePreview${idx}" style="min-width:70px;text-align:center;background:rgba(255,255,255,.08);border-radius:14px;padding:8px"></div>
+      </div>
       <label>Descritor</label>
       <input id="mqHab${idx}" placeholder="Ex.: D01 — Localizar informações explícitas">
       <label>Texto/base</label>
@@ -1942,7 +1971,8 @@ function montarFormularioQuestoesManual(){
         <div><label>Gabarito</label><select id="mqG${idx}"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select></div>
       </div>
     </div>`).join("");
-  document.getElementById("manualSaida").textContent="Formulário pronto. Preencha as 10 questões e clique em salvar.";
+  atualizarPreviewsQuestoes();
+  document.getElementById("manualSaida").textContent="Formulário pronto. Preencha as 10 questões, confira o ícone de cada questão e clique em salvar.";
 }
 
 function obterProvasManuais(){
@@ -2005,7 +2035,8 @@ async function salvarProvaManualDev(){
   salvarProvasManuais(lista.slice(0,100));
   await salvarProvaManualOnline(prova);
   document.getElementById("manualCodigo").value=codigo;
-  document.getElementById("manualSaida").innerHTML=`<b>Prova salva:</b> ${codigo}<br>Use este código na área “Criar avaliação para aluno ou turma”.${alunoNomeManual?`<br><b>Aluno vinculado:</b> ${alunoNomeManual}`:""}`;
+  const qtdIcones=questoes.filter(q=>q.icone).length;
+  document.getElementById("manualSaida").innerHTML=`<b>Prova salva:</b> ${codigo}<br><b>Ícones por questão:</b> ${qtdIcones}/10 configurados.<br>Use este código na área “Criar avaliação para aluno ou turma”.${alunoNomeManual?`<br><b>Aluno vinculado:</b> ${alunoNomeManual}`:""}`;
   atualizarProvasPorTurma();
 }
 
