@@ -349,7 +349,6 @@ function mostrarEntrada(){
         Confirmo que estou usando esta ferramenta com orientação da escola/professor e para fins pedagógicos.
       </label>
       <button class="btn gold" onclick="iniciar()">ENTRAR NO TREINAMENTO</button>
-      <button class="btn muted" onclick="location.href='index.html'">VOLTAR À PÁGINA INICIAL</button>
       <div class="notice"><strong>Acesso por código:</strong> digite somente o código entregue pela escola/professor. Não use códigos de prova que não foram liberados para você.</div>
     </div>`;
 }
@@ -448,7 +447,6 @@ function mostrarQuestao(){
       </div>
       <div class="qactions">
         <button class="btn gold" onclick="avancar()">Avançar</button>
-        <button class="btn muted" onclick="mostrarEntrada()">Voltar ao início</button>
       </div>
     </div>`;
 }
@@ -642,7 +640,6 @@ async function finalizar(){
       <p>Suas respostas foram registradas e enviadas para acompanhamento do professor responsável e da coordenação.</p>
       <p>O resultado individual não será exibido nesta tela.</p><p>Se esta avaliação foi liberada por código individual/turma, o acesso fica bloqueado após o envio.</p>
       <button class="btn gold" onclick="mostrarEntrada()">FAZER OUTRO TREINAMENTO</button>
-      <button class="btn muted" onclick="location.href='index.html'">VOLTAR À PÁGINA INICIAL</button>
     </div>`;
 }
 mostrarEntrada();
