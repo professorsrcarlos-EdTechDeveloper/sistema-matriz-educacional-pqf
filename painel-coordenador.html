@@ -467,16 +467,21 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
     <small>2º, 5º e 9º ano • Português e Matemática • banco de ícones para questões</small>
   </div>
   <div class="dev-box">
+    <div id="manualPerfilBox" class="notice" style="margin-top:6px;display:none"></div>
     <div class="student-form-grid">
-      <div>
+      <div class="campo-dev-perfil">
         <label>Professor responsável</label>
         <input id="manualProfessor" placeholder="Nome do professor">
-        <label>Aluno vinculado (opcional)</label>
-        <input id="manualAlunoNome" placeholder="Preencha apenas se esta prova personalizada for individual">
-        <label>Turma vinculada (opcional)</label>
-        <select id="manualTurma"><option value="">Sem turma vinculada</option><option>2º ano</option><option>5º ano</option><option>9º ano</option></select>
       </div>
       <div>
+        <label>Aluno vinculado (opcional)</label>
+        <input id="manualAlunoNome" placeholder="Preencha apenas se esta prova personalizada for individual">
+      </div>
+      <div class="campo-dev-perfil">
+        <label>Turma vinculada</label>
+        <select id="manualTurma"><option value="">Sem turma vinculada</option><option>2º ano</option><option>5º ano</option><option>9º ano</option></select>
+      </div>
+      <div class="campo-dev-perfil">
         <label>Série</label>
         <select id="manualSerie">
           <option value="2">2º ano</option>
@@ -484,7 +489,7 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
           <option value="9">9º ano</option>
         </select>
       </div>
-      <div>
+      <div class="campo-dev-perfil">
         <label>Componente</label>
         <select id="manualComponente">
           <option>Português</option>
@@ -1454,7 +1459,7 @@ function prepararFerramentasExpansiveis(){
     sec.dataset.expandReady="1";
   });
 }
-document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{prepararFerramentasExpansiveis();ajustarTipoAvaliacao();atualizarProvasPorTurma();renderAvaliacoesCriadas();},300)});
+document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{prepararFerramentasExpansiveis();ajustarTipoAvaliacao();atualizarProvasPorTurma();aplicarPerfilAreaDev();renderAvaliacoesCriadas();},300)});
 
 </script>
 
@@ -1526,6 +1531,35 @@ function aplicarPermissoesUsuario(){
     if(escola) escola.value="EMEF Pedro de Queiroz Ferreira";
   }
   atualizarProvasPorTurma();
+  aplicarPerfilAreaDev();
+}
+function aplicarPerfilAreaDev(){
+  const u=usuarioAtual();
+  const box=document.getElementById("manualPerfilBox");
+  const campos=document.querySelectorAll(".campo-dev-perfil");
+  const professor=document.getElementById("manualProfessor");
+  const turma=document.getElementById("manualTurma");
+  const serie=document.getElementById("manualSerie");
+  const componente=document.getElementById("manualComponente");
+  if(!u){return;}
+  const isProfessor = String(u.perfil||"").toLowerCase()==="professor" && !u.acesso_geral;
+  if(isProfessor){
+    const serieNum=serieDaTurmaUsuario(u.turma_vinculada)||"5";
+    if(professor) professor.value=u.nome||"";
+    if(turma) turma.value=u.turma_vinculada||nomeSerieCurta(serieNum);
+    if(serie) serie.value=String(serieNum);
+    if(componente) componente.value=u.componente_vinculado||"Português";
+    campos.forEach(el=>el.style.display="none");
+    if(box){
+      box.style.display="block";
+      box.innerHTML=`<b>Dados automáticos do professor:</b> ${u.nome} • ${u.turma_vinculada} • ${u.componente_vinculado} • E.M.E.F. Pedro de Queiroz Ferreira.<br>Preencha apenas título, aluno vinculado se for individual, questões, alternativas, resposta correta e ícone de cada questão.`;
+    }
+  }else{
+    campos.forEach(el=>el.style.display="block");
+    [professor,turma,serie,componente].forEach(el=>{if(el) el.disabled=false;});
+    if(professor && !professor.value) professor.value=u.nome||"";
+    if(box){box.style.display="block"; box.innerHTML="<b>Acesso geral:</b> coordenador/gestor pode escolher professor, turma, série e componente para criar avaliações personalizadas.";}
+  }
 }
 async function validarSenhaPainel(){
   const usuario=(document.getElementById("usuarioPainel")?.value || "").trim().toLowerCase();
@@ -1982,7 +2016,7 @@ function salvarProvasManuais(lista){
   localStorage.setItem("matriz_provas_personalizadas", JSON.stringify(lista));
 }
 function gerarCodigoManualDev(){
-  const serie=document.getElementById("manualSerie")?.value||"5";
+  const serie=(document.getElementById("manualSerie")?.value||serieDaTurmaUsuario(uLogado?.turma_vinculada)||"5");
   const comp=(document.getElementById("manualComponente")?.value||"Português").startsWith("Port")?"P":"M";
   return `${serie}${comp}DEV${String(Date.now()).slice(-4)}`;
 }
@@ -2007,13 +2041,15 @@ async function salvarProvaManualOnline(prova){
   }catch(e){console.warn("Falha ao salvar prova personalizada online:", e);}
 }
 async function salvarProvaManualDev(){
+  aplicarPerfilAreaDev();
+  const uLogado=usuarioAtual();
   const codigo=(document.getElementById("manualCodigo")?.value||"").trim().toUpperCase() || gerarCodigoManualDev();
-  const professor=(document.getElementById("manualProfessor")?.value||usuarioAtual()?.nome||"Professor").trim();
-  const serie=document.getElementById("manualSerie")?.value||"5";
-  const componente=document.getElementById("manualComponente")?.value||"Português";
+  const professor=(document.getElementById("manualProfessor")?.value||uLogado?.nome||"Professor").trim();
+  const serie=(document.getElementById("manualSerie")?.value||serieDaTurmaUsuario(uLogado?.turma_vinculada)||"5");
+  const componente=(document.getElementById("manualComponente")?.value||uLogado?.componente_vinculado||"Português");
   const titulo=(document.getElementById("manualTitulo")?.value||"Avaliação personalizada").trim();
   const alunoNomeManual=(document.getElementById("manualAlunoNome")?.value||"").trim();
-  const turmaManual=(document.getElementById("manualTurma")?.value||"").trim();
+  const turmaManual=(document.getElementById("manualTurma")?.value||uLogado?.turma_vinculada||nomeSerieCurta(serie)||"").trim();
   const escolaManual="EMEF Pedro de Queiroz Ferreira";
   const questoes=[];
   for(let i=0;i<10;i++){
@@ -2029,7 +2065,7 @@ async function salvarProvaManualDev(){
       icone:(document.getElementById("mqIcone"+i)?.value||document.getElementById("manualIconePadrao")?.value||"📘")
     });
   }
-  const prova={codigo,titulo,serie,componente,professor_nome:professor,professor_usuario:usuarioAtual()?.email||usuarioAtual()?.login||"",aluno_nome:alunoNomeManual,turma:turmaManual,escola:escolaManual,questoes,created_at:new Date().toISOString()};
+  const prova={codigo,titulo,serie,componente,professor_nome:professor,professor_usuario:uLogado?.usuario||uLogado?.email||uLogado?.login||"",aluno_nome:alunoNomeManual,turma:turmaManual,escola:escolaManual,questoes,created_at:new Date().toISOString()};
   const lista=obterProvasManuais().filter(p=>p.codigo!==codigo);
   lista.unshift(prova);
   salvarProvasManuais(lista.slice(0,100));
