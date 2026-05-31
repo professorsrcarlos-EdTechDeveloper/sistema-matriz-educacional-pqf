@@ -312,6 +312,7 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
   <div class="filters">
     <label>Aluno</label><input id="buscaAluno" placeholder="Buscar aluno/código">
     <label>Série</label><select id="filtroSerie"><option value="">Todas</option><option value="2">2º ano</option><option value="5">5º ano</option><option value="9">9º ano</option></select>
+    <label>Turma</label><select id="filtroTurma"><option value="">Todas</option></select>
     <label>Componente Curricular</label><select id="filtroComponente"><option value="">Todos</option><option value="Português">Português</option><option value="Matemática">Matemática</option></select>
     <label>Escola</label><input id="filtroEscola" placeholder="Nome da escola">
     <label>Ano</label><select id="filtroAno"><option value="">Todos</option></select>
@@ -2122,6 +2123,102 @@ window.addEventListener("DOMContentLoaded",async()=>{
   await carregarProvasPersonalizadasSupabaseV40();
   setTimeout(()=>{if(!document.getElementById("manualQuestoesBox")?.innerHTML) montarFormularioQuestoesManual();},800);
 });
+
+/* V45 — filtro de turma nos resultados do painel */
+function turmaRegistroPainel(d){
+  const valor = d.turma || d.turma_nome || d.turma_avaliacao || d.turma_vinculada || d.destinatario_avaliacao || "";
+  const normal = String(valor || "").trim();
+  if(normal) return normal;
+  const serie = serieNumero(d.serie_codigo || d.serie || d.ano || "");
+  return serie ? nomeSerieCurta(serie) : "Não informada";
+}
+
+function normalizarRegistroV45(d){
+  const base = normalizarRegistroBaseV45 ? normalizarRegistroBaseV45(d) : d;
+  return {...base, turma: turmaRegistroPainel({...d, ...base})};
+}
+
+const normalizarRegistroBaseV45 = typeof normalizarRegistro === "function" ? normalizarRegistro : null;
+if(normalizarRegistroBaseV45){
+  normalizarRegistro = normalizarRegistroV45;
+}
+
+function preencherFiltrosV45(){
+  if(preencherFiltrosBaseV45) preencherFiltrosBaseV45();
+  const selectTurma = document.getElementById("filtroTurma");
+  if(!selectTurma) return;
+  const valorAtual = selectTurma.value;
+  const turmas = [...new Set(dadosOriginais.map(d=>turmaRegistroPainel(d)).filter(Boolean))]
+    .sort((a,b)=>String(a).localeCompare(String(b),'pt-BR',{numeric:true}));
+  selectTurma.innerHTML = '<option value="">Todas</option>' + turmas.map(t=>`<option value="${String(t).replace(/"/g,'&quot;')}">${t}</option>`).join("");
+  if(valorAtual && turmas.includes(valorAtual)) selectTurma.value = valorAtual;
+}
+
+const preencherFiltrosBaseV45 = typeof preencherFiltros === "function" ? preencherFiltros : null;
+preencherFiltros = preencherFiltrosV45;
+
+function aplicarFiltrosV45(){
+  const aluno = document.getElementById("buscaAluno")?.value.trim().toLowerCase() || "";
+  const serie = document.getElementById("filtroSerie")?.value || "";
+  const turma = document.getElementById("filtroTurma")?.value || "";
+  const comp = document.getElementById("filtroComponente")?.value || "";
+  const escola = document.getElementById("filtroEscola")?.value.trim().toLowerCase() || "";
+  const ano = document.getElementById("filtroAno")?.value || "";
+  const mes = document.getElementById("filtroMes")?.value || "";
+  dados = dadosOriginais.filter(d=>{
+    const nomeCodigo = String((d.aluno_nome||"") + " " + (d.codigo_avaliacao||"") + " " + (d.codigo_prova||"")).toLowerCase();
+    return (!aluno || nomeCodigo.includes(aluno))
+      && (!serie || serieNumero(d.serie_codigo || d.serie) === serie)
+      && (!turma || turmaRegistroPainel(d) === turma)
+      && (!comp || d.materia === comp)
+      && (!escola || String(d.escola||"").toLowerCase().includes(escola))
+      && (!ano || anoLetivo(d) === ano)
+      && (!mes || d.mes_ano === mes);
+  });
+  renderizar();
+}
+aplicarFiltros = aplicarFiltrosV45;
+
+function limparFiltrosPainelV45(){
+  ["buscaAluno","filtroEscola"].forEach(id=>{const el=document.getElementById(id); if(el) el.value="";});
+  ["filtroSerie","filtroTurma","filtroComponente","filtroAno","filtroMes"].forEach(id=>{const el=document.getElementById(id); if(el && !el.disabled) el.value="";});
+  aplicarFiltros();
+}
+limparFiltrosPainel = limparFiltrosPainelV45;
+
+function exportarCSVV45(anon=false){
+  if(!dados.length){alert("Sem dados para exportar.");return}
+  const linhas=[["Data","Aluno","Série","Turma","Componente Curricular","Escola","Código Prova","Código Avaliação","Ano","Mês","Acertos","Total","Percentual","Descritores para revisar"]];
+  dados.forEach(d=>{
+    const rev=Array.isArray(d.habilidades_revisar)?d.habilidades_revisar.map(x=>`${x.habilidade} (${x.erros})`).join("; "):"";
+    linhas.push([formatarData(d.created_at),anon?nomeSeguroTexto(d.aluno_nome):d.aluno_nome,d.serie,turmaRegistroPainel(d),d.materia,d.escola,d.codigo_prova,d.codigo_avaliacao||"",d.ano_letivo,d.mes_ano,d.acertos,d.total_questoes,d.percentual,rev]);
+  });
+  const csv=linhas.map(l=>l.map(csvEscape).join(";")).join("\r\n");
+  const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=anon?"resultados_anonimizados.csv":"resultados_matriz_educacional.csv";a.click();URL.revokeObjectURL(url);
+}
+exportarCSV = exportarCSVV45;
+
+function aplicarPermissoesUsuarioV45(){
+  if(aplicarPermissoesUsuarioBaseV45) aplicarPermissoesUsuarioBaseV45();
+  const u = usuarioAtual();
+  if(!u || u.acesso_geral) return;
+  const filtroTurma = document.getElementById("filtroTurma");
+  if(filtroTurma){
+    const turmaNome = u.turma_vinculada || nomeSerieCurta(serieDaTurmaUsuario(u.turma_vinculada));
+    preencherFiltros();
+    if([...filtroTurma.options].some(o=>o.value===turmaNome)) filtroTurma.value = turmaNome;
+    filtroTurma.disabled = true;
+  }
+}
+const aplicarPermissoesUsuarioBaseV45 = typeof aplicarPermissoesUsuario === "function" ? aplicarPermissoesUsuario : null;
+aplicarPermissoesUsuario = aplicarPermissoesUsuarioV45;
+
+window.addEventListener("DOMContentLoaded",()=>{
+  const filtroTurma = document.getElementById("filtroTurma");
+  if(filtroTurma) filtroTurma.addEventListener("input", aplicarFiltros);
+});
+
 </script>
 
 </body>
