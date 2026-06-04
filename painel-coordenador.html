@@ -1865,17 +1865,34 @@ function iconeEhImagem(valor){
   const v=String(valor||"").trim().toLowerCase();
   return /^(https?:\/\/|\.\/|\/|icones\/)/.test(v) || /\.(png|jpg|jpeg|webp|svg|gif)(\?.*)?$/.test(v);
 }
+function emojiFallbackIcone(valor){
+  const t=String(valor||"").toLowerCase();
+  if(t.includes("grafico")||t.includes("dados")||t.includes("tabela")||t.includes("media")||t.includes("probabilidade")) return "📊";
+  if(t.includes("matematica")||t.includes("calculadora")||t.includes("numero")||t.includes("adicao")||t.includes("subtracao")||t.includes("multiplicacao")||t.includes("divisao")||t.includes("fracao")||t.includes("porcentagem")||t.includes("razao")||t.includes("proporcao")) return "🧮";
+  if(t.includes("regua")||t.includes("medida")||t.includes("comprimento")||t.includes("area")||t.includes("perimetro")||t.includes("geometria")||t.includes("forma")||t.includes("solido")||t.includes("angulo")||t.includes("malha")||t.includes("localizacao")) return "📏";
+  if(t.includes("portugues")||t.includes("leitura")||t.includes("texto")||t.includes("livro")||t.includes("noticia")||t.includes("palavra")||t.includes("frase")||t.includes("silaba")||t.includes("poema")||t.includes("bilhete")||t.includes("genero")) return "📖";
+  if(t.includes("aluno")) return "👨‍🎓";
+  if(t.includes("professor")) return "👩‍🏫";
+  if(t.includes("escola")) return "🏫";
+  if(t.includes("atencao")) return "⚠️";
+  if(t.includes("desafio")||t.includes("dificil")) return "🧩";
+  if(t.includes("audio")) return "🔊";
+  return "⭐";
+}
 function htmlIconeVisual(valor, tamanho="42px"){
   const v=String(valor||"").trim();
-  if(!v) return `<span style="font-size:${tamanho}">📘</span>`;
+  const fallback=emojiFallbackIcone(v);
+  if(!v) return `<span style="font-size:${tamanho};vertical-align:middle">${fallback}</span>`;
   const safe=limparTextoSeguro(v);
   if(iconeEhImagem(v)){
-    return `<img src="${safe}" alt="ícone" style="width:${tamanho};height:${tamanho};object-fit:contain;vertical-align:middle" onerror="this.outerHTML='📘'">`;
+    const fb=limparTextoSeguro(fallback);
+    return `<img src="${safe}" alt="ícone" style="width:${tamanho};height:${tamanho};object-fit:contain;vertical-align:middle" onerror="this.onerror=null;this.outerHTML='<span style=&quot;font-size:${tamanho};vertical-align:middle&quot;>${fb}</span>'">`;
   }
   return `<span style="font-size:${tamanho};vertical-align:middle">${safe}</span>`;
 }
 function rotuloIconeSelect(ico,nome){
-  return `${iconeEhImagem(ico)?"🖼️":ico} ${nome}${iconeEhImagem(ico)?" — "+ico:""}`;
+  const fallback=emojiFallbackIcone((nome||"")+" "+(ico||""));
+  return `${iconeEhImagem(ico)?fallback:ico} ${nome}${iconeEhImagem(ico)?" — "+ico:""}`;
 }
 function normalizarIconeBanco(row){
   if(Array.isArray(row)) return [row[0]||"📘", row[1]||"Ícone", row[2]||"geral"];
@@ -2217,6 +2234,99 @@ aplicarPermissoesUsuario = aplicarPermissoesUsuarioV45;
 window.addEventListener("DOMContentLoaded",()=>{
   const filtroTurma = document.getElementById("filtroTurma");
   if(filtroTurma) filtroTurma.addEventListener("input", aplicarFiltros);
+});
+
+
+/* V47 — filtro de turma protegido: não lista nomes, códigos ou testes no campo Turma */
+const TURMAS_VALIDAS_PAINEL_V47 = ["2º ano", "5º ano", "9º ano"];
+function turmaValidaPainelV47(valor){
+  const t = String(valor || "").trim().toLowerCase();
+  if(!t) return "";
+  if(t === "2º ano" || t === "2o ano" || t === "2 ano" || t === "2") return "2º ano";
+  if(t === "5º ano" || t === "5o ano" || t === "5 ano" || t === "5") return "5º ano";
+  if(t === "9º ano" || t === "9o ano" || t === "9 ano" || t === "9") return "9º ano";
+  return "";
+}
+function turmaRegistroPainelV47(d){
+  const direta = turmaValidaPainelV47(d.turma || d.turma_nome || d.turma_avaliacao || d.turma_vinculada || "");
+  if(direta) return direta;
+  const serie = serieNumero(d.serie_codigo || d.serie || d.ano || "");
+  return serie ? nomeSerieCurta(serie) : "Não informada";
+}
+function normalizarRegistroV47(d){
+  const base = normalizarRegistroBaseV47 ? normalizarRegistroBaseV47(d) : d;
+  return {...base, turma: turmaRegistroPainelV47({...d, ...base})};
+}
+const normalizarRegistroBaseV47 = typeof normalizarRegistro === "function" ? normalizarRegistro : null;
+if(normalizarRegistroBaseV47){ normalizarRegistro = normalizarRegistroV47; }
+function preencherFiltrosV47(){
+  if(preencherFiltrosBaseV47) preencherFiltrosBaseV47();
+  const selectTurma = document.getElementById("filtroTurma");
+  if(!selectTurma) return;
+  const valorAtual = turmaValidaPainelV47(selectTurma.value);
+  selectTurma.innerHTML = '<option value="">Todas</option>' + TURMAS_VALIDAS_PAINEL_V47.map(t=>`<option value="${t}">${t}</option>`).join("");
+  if(valorAtual) selectTurma.value = valorAtual;
+}
+const preencherFiltrosBaseV47 = typeof preencherFiltros === "function" ? preencherFiltros : null;
+preencherFiltros = preencherFiltrosV47;
+function aplicarFiltrosV47(){
+  const aluno = document.getElementById("buscaAluno")?.value.trim().toLowerCase() || "";
+  const serie = document.getElementById("filtroSerie")?.value || "";
+  const turma = turmaValidaPainelV47(document.getElementById("filtroTurma")?.value || "");
+  const comp = document.getElementById("filtroComponente")?.value || "";
+  const escola = document.getElementById("filtroEscola")?.value.trim().toLowerCase() || "";
+  const ano = document.getElementById("filtroAno")?.value || "";
+  const mes = document.getElementById("filtroMes")?.value || "";
+  dados = dadosOriginais.filter(d=>{
+    const turmaRegistro = turmaRegistroPainelV47(d);
+    const nomeCodigo = String((d.aluno_nome||"") + " " + (d.codigo_avaliacao||"") + " " + (d.codigo_prova||"")).toLowerCase();
+    return (!aluno || nomeCodigo.includes(aluno))
+      && (!serie || serieNumero(d.serie_codigo || d.serie) === serie)
+      && (!turma || turmaRegistro === turma)
+      && (!comp || d.materia === comp)
+      && (!escola || String(d.escola||"").toLowerCase().includes(escola))
+      && (!ano || anoLetivo(d) === ano)
+      && (!mes || d.mes_ano === mes);
+  });
+  renderizar();
+}
+aplicarFiltros = aplicarFiltrosV47;
+function limparFiltrosPainelV47(){
+  ["buscaAluno","filtroEscola"].forEach(id=>{const el=document.getElementById(id); if(el) el.value="";});
+  ["filtroSerie","filtroTurma","filtroComponente","filtroAno","filtroMes"].forEach(id=>{const el=document.getElementById(id); if(el && !el.disabled) el.value="";});
+  aplicarFiltros();
+}
+limparFiltrosPainel = limparFiltrosPainelV47;
+function exportarCSVV47(anon=false){
+  if(!dados.length){alert("Sem dados para exportar.");return}
+  const linhas=[["Data","Aluno","Série","Turma","Componente Curricular","Escola","Código Prova","Código Avaliação","Ano","Mês","Acertos","Total","Percentual","Descritores para revisar"]];
+  dados.forEach(d=>{
+    const rev=Array.isArray(d.habilidades_revisar)?d.habilidades_revisar.map(x=>`${x.habilidade} (${x.erros})`).join("; "):"";
+    linhas.push([formatarData(d.created_at),anon?nomeSeguroTexto(d.aluno_nome):d.aluno_nome,d.serie,turmaRegistroPainelV47(d),d.materia,d.escola,d.codigo_prova,d.codigo_avaliacao||"",d.ano_letivo,d.mes_ano,d.acertos,d.total_questoes,d.percentual,rev]);
+  });
+  const csv=linhas.map(l=>l.map(csvEscape).join(";")).join("
+");
+  const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=anon?"resultados_anonimizados.csv":"resultados_matriz_educacional.csv";a.click();URL.revokeObjectURL(url);
+}
+exportarCSV = exportarCSVV47;
+function aplicarPermissoesUsuarioV47(){
+  if(aplicarPermissoesUsuarioBaseV47) aplicarPermissoesUsuarioBaseV47();
+  const u = usuarioAtual();
+  const filtroTurma = document.getElementById("filtroTurma");
+  if(!u || !filtroTurma) return;
+  preencherFiltros();
+  if(!u.acesso_geral){
+    const turmaNome = turmaValidaPainelV47(u.turma_vinculada) || nomeSerieCurta(serieDaTurmaUsuario(u.turma_vinculada));
+    if(turmaNome) filtroTurma.value = turmaNome;
+    filtroTurma.disabled = true;
+  }
+}
+const aplicarPermissoesUsuarioBaseV47 = typeof aplicarPermissoesUsuario === "function" ? aplicarPermissoesUsuario : null;
+aplicarPermissoesUsuario = aplicarPermissoesUsuarioV47;
+window.addEventListener("DOMContentLoaded",()=>{
+  const filtroTurma = document.getElementById("filtroTurma");
+  if(filtroTurma){ preencherFiltrosV47(); filtroTurma.addEventListener("input", aplicarFiltros); }
 });
 
 </script>

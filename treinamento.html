@@ -92,6 +92,17 @@ function nomeSerie(s){ if(String(s).includes("2")) return "2º ano"; if(String(s
 function componenteDoCodigo(c){ c=normalizarCodigo(c); return c.includes("P") ? "Português" : c.includes("M") ? "Matemática" : ""; }
 function serieDoCodigo(c){ c=normalizarCodigo(c); return c.startsWith("2")?"2":c.startsWith("5")?"5":c.startsWith("9")?"9":""; }
 function serieDaTurmaTreino(turma){ const t=String(turma||""); if(t.includes("2")) return "2"; if(t.includes("5")) return "5"; if(t.includes("9")) return "9"; return ""; }
+function turmaValidaTreino(valor, serieFallback=""){
+  const t=String(valor||"").trim().toLowerCase();
+  if(t === "2º ano" || t === "2o ano" || t === "2 ano" || t === "2") return "2º ano";
+  if(t === "5º ano" || t === "5o ano" || t === "5 ano" || t === "5") return "5º ano";
+  if(t === "9º ano" || t === "9o ano" || t === "9 ano" || t === "9") return "9º ano";
+  const s=String(serieFallback||"");
+  if(s.includes("2")) return "2º ano";
+  if(s.includes("5")) return "5º ano";
+  if(s.includes("9")) return "9º ano";
+  return "";
+}
 
 function obterProvaPorCodigo(codigo){
   codigo = normalizarCodigo(codigo);
@@ -160,12 +171,27 @@ function iconeTreinoEhImagem(valor){
   const v=String(valor||"").trim().toLowerCase();
   return /^(https?:\/\/|\.\/|\/|icones\/)/.test(v) || /\.(png|jpg|jpeg|webp|svg|gif)(\?.*)?$/.test(v);
 }
+function emojiFallbackTreino(valor){
+  const t=String(valor||"").toLowerCase();
+  if(t.includes("grafico")||t.includes("dados")||t.includes("tabela")||t.includes("media")||t.includes("probabilidade")) return "📊";
+  if(t.includes("matematica")||t.includes("calculadora")||t.includes("numero")||t.includes("adicao")||t.includes("subtracao")||t.includes("multiplicacao")||t.includes("divisao")||t.includes("fracao")||t.includes("porcentagem")||t.includes("razao")||t.includes("proporcao")) return "🧮";
+  if(t.includes("regua")||t.includes("medida")||t.includes("comprimento")||t.includes("area")||t.includes("perimetro")||t.includes("geometria")||t.includes("forma")||t.includes("solido")||t.includes("angulo")||t.includes("malha")||t.includes("localizacao")) return "📏";
+  if(t.includes("portugues")||t.includes("leitura")||t.includes("texto")||t.includes("livro")||t.includes("noticia")||t.includes("palavra")||t.includes("frase")||t.includes("silaba")||t.includes("poema")||t.includes("bilhete")||t.includes("genero")) return "📖";
+  if(t.includes("aluno")) return "👨‍🎓";
+  if(t.includes("professor")) return "👩‍🏫";
+  if(t.includes("escola")) return "🏫";
+  if(t.includes("atencao")) return "⚠️";
+  if(t.includes("desafio")||t.includes("dificil")) return "🧩";
+  if(t.includes("audio")) return "🔊";
+  return "⭐";
+}
 function htmlIconeTreino(valor){
   const v=String(valor||"").trim();
   if(!v) return "";
   const safe=limparHtmlIconeTreino(v);
+  const fallback=limparHtmlIconeTreino(emojiFallbackTreino(v));
   if(iconeTreinoEhImagem(v)){
-    return `<div style="text-align:center;padding:12px"><img src="${safe}" alt="ícone da questão" style="width:170px;max-width:45%;height:170px;object-fit:contain" onerror="this.outerHTML='<div style=&quot;font-size:4rem&quot;>📘</div>'"></div>`;
+    return `<div style="text-align:center;padding:12px"><img src="${safe}" alt="ícone da questão" style="width:170px;max-width:45%;height:170px;object-fit:contain" onerror="this.onerror=null;this.outerHTML='<div style=&quot;font-size:4rem&quot;>${fallback}</div>'"></div>`;
   }
   return `<div style="font-size:4rem;text-align:center;padding:12px">${safe}</div>`;
 }
@@ -308,7 +334,7 @@ async function tentarReconhecerCodigoAluno(){
       const temAluno=!!prova.aluno_nome;
       box.innerHTML = temAluno
         ? `<strong>Código reconhecido:</strong> prova personalizada ${prova.codigo}.<br>Aluno vinculado: ${prova.aluno_nome}.`
-        : `<strong>Código reconhecido:</strong> prova personalizada ${prova.codigo}.<br><b>Informe o nome completo do aluno no campo que apareceu abaixo.</b>`;
+        : `<strong>Código reconhecido:</strong> prova personalizada ${prova.codigo}.<br><b>Nome do aluno é opcional. Se não preencher, o painel registrará como aluno não identificado.</b>`;
       box.style.display = "block";
     }
     if(prova.escola) document.getElementById("nomeEscola").value=prova.escola;
@@ -328,8 +354,8 @@ function mostrarEntrada(){
       <label>Nome ou código do aluno</label>
       <input id="nomeAluno" oninput="tentarReconhecerCodigoAluno()" placeholder="Nome do aluno ou código da avaliação criada pelo coordenador">
       <div id="campoNomeAlunoDireto" style="display:none">
-        <label>Nome completo do aluno</label>
-        <input id="nomeAlunoDireto" placeholder="Obrigatório quando usar código direto de prova personalizada">
+        <label>Nome completo do aluno (opcional)</label>
+        <input id="nomeAlunoDireto" placeholder="Opcional: preencha para identificar melhor no painel">
       </div>
       <label>Nome da escola</label>
       <input id="nomeEscola" placeholder="Ex.: EMEF Pedro de Queiroz Ferreira">
@@ -371,14 +397,13 @@ async function iniciar(){
   const nomeDireto=(document.getElementById("nomeAlunoDireto")?.value||"").trim();
   const nome=avaliacaoCriada
     ? (avaliacaoCriada.aluno_nome_completo || avaliacaoCriada.aluno_nome || avaliacaoCriada.destinatario || avaliacaoCriada.codigo)
-    : (provaDireta && provaDireta.aluno_nome ? provaDireta.aluno_nome : (provaDireta ? nomeDireto : nomeDigitado));
-  const turma=(avaliacaoCriada && avaliacaoCriada.turma) ? avaliacaoCriada.turma : (provaDireta?.turma || "");
+    : (provaDireta && provaDireta.aluno_nome ? provaDireta.aluno_nome : (provaDireta ? (nomeDireto || ("Aluno não identificado - "+provaDireta.codigo)) : nomeDigitado));
+  const turma=turmaValidaTreino((avaliacaoCriada && avaliacaoCriada.turma) ? avaliacaoCriada.turma : (provaDireta?.turma || ""), serieAuto);
   const escola=(avaliacaoCriada && avaliacaoCriada.escola) ? avaliacaoCriada.escola : (provaDireta?.escola || document.getElementById("nomeEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira");
   const serie=String(serieAuto||"");
   const aceite=document.getElementById("aceiteLgpd").checked;
   if(!codigo){alert("Digite o código da prova ou use o código individual entregue pela escola/professor.");return;}
   if(!serie){alert("Não foi possível identificar a série/ano. Se for teste livre, selecione a série manualmente.");return;}
-  if(provaDireta && !avaliacaoCriada && !nome){alert("Informe o nome completo do aluno para o resultado aparecer corretamente no painel.");return;}
   if(!provaDireta && !avaliacaoCriada && nome.length<2){alert("Digite o nome do aluno, o código da avaliação ou o código da prova personalizada.");return;}
   if(!aceite){alert("Confirme o uso com orientação da escola/professor.");return;}
   if(serieDoCodigo(codigo) && serieDoCodigo(codigo)!==serie){alert("O código da prova não corresponde à série selecionada.");return;}
@@ -390,7 +415,7 @@ async function iniciar(){
     provaAtual.codigoAvaliacaoUnica=avaliacaoCriada.codigo;
     provaAtual.tipoAvaliacao=avaliacaoCriada.tipo || "aluno";
     provaAtual.destinatario=avaliacaoCriada.destinatario || avaliacaoCriada.aluno_nome_completo || "";
-    provaAtual.turma=avaliacaoCriada.turma || "";
+    provaAtual.turma=turmaValidaTreino(avaliacaoCriada.turma || "", serieAuto);
     provaAtual.professor_nome=avaliacaoCriada.professor_nome || "";
     provaAtual.professor_usuario=avaliacaoCriada.professor_usuario || "";
     provaAtual.professor_perfil=avaliacaoCriada.professor_perfil || "";
@@ -399,7 +424,7 @@ async function iniciar(){
     provaAtual.codigoAvaliacaoUnica="";
     provaAtual.tipoAvaliacao="prova_personalizada_direta";
     provaAtual.destinatario=nome;
-    provaAtual.turma=turma;
+    provaAtual.turma=turmaValidaTreino(turma, serieAuto);
     provaAtual.professor_nome=provaDireta.professor_nome || "";
     provaAtual.professor_usuario=provaDireta.professor_usuario || "";
     provaAtual.professor_perfil="professor";
