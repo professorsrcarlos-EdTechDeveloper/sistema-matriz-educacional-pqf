@@ -1,147 +1,231 @@
-/*
-  SISTEMA MATRIZ EDUCACIONAL PQF
-  Patch seguro: NÃO altera o layout do painel.
-  Funções:
-  1) Mantém exportação XLSX de dados, quando a biblioteca XLSX estiver disponível.
-  2) Gera RELATÓRIO/IMPRESSÃO COM GRÁFICOS usando os gráficos que já aparecem no painel.
-  3) Baixa um arquivo .xls visual com os gráficos em HTML, abrindo no Excel/Excel Web como relatório visual.
-*/
-(function(){
+/* =========================================================
+   PATCH SEGURO - MATRIZ EDUCACIONAL PQF
+   Funcoes:
+   1) Mantem exportacao XLSX dos dados
+   2) Adiciona botao IMPRIMIR RELATORIO COM GRAFICOS
+   3) Nao altera layout original do painel
+   ========================================================= */
+(function () {
   'use strict';
 
-  function hojeBR(){
-    const d = new Date();
-    return d.toISOString().slice(0,10);
+  function carregarXLSX(callback) {
+    if (window.XLSX) return callback && callback();
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.onload = function () { callback && callback(); };
+    document.head.appendChild(s);
   }
 
-  function baixarBlob(nome, conteudo, tipo){
-    const blob = new Blob([conteudo], {type: tipo});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = nome;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(()=>{URL.revokeObjectURL(url); a.remove();}, 500);
+  function texto(v) {
+    if (v === null || v === undefined) return '';
+    return String(v).replace(/\s+/g, ' ').trim();
   }
 
-  function texto(id){
-    const el = document.getElementById(id);
-    return el ? (el.textContent || '').trim() : '';
+  function coletarTabelaDaPagina() {
+    var tabelas = Array.from(document.querySelectorAll('table'));
+    var maior = null;
+    tabelas.forEach(function (t) {
+      var linhas = t.querySelectorAll('tr').length;
+      if (!maior || linhas > maior.querySelectorAll('tr').length) maior = t;
+    });
+    if (!maior) return [];
+
+    var linhas = Array.from(maior.querySelectorAll('tr'));
+    return linhas.map(function (tr) {
+      return Array.from(tr.querySelectorAll('th,td')).map(function (td) { return texto(td.innerText); });
+    }).filter(function (r) { return r.some(Boolean); });
   }
 
-  function clonarHTML(id){
-    const el = document.getElementById(id);
-    return el ? el.outerHTML : '<div class="sem-dados">Sem dados.</div>';
+  function coletarCardsResumo() {
+    var candidatos = Array.from(document.querySelectorAll('.card, .kpi, .stat, section, article, div'));
+    var itens = [];
+    candidatos.forEach(function (el) {
+      var t = texto(el.innerText);
+      if (!t || t.length < 3 || t.length > 180) return;
+      if (/registros|média|media|maior resultado|abaixo de 50|evolução|evolucao|faixa|descritor|ranking|aluno/i.test(t)) {
+        if (!itens.includes(t)) itens.push(t);
+      }
+    });
+    return itens.slice(0, 80).map(function (v, i) { return [i + 1, v]; });
   }
 
-  function cssRelatorio(){
-    return `
-      <style>
-        *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-        body{margin:0;padding:22px;background:#fff;color:#111827}
-        .cabecalho{border-bottom:4px solid #0f4c81;margin-bottom:18px;padding-bottom:10px}
-        h1{margin:0;color:#0f4c81;font-size:24px}
-        h2{color:#0f4c81;font-size:18px;margin:18px 0 8px;border-bottom:1px solid #cbd5e1;padding-bottom:5px}
-        .sub{color:#475569;font-size:12px;margin-top:4px}
-        .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 18px}
-        .kpiPrint{border:1px solid #cbd5e1;border-left:6px solid #0f4c81;border-radius:8px;padding:10px;background:#f8fafc}
-        .kpiPrint b{font-size:12px;color:#475569;display:block;text-transform:uppercase}
-        .kpiPrint strong{font-size:28px;color:#111827;display:block;margin-top:4px}
-        .secao{page-break-inside:avoid;border:1px solid #cbd5e1;border-radius:10px;padding:12px;margin-bottom:14px;background:#fff}
-        .chart-bar,.bar-row{margin:8px 0}
-        .bar-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px}
-        .bar-track{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden}
-        .bar-fill{height:100%;background:#2563eb;border-radius:999px}
-        .bar-fill.red{background:#dc2626}.bar-fill.gold{background:#d97706}
-        .vertical-chart{display:flex;align-items:end;gap:10px;min-height:180px;border-left:1px solid #cbd5e1;border-bottom:1px solid #cbd5e1;padding:10px 6px 30px;margin-top:8px}
-        .vertical-item,.vbar-wrap{flex:1;text-align:center;position:relative}
-        .vertical-bar,.vbar{margin:auto;width:70%;max-width:45px;border-radius:8px 8px 2px 2px;background:#2563eb;min-height:4px}
-        .pizza,.pie{width:150px;height:150px;border-radius:50%;margin:10px auto;border:1px solid #cbd5e1}
-        .mini-card,.rank-item,.plan-item,.result-card,.avaliacao-card{border:1px solid #cbd5e1;border-radius:8px;padding:8px;margin:6px 0;background:#f8fafc;color:#111827}
-        .heat-table,.heatmap-grid{display:grid;grid-template-columns:240px repeat(3,1fr);gap:5px}
-        .heat-cell{border:1px solid #cbd5e1;border-radius:6px;padding:7px;font-size:12px;background:#f8fafc;color:#111827}
-        .heat-bad{background:#fee2e2!important}.heat-warn{background:#fef3c7!important}.heat-good{background:#dcfce7!important}
-        .pre{white-space:pre-wrap;border:1px solid #cbd5e1;border-radius:8px;padding:10px;background:#f8fafc;color:#111827}
-        table{width:100%;border-collapse:collapse;margin-top:10px}td,th{border:1px solid #cbd5e1;padding:6px;font-size:12px;text-align:left}th{background:#e2e8f0}
-        @media print{body{padding:10mm}.no-print{display:none!important}.secao{break-inside:avoid}.page-break{page-break-before:always}}
-      </style>`;
+  function pegarLocalStorageResultados() {
+    var possiveis = [];
+    Object.keys(localStorage).forEach(function (k) {
+      try {
+        var v = localStorage.getItem(k);
+        if (!v || v.length < 2) return;
+        var parsed = JSON.parse(v);
+        if (Array.isArray(parsed) && parsed.length) possiveis.push(parsed);
+      } catch(e) {}
+    });
+    possiveis.sort(function(a,b){ return b.length - a.length; });
+    return possiveis[0] || [];
   }
 
-  function montarRelatorioHTML(){
-    const usuario = texto('usuarioLogadoBox') || 'Painel PQF';
-    return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Relatório MATRIZ com gráficos</title>${cssRelatorio()}</head><body>
-      <div class="cabecalho">
-        <h1>Sistema MATRIZ EDUCACIONAL — Relatório com Gráficos</h1>
-        <div class="sub">E.M.E.F. Pedro de Queiroz Ferreira • Sítio Lucas • Beberibe</div>
-        <div class="sub">Gerado em ${new Date().toLocaleString('pt-BR')} • ${usuario}</div>
-      </div>
-      <div class="kpis">
-        <div class="kpiPrint"><b>Registros</b><strong>${texto('kTotal') || '0'}</strong></div>
-        <div class="kpiPrint"><b>Média geral</b><strong>${texto('kMedia') || '0%'}</strong></div>
-        <div class="kpiPrint"><b>Maior resultado</b><strong>${texto('kMaior') || '0%'}</strong></div>
-        <div class="kpiPrint"><b>Abaixo de 50%</b><strong>${texto('kBaixo50') || '0'}</strong></div>
-        <div class="kpiPrint"><b>50% a 69%</b><strong>${texto('kAtencao') || '0'}</strong></div>
-        <div class="kpiPrint"><b>Evolução recente</b><strong>${texto('kEvolucao') || '0%'}</strong></div>
-      </div>
-      <div class="secao"><h2>Comparativo por Componente Curricular</h2>${clonarHTML('chartComponentes')}</div>
-      <div class="secao"><h2>Faixa de Desempenho</h2>${clonarHTML('chartFaixas')}</div>
-      <div class="secao"><h2>Descritores com Maior Dificuldade</h2>${clonarHTML('chartErros')}</div>
-      <div class="secao"><h2>Descritores com Melhor Domínio</h2>${clonarHTML('chartAcertos')}</div>
-      <div class="secao"><h2>Ranking Pedagógico de Evolução</h2>${clonarHTML('rankingEvolucao')}</div>
-      <div class="secao"><h2>Nível de Acompanhamento Pedagógico</h2>${clonarHTML('riscoPedagogico')}</div>
-      <div class="secao"><h2>Mapa de Calor dos Descritores por Ano</h2>${clonarHTML('heatmapDescritores')}</div>
-      <div class="secao"><h2>Evolução por Descritor</h2>${clonarHTML('evolucaoDescritores')}</div>
-      <div class="secao"><h2>Plano Automático de Intervenção</h2>${clonarHTML('planoIntervencao')}</div>
-      <div class="secao"><h2>Desempenho Mensal</h2>${clonarHTML('desempenhoMensal')}</div>
-      <div class="secao"><h2>Relatório Pedagógico</h2>${clonarHTML('relatorioPedagogico')}</div>
-    </body></html>`;
+  function normalizarObjeto(r, i) {
+    return {
+      'Nº': i + 1,
+      'Data': r.data || r.created_at || r.dataHora || r.timestamp || '',
+      'Aluno': r.aluno || r.nome || r.nomeAluno || '',
+      'Série': r.serie || r.série || r.anoSerie || r.ano_escolar || '',
+      'Turma': r.turma || '',
+      'Componente Curricular': r.componente || r.componenteCurricular || r.materia || r.disciplina || '',
+      'Escola': r.escola || '',
+      'Código da Prova': r.codigo || r.codigoProva || r.prova || '',
+      'Ano': r.ano || '2026',
+      'Mês': r.mes || r.mês || '',
+      'Acertos': Number(r.acertos || r.qtdAcertos || 0),
+      'Total': Number(r.total || r.totalQuestoes || r.questoes || 0),
+      'Percentual': r.percentual || r.porcentagem || (r.total ? Math.round((Number(r.acertos || 0) / Number(r.total || 1)) * 100) + '%' : ''),
+      'Descritor': r.descritor || r.habilidade || '',
+      'Resultado': r.resultado || r.status || '',
+      'Observações': r.observacoes || r.observação || ''
+    };
   }
 
-  window.imprimirRelatorioComGraficos = function(){
-    const html = montarRelatorioHTML();
-    const w = window.open('', '_blank');
-    if(!w){ alert('O navegador bloqueou a janela de impressão. Permita pop-ups para este site.'); return; }
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
-    setTimeout(()=>{ w.focus(); w.print(); }, 500);
-  };
+  function baixarExcelMatriz(anonimo) {
+    carregarXLSX(function () {
+      var dadosStorage = pegarLocalStorageResultados();
+      var dados = [];
 
-  window.baixarRelatorioExcelVisual = function(){
-    const html = montarRelatorioHTML();
-    baixarBlob('relatorio_matriz_com_graficos_' + hojeBR() + '.xls', html, 'application/vnd.ms-excel;charset=utf-8');
-  };
+      if (dadosStorage.length && typeof dadosStorage[0] === 'object' && !Array.isArray(dadosStorage[0])) {
+        dados = dadosStorage.map(normalizarObjeto);
+      }
 
-  // Se existir o botão antigo “Planilha com gráficos”, ele passa a gerar o relatório visual com gráficos.
-  window.gerarPlanilhaGraficos = window.baixarRelatorioExcelVisual;
+      var tabela = coletarTabelaDaPagina();
+      if (!dados.length && tabela.length) {
+        var cab = tabela[0];
+        dados = tabela.slice(1).map(function (linha, idx) {
+          var obj = {};
+          cab.forEach(function (c, i) { obj[c || ('Coluna ' + (i + 1))] = linha[i] || ''; });
+          obj['Nº'] = obj['Nº'] || idx + 1;
+          return obj;
+        });
+      }
 
-  function inserirBotoesRelatorio(){
-    const botoes = Array.from(document.querySelectorAll('button, a'));
-    const jaTem = botoes.some(b => /relat.rio.*gr.ficos|imprimir.*gr.ficos/i.test(b.textContent || ''));
-    if(jaTem) return;
-    const alvo = botoes.find(b => /Excel|CSV|Planilha/i.test(b.textContent || ''));
-    const container = alvo ? alvo.parentElement : document.querySelector('.actions');
-    if(!container) return;
+      if (!dados.length) {
+        alert('Nenhum dado encontrado para exportar. Clique em Atualizar e tente novamente.');
+        return;
+      }
 
-    const btnPrint = document.createElement('button');
+      if (anonimo) {
+        dados = dados.map(function (r) {
+          var novo = Object.assign({}, r);
+          if ('Aluno' in novo) novo.Aluno = 'Aluno ' + String(novo['Nº'] || '').padStart(2, '0');
+          if ('Nome' in novo) novo.Nome = 'Aluno ' + String(novo['Nº'] || '').padStart(2, '0');
+          return novo;
+        });
+      }
+
+      var wb = XLSX.utils.book_new();
+      var wsDados = XLSX.utils.json_to_sheet(dados);
+      wsDados['!cols'] = Object.keys(dados[0]).map(function (k) { return { wch: Math.max(12, Math.min(32, k.length + 8)) }; });
+      XLSX.utils.book_append_sheet(wb, wsDados, 'Resultados');
+
+      var resumo = coletarCardsResumo();
+      resumo.unshift(['Item', 'Informação do painel']);
+      var wsResumo = XLSX.utils.aoa_to_sheet(resumo);
+      wsResumo['!cols'] = [{wch:8},{wch:90}];
+      XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo do Painel');
+
+      var nome = anonimo ? 'resultados_matriz_anonimizado_' : 'resultados_matriz_educacional_';
+      var hoje = new Date().toISOString().slice(0,10);
+      XLSX.writeFile(wb, nome + hoje + '.xlsx');
+    });
+  }
+
+  function imprimirRelatorioComGraficos() {
+    var titulo = 'Relatório Pedagógico - Sistema Matriz Educacional PQF';
+    var cabecalho = document.querySelector('header, .header, .topo, .hero') || document.body.firstElementChild;
+    var filtros = document.querySelector('form, .filters, .filtros') || null;
+
+    var blocos = Array.from(document.querySelectorAll('canvas, svg, table, .card, .kpi, .stat, section, article'));
+    var usados = [];
+    blocos.forEach(function (el) {
+      if (usados.indexOf(el) >= 0) return;
+      var txt = texto(el.innerText || '');
+      if (el.tagName === 'CANVAS' || el.tagName === 'SVG' || txt.length > 2) usados.push(el);
+    });
+
+    var conteudo = '';
+    if (cabecalho) conteudo += '<div class="cabecalho-relatorio">' + cabecalho.outerHTML + '</div>';
+    if (filtros) conteudo += '<h2>Filtros e contexto da análise</h2><div class="bloco">' + filtros.outerHTML + '</div>';
+
+    conteudo += '<h2>Painel de indicadores e gráficos</h2>';
+    if (usados.length) {
+      usados.forEach(function (el) {
+        if (el.tagName === 'CANVAS') {
+          try { conteudo += '<div class="bloco"><img src="' + el.toDataURL('image/png') + '" /></div>'; } catch(e) {}
+        } else {
+          conteudo += '<div class="bloco">' + el.outerHTML + '</div>';
+        }
+      });
+    } else {
+      conteudo += '<p>Nenhum gráfico visível encontrado. Clique em Atualizar no painel antes de imprimir.</p>';
+    }
+
+    var win = window.open('', '_blank');
+    win.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+titulo+'</title><style>body{font-family:Arial,sans-serif;margin:24px;color:#111;background:#fff}h1{font-size:24px;margin:0 0 6px}h2{font-size:18px;margin:22px 0 10px;border-bottom:2px solid #ddd;padding-bottom:6px}.data{color:#555;margin-bottom:18px}.bloco{border:1px solid #ddd;border-radius:10px;padding:12px;margin:10px 0;page-break-inside:avoid;background:#fff}table{width:100%;border-collapse:collapse;font-size:12px}td,th{border:1px solid #ccc;padding:6px;text-align:left}img,canvas,svg{max-width:100%;height:auto}.cabecalho-relatorio *{max-width:100%}@media print{button{display:none}.bloco{break-inside:avoid}body{margin:12mm}}</style></head><body>');
+    win.document.write('<button onclick="window.print()" style="padding:12px 18px;margin-bottom:16px;font-weight:bold">Imprimir / Salvar em PDF</button>');
+    win.document.write('<h1>'+titulo+'</h1><div class="data">Gerado em '+new Date().toLocaleString('pt-BR')+'</div>');
+    win.document.write(conteudo);
+    win.document.write('</body></html>');
+    win.document.close();
+    setTimeout(function(){ win.focus(); }, 500);
+  }
+
+  function adicionarBotoes() {
+    var area = document.querySelector('.filters, .filtros, form') || document.querySelector('main') || document.body;
+    if (!area || document.getElementById('btn-imprimir-graficos-matriz')) return;
+
+    var box = document.createElement('div');
+    box.style.display = 'flex';
+    box.style.flexWrap = 'wrap';
+    box.style.gap = '8px';
+    box.style.margin = '10px 0';
+
+    var btnPrint = document.createElement('button');
+    btnPrint.id = 'btn-imprimir-graficos-matriz';
     btnPrint.type = 'button';
-    btnPrint.className = 'btn gold';
     btnPrint.textContent = 'Imprimir relatório com gráficos';
-    btnPrint.onclick = window.imprimirRelatorioComGraficos;
+    btnPrint.style.background = '#22c55e';
+    btnPrint.style.color = '#001b0b';
+    btnPrint.style.border = '0';
+    btnPrint.style.borderRadius = '10px';
+    btnPrint.style.padding = '11px 14px';
+    btnPrint.style.fontWeight = '800';
+    btnPrint.onclick = imprimirRelatorioComGraficos;
 
-    const btnXls = document.createElement('button');
-    btnXls.type = 'button';
-    btnXls.className = 'btn gold';
-    btnXls.textContent = 'Excel visual com gráficos';
-    btnXls.onclick = window.baixarRelatorioExcelVisual;
+    var btnExcel = document.createElement('button');
+    btnExcel.id = 'btn-exportar-xlsx-matriz';
+    btnExcel.type = 'button';
+    btnExcel.textContent = 'Baixar Excel XLSX';
+    btnExcel.style.background = '#facc15';
+    btnExcel.style.color = '#111827';
+    btnExcel.style.border = '0';
+    btnExcel.style.borderRadius = '10px';
+    btnExcel.style.padding = '11px 14px';
+    btnExcel.style.fontWeight = '800';
+    btnExcel.onclick = function(){ baixarExcelMatriz(false); };
 
-    container.appendChild(btnPrint);
-    container.appendChild(btnXls);
+    box.appendChild(btnPrint);
+    box.appendChild(btnExcel);
+    area.appendChild(box);
   }
 
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(inserirBotoesRelatorio, 800);
-    setTimeout(inserirBotoesRelatorio, 2000);
-  });
+  // Sobrescreve nomes comuns sem quebrar botoes antigos
+  window.exportarResultadosExcel = function(){ baixarExcelMatriz(false); };
+  window.exportarExcel = function(){ baixarExcelMatriz(false); };
+  window.exportarCSV = function(){ baixarExcelMatriz(false); };
+  window.exportarExcelAnonimizado = function(){ baixarExcelMatriz(true); };
+  window.imprimirRelatorioComGraficos = imprimirRelatorioComGraficos;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', adicionarBotoes);
+  } else {
+    adicionarBotoes();
+  }
+  setTimeout(adicionarBotoes, 1000);
+  setTimeout(adicionarBotoes, 3000);
 })();
