@@ -11,10 +11,21 @@ body{min-height:100vh;background:radial-gradient(circle at top left,rgba(56,189,
 body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;mask-image:linear-gradient(to bottom,black,transparent 80%)}
 .wrap{max-width:1120px;margin:0 auto;position:relative;z-index:1}
 .header{border:1px solid rgba(56,189,248,.24);border-radius:18px;padding:14px;background:linear-gradient(135deg,rgba(11,18,36,.95),rgba(16,27,53,.92));box-shadow:0 0 16px rgba(56,189,248,.10), inset 0 0 20px rgba(255,255,255,.03);text-align:center;margin-bottom:10px}
-.school-logo{width:82px;height:82px;object-fit:contain;border-radius:50%;background:#fff;padding:5px;margin:0 auto 8px;display:block;box-shadow:0 0 18px rgba(56,189,248,.18)}
-.logo{width:132px;height:56px;border-radius:18px;margin:0 auto 8px;background:radial-gradient(circle at 18% 28%,rgba(255,255,255,.20),transparent 22%),linear-gradient(135deg,#0f2b46,#133d63 44%,#12729a 100%);display:grid;place-items:center;color:#fff;font-weight:1000;font-size:.78rem;letter-spacing:.08em;box-shadow:0 0 24px rgba(56,189,248,.20);position:relative;overflow:hidden;border:1px solid rgba(56,189,248,.34)}
-.logo::before{content:"";position:absolute;width:18px;height:18px;right:10px;top:18px;border:2px solid rgba(251,191,36,.62);transform:rotate(45deg);border-radius:4px}
+.header{position:relative;isolation:isolate}
+.header::before,.header::after{content:"";position:absolute;pointer-events:none;left:50%;transform:translateX(-50%);border-radius:50%;z-index:0}
+.header::before{top:6px;width:130px;height:130px;background:radial-gradient(circle,rgba(125,211,252,.34) 0%,rgba(56,189,248,.12) 36%,rgba(56,189,248,0) 74%);filter:blur(8px);animation:gemPulse 3.2s ease-in-out infinite}
+.header::after{top:-2px;width:156px;height:156px;background:conic-gradient(from 0deg,transparent 0 14%,rgba(255,255,255,.72) 20%,transparent 26%,rgba(56,189,248,.44) 36%,transparent 42%,rgba(251,191,36,.34) 52%,transparent 58%,rgba(167,139,250,.28) 68%,transparent 74%);filter:blur(12px);mix-blend-mode:screen;animation:prismSpin 8.5s linear infinite}
+.school-logo{width:82px;height:82px;object-fit:contain;border-radius:50%;background:#fff;padding:5px;margin:0 auto 8px;display:block;position:relative;z-index:1;box-shadow:0 0 18px rgba(56,189,248,.18);animation:logoFloat 4.8s ease-in-out infinite, logoGlow 3s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(56,189,248,.24))}
+.logo{width:132px;height:56px;border-radius:18px;margin:0 auto 8px;background:radial-gradient(circle at 18% 28%,rgba(255,255,255,.26),transparent 22%),linear-gradient(135deg,#0f2b46,#133d63 44%,#12729a 100%);display:grid;place-items:center;color:#fff;font-weight:1000;font-size:.78rem;letter-spacing:.08em;box-shadow:0 0 24px rgba(56,189,248,.20);position:relative;overflow:hidden;border:1px solid rgba(56,189,248,.34);z-index:1;animation:logoFloat 4.8s ease-in-out infinite reverse, gemFrame 3.6s ease-in-out infinite}
+.logo::before{content:"";position:absolute;width:18px;height:18px;right:10px;top:18px;border:2px solid rgba(251,191,36,.72);transform:rotate(45deg);border-radius:4px;box-shadow:0 0 12px rgba(251,191,36,.26)}
+.logo::after{content:"";position:absolute;inset:-30% auto -30% -18%;width:48%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.40),transparent);transform:skewX(-24deg);animation:prismSweep 4.6s linear infinite}
 .logo span{position:relative;z-index:1;padding-right:16px}
+@keyframes logoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.03)}}
+@keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 10px rgba(56,189,248,.20)) drop-shadow(0 0 16px rgba(14,165,233,.16))}50%{filter:drop-shadow(0 0 15px rgba(125,211,252,.55)) drop-shadow(0 0 28px rgba(99,102,241,.28))}}
+@keyframes gemPulse{0%,100%{opacity:.56;transform:translateX(-50%) scale(.94)}50%{opacity:1;transform:translateX(-50%) scale(1.09)}}
+@keyframes prismSpin{from{transform:translateX(-50%) rotate(0)}to{transform:translateX(-50%) rotate(360deg)}}
+@keyframes prismSweep{0%{transform:translateX(-170%) skewX(-24deg);opacity:0}15%{opacity:0}30%{opacity:.55}55%{opacity:0}100%{transform:translateX(320%) skewX(-24deg);opacity:0}}
+@keyframes gemFrame{0%,100%{box-shadow:0 0 18px rgba(56,189,248,.18), inset 0 0 10px rgba(255,255,255,.04)}50%{box-shadow:0 0 28px rgba(56,189,248,.28),0 0 44px rgba(14,165,233,.12),inset 0 0 16px rgba(255,255,255,.12)}}
 .badge{display:inline-flex;padding:5px 10px;border:1px solid rgba(250,204,21,.32);color:var(--gold);border-radius:999px;font-size:.68rem;font-weight:1000;letter-spacing:.08em;text-transform:uppercase;background:rgba(250,204,21,.08);margin-bottom:8px}
 h1{font-size:clamp(1.35rem,3vw,2.15rem);line-height:1.05;text-shadow:0 0 12px rgba(0,229,255,.28)}
 .header p{color:var(--muted);font-size:.9rem;margin-top:6px;line-height:1.35}
@@ -61,7 +72,7 @@ footer strong{color:var(--gold)}
   </header>
   <div class="legal"><strong>Aviso legal:</strong> Ferramenta independente de treinamento escolar. Não oficial, não vinculada à SEDUC/CE, CAEd/UFJF ou Governo do Estado do Ceará. SPAECE é citado apenas como referência à avaliação educacional.</div>
   <main id="app" class="box"></main>
-  <footer><strong>Idealizadores professores/coordenadores:</strong> Cleilsom Paiva-História e Carlos Tavares- Geografia</footer>
+  <footer><strong>Idealizadores:</strong> Cleilson Paiva — gestor escolar e Carlos Tavares — coordenador / Geografia</footer>
 </div>
 
 <script src="questoes.js"></script>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel do Coordenador — Sistema MATRIZ EDUCACIONAL</title>
+<title>Painel de Gestão e Coordenação — Sistema MATRIZ EDUCACIONAL</title>
 <style>
 :root{
   --bg:#071524;--card:#0f2335;--card2:#15344d;--blue:#38bdf8;--green:#22c55e;--gold:#fbbf24;
@@ -38,16 +38,26 @@ main{max-width:1360px;margin:0 auto;position:relative;z-index:1}
 }
 .header{padding:20px;margin-bottom:16px;border-color:rgba(56,189,248,.25)}
 .header-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.brand{display:flex;gap:14px;align-items:center}
-.school-logo{width:74px;height:74px;object-fit:contain;border-radius:50%;background:#fff;padding:5px;box-shadow:0 0 18px rgba(56,189,248,.18)}
+.brand{display:flex;gap:14px;align-items:center;position:relative;isolation:isolate;overflow:visible}
+.brand::before,.brand::after{content:"";position:absolute;pointer-events:none;border-radius:50%;left:-2px;top:-6px;width:92px;height:92px;z-index:0}
+.brand::before{background:radial-gradient(circle,rgba(125,211,252,.45) 0%,rgba(56,189,248,.18) 34%,rgba(56,189,248,0) 72%);filter:blur(7px);animation:gemPulse 3.2s ease-in-out infinite}
+.brand::after{background:conic-gradient(from 0deg,transparent 0 14%,rgba(255,255,255,.70) 20%,transparent 26%,rgba(56,189,248,.52) 36%,transparent 42%,rgba(251,191,36,.42) 52%,transparent 58%,rgba(167,139,250,.34) 68%,transparent 74%);filter:blur(11px);mix-blend-mode:screen;animation:prismSpin 8s linear infinite}
+.school-logo{width:74px;height:74px;object-fit:contain;border-radius:50%;background:#fff;padding:5px;position:relative;z-index:1;box-shadow:0 0 18px rgba(56,189,248,.18);animation:logoFloat 4.8s ease-in-out infinite, logoGlow 3s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(56,189,248,.24))}
 .brand-mark{
   width:132px;height:56px;border-radius:18px;
-  background:radial-gradient(circle at 18% 28%,rgba(255,255,255,.20),transparent 22%),linear-gradient(135deg,#0f2b46,#133d63 44%,#12729a 100%);
+  background:radial-gradient(circle at 18% 28%,rgba(255,255,255,.28),transparent 22%),linear-gradient(135deg,#0f2b46,#133d63 44%,#12729a 100%);
   display:grid;place-items:center;color:#fff;font-weight:1000;font-size:.78rem;letter-spacing:.08em;
-  box-shadow:0 0 24px rgba(56,189,248,.20);position:relative;overflow:hidden;border:1px solid rgba(56,189,248,.34);
+  box-shadow:0 0 24px rgba(56,189,248,.20);position:relative;overflow:hidden;border:1px solid rgba(56,189,248,.34);z-index:1;animation:logoFloat 4.8s ease-in-out infinite reverse, gemFrame 3.6s ease-in-out infinite;
 }
-.brand-mark::before{content:"";position:absolute;width:18px;height:18px;right:10px;top:18px;border:2px solid rgba(251,191,36,.62);transform:rotate(45deg);border-radius:4px}
+.brand-mark::before{content:"";position:absolute;width:18px;height:18px;right:10px;top:18px;border:2px solid rgba(251,191,36,.72);transform:rotate(45deg);border-radius:4px;box-shadow:0 0 12px rgba(251,191,36,.28)}
+.brand-mark::after{content:"";position:absolute;inset:-30% auto -30% -18%;width:48%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.40),transparent);transform:skewX(-24deg);animation:prismSweep 4.6s linear infinite}
 .brand-mark span{position:relative;z-index:1;padding-right:16px;white-space:nowrap}
+@keyframes logoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.03)}}
+@keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 10px rgba(56,189,248,.20)) drop-shadow(0 0 16px rgba(14,165,233,.16))}50%{filter:drop-shadow(0 0 15px rgba(125,211,252,.55)) drop-shadow(0 0 28px rgba(99,102,241,.28))}}
+@keyframes gemPulse{0%,100%{opacity:.56;transform:scale(.94)}50%{opacity:1;transform:scale(1.09)}}
+@keyframes prismSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes prismSweep{0%{transform:translateX(-170%) skewX(-24deg);opacity:0}15%{opacity:.0}30%{opacity:.55}55%{opacity:0}100%{transform:translateX(320%) skewX(-24deg);opacity:0}}
+@keyframes gemFrame{0%,100%{box-shadow:0 0 18px rgba(56,189,248,.18), inset 0 0 10px rgba(255,255,255,.04)}50%{box-shadow:0 0 28px rgba(56,189,248,.28),0 0 44px rgba(14,165,233,.12),inset 0 0 16px rgba(255,255,255,.12)}}
 h1{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.05}
 .subtitle{color:var(--muted);margin-top:5px;line-height:1.35;font-size:.96rem}
 .nav,.filters,.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -278,7 +288,7 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
   <div class="login-card">
     <div class="brand-mark" style="margin:0 auto 12px"><span>MATRIZ</span></div>
     <h2>Acesso PQF</h2>
-    <p>Entre com usuário e senha. Professores veem somente sua turma e componente; Carlos e Cleilson têm acesso geral.</p>
+    <p>Entre com usuário e senha. Professores veem somente sua turma e componente; Cleilson e Carlos têm acesso geral.</p>
     <input id="usuarioPainel" type="text" placeholder="Usuário" autocomplete="username" style="letter-spacing:0;text-transform:lowercase">
     <input id="senhaPainel" type="password" placeholder="Senha" autocomplete="current-password">
     <button onclick="validarSenhaPainel()">Entrar no painel</button>
@@ -1467,8 +1477,8 @@ document.addEventListener("DOMContentLoaded",()=>{setTimeout(()=>{prepararFerram
 <script>
 /* V33 PQF - login por usuário, permissão por turma/componente e histórico Supabase */
 const USUARIOS_PQF = [
-  {nome:"Carlos Tavares", usuario:"carlos.tavares", senha:"7890uiop", perfil:"gestor", turma_vinculada:"Todas", componente_vinculado:"Todos", acesso_geral:true},
-  {nome:"Cleilson Paiva", usuario:"cleilson.paiva", senha:"1234qwer", perfil:"coordenador", turma_vinculada:"Todas", componente_vinculado:"Todos", acesso_geral:true},
+  {nome:"Carlos Tavares", usuario:"carlos.tavares", senha:"7890uiop", perfil:"coordenador", turma_vinculada:"Todas", componente_vinculado:"Todos", acesso_geral:true},
+  {nome:"Cleilson Paiva", usuario:"cleilson.paiva", senha:"1234qwer", perfil:"gestor", turma_vinculada:"Todas", componente_vinculado:"Todos", acesso_geral:true},
   {nome:"Ana Ribeiro", usuario:"ana.ribeiro", senha:"2026abcd", perfil:"professor", turma_vinculada:"2º ano", componente_vinculado:"Português", acesso_geral:false},
   {nome:"Paulo Mendes", usuario:"paulo.mendes", senha:"2027efgh", perfil:"professor", turma_vinculada:"2º ano", componente_vinculado:"Matemática", acesso_geral:false},
   {nome:"Maria Duarte", usuario:"maria.duarte", senha:"2028ijkl", perfil:"professor", turma_vinculada:"5º ano", componente_vinculado:"Português", acesso_geral:false},
