@@ -27,11 +27,10 @@ body::before{
   mask-image:linear-gradient(to bottom,black,transparent 82%);
 }
 a{text-decoration:none;color:inherit}
-.book-mascot-wrap{display:flex;align-items:center;justify-content:center;position:relative;margin-left:10px}
+.book-mascot-wrap{display:flex;align-items:center;justify-content:center;position:relative;margin-left:8px}
 .book-mascot-wrap::before{content:"";position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.22) 0%,rgba(56,189,248,.10) 50%,rgba(56,189,248,0) 78%);filter:blur(10px)}
-.book-mascot{width:58px;height:58px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(56,189,248,.24));animation:float 4.4s ease-in-out infinite alternate}
+.book-mascot{width:58px;height:58px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(56,189,248,.24));animation:logoFloat 4.4s ease-in-out infinite alternate}
 @media(max-width:760px){.book-mascot{width:48px;height:48px}}
-
 .container{width:min(1180px,94%);margin:0 auto;position:relative;z-index:1}
 .topbar{
   position:sticky;top:0;z-index:20;

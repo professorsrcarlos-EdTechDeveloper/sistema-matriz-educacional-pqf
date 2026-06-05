@@ -53,7 +53,7 @@ main{max-width:1360px;margin:0 auto;position:relative;z-index:1}
 .brand-mark::after{content:"";position:absolute;inset:-30% auto -30% -18%;width:48%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.40),transparent);transform:skewX(-24deg);animation:prismSweep 4.6s linear infinite}
 .brand-mark span{position:relative;z-index:1;padding-right:16px;white-space:nowrap}
 
-.book-mascot-wrap{display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.book-mascot-wrap{display:flex;align-items:center;justify-content:center;position:relative;z-index:1;margin-left:2px}
 .book-mascot-wrap::before{content:"";position:absolute;inset:-10px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.26) 0%,rgba(56,189,248,.10) 48%,rgba(56,189,248,0) 74%);filter:blur(10px)}
 .book-mascot{width:68px;height:68px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(56,189,248,.25));animation:logoFloat 4.5s ease-in-out infinite alternate}
 @media(max-width:760px){.book-mascot{width:54px;height:54px}}
@@ -2409,135 +2409,6 @@ ${tabelaResumo}
 </tr>
 ${detalhesHTML}
 </table>
-
-<script>
-(function(){
-  const LOCAL_RESULT_KEYS = [
-    "matriz_spaece_resultados_locais",
-    "resultados_treinamento",
-    "matriz_resultados",
-    "resultados_matriz",
-    "matriz_resultados_backup"
-  ];
-
-  function obterLocalJSON(chave){
-    try{
-      const raw = localStorage.getItem(chave);
-      if(!raw) return [];
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    }catch(e){ return []; }
-  }
-
-  function coletarResultadosLocaisV56(){
-    let lista = [];
-    LOCAL_RESULT_KEYS.forEach(k=>{ lista = lista.concat(obterLocalJSON(k)); });
-    return lista;
-  }
-
-  function dataDentroFaixa(valor, inicio, fim){
-    if(!valor) return !inicio && !fim;
-    const dt = new Date(valor);
-    if(isNaN(dt.getTime())) return true;
-    if(inicio){ const di = new Date(inicio + 'T00:00:00'); if(dt < di) return false; }
-    if(fim){ const df = new Date(fim + 'T23:59:59'); if(dt > df) return false; }
-    return true;
-  }
-
-  function deduplicarResultadosV56(lista){
-    const seen = new Set();
-    const normaliza = (typeof normalizarRegistro === 'function') ? normalizarRegistro : (x=>x);
-    return (Array.isArray(lista)?lista:[]).map(normaliza).filter(d=>{
-      const key = [d.created_at||d.data||'', d.aluno_nome||d.aluno||d.nome||'', d.codigo_avaliacao||d.codigoAvaliacao||'', d.codigo_prova||d.codigoProva||'', d.materia||d.componente_curricular||''].join('|');
-      if(seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    }).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
-  }
-
-  async function carregarResultadosSupabaseV56(inicio='', fim=''){
-    if(!(typeof supabaseAtivo === 'function' && supabaseAtivo())) return [];
-    try{
-      let query = sb().from('resultados_treinamento').select('*').order('created_at',{ascending:false}).limit(5000);
-      if(inicio) query = query.gte('created_at', new Date(inicio+'T00:00:00').toISOString());
-      if(fim) query = query.lte('created_at', new Date(fim+'T23:59:59').toISOString());
-      const {data,error} = await query;
-      if(error){ console.warn('Supabase V56:', error); return []; }
-      return Array.isArray(data)?data:[];
-    }catch(e){ console.warn('Falha ao carregar Supabase V56:', e); return []; }
-  }
-
-  function atualizarKpisV56(lista){
-    const total = lista.length;
-    const mediaGeral = (typeof media === 'function') ? media(lista) : 0;
-    const maior = lista.reduce((m,d)=>Math.max(m, Number(d.percentual||0)), 0);
-    const abaixo50 = lista.filter(d=>Number(d.percentual||0)<50).length;
-    const faixa50 = lista.filter(d=>Number(d.percentual||0)>=50 && Number(d.percentual||0)<70).length;
-    const evol = (typeof deltaUltimas === 'function') ? deltaUltimas(lista) : 0;
-
-    const el = (id) => document.getElementById(id);
-    if(el('kTotal')) el('kTotal').innerHTML = String(total);
-    if(el('kMedia')) el('kMedia').innerHTML = String(mediaGeral) + '%';
-    if(el('tMedia')) el('tMedia').innerHTML = (typeof trendHtml === 'function') ? trendHtml(evol) : '';
-    if(el('kMaior')) el('kMaior').innerHTML = String(maior) + '%';
-    if(el('kBaixo50')) el('kBaixo50').innerHTML = String(abaixo50);
-    if(el('kAtencao')) el('kAtencao').innerHTML = String(faixa50);
-    if(el('kEvolucao')) el('kEvolucao').innerHTML = String(Math.abs(evol)) + '%';
-    if(el('tEvolucao')) el('tEvolucao').innerHTML = (typeof trendHtml === 'function') ? trendHtml(evol) : '';
-  }
-
-  window.renderizar = function renderizarV56(){
-    const lista = Array.isArray(window.dados) ? window.dados : [];
-    atualizarKpisV56(lista);
-    try{ if(typeof renderComponentes === 'function') renderComponentes(); }catch(e){console.warn(e)}
-    try{ if(typeof renderFaixas === 'function') renderFaixas(); }catch(e){console.warn(e)}
-    try{ if(typeof renderDescritores === 'function') renderDescritores(); }catch(e){console.warn(e)}
-    try{ if(typeof renderRanking === 'function') renderRanking(); }catch(e){console.warn(e)}
-    try{ if(typeof renderHeatmap === 'function') renderHeatmap(); }catch(e){console.warn(e)}
-    try{ if(typeof renderEvolucaoDescritores === 'function') renderEvolucaoDescritores(); }catch(e){console.warn(e)}
-    try{ if(typeof renderPlano === 'function') renderPlano(); }catch(e){console.warn(e)}
-    try{ if(typeof renderMensal === 'function') renderMensal(); }catch(e){console.warn(e)}
-    try{ if(typeof renderTabela === 'function') renderTabela(); }catch(e){console.warn(e)}
-    try{ if(typeof renderDashboardGestaoCoord === 'function') renderDashboardGestaoCoord(); }catch(e){console.warn(e)}
-    try{ if(typeof gerarRelatorioPedagogico === 'function') gerarRelatorioPedagogico(); }catch(e){console.warn(e)}
-    try{ if(typeof prepararFerramentasExpansiveis === 'function') prepararFerramentasExpansiveis(); }catch(e){console.warn(e)}
-  };
-
-  window.carregar = async function carregarV56(){
-    const remotos = await carregarResultadosSupabaseV56();
-    const locais = coletarResultadosLocaisV56();
-    window.dadosOriginais = deduplicarResultadosV56([].concat(remotos, locais));
-    if(typeof preencherFiltros === 'function') preencherFiltros();
-    if(typeof aplicarPermissoesUsuario === 'function') aplicarPermissoesUsuario();
-    if(typeof aplicarFiltros === 'function') aplicarFiltros();
-    else window.renderizar();
-    return window.dadosOriginais;
-  };
-
-  window.recuperarDadosPorData = async function recuperarDadosPorDataV56(){
-    const inicio = document.getElementById('dataInicioRecuperar')?.value || '';
-    const fim = document.getElementById('dataFimRecuperar')?.value || '';
-    const remotos = await carregarResultadosSupabaseV56(inicio, fim);
-    const locais = coletarResultadosLocaisV56().filter(d=>dataDentroFaixa(d.created_at || d.data || d.finalizado_em, inicio, fim));
-    window.dadosOriginais = deduplicarResultadosV56([].concat(remotos, locais));
-    if(typeof preencherFiltros === 'function') preencherFiltros();
-    if(typeof aplicarPermissoesUsuario === 'function') aplicarPermissoesUsuario();
-    if(typeof aplicarFiltros === 'function') aplicarFiltros();
-    else window.renderizar();
-    alert(window.dadosOriginais.length + ' avaliações recuperadas para o período informado.');
-  };
-
-  document.addEventListener('DOMContentLoaded', function(){
-    const tg = document.getElementById('tipoGrafico');
-    if(tg && !tg.dataset.v56bind){
-      tg.dataset.v56bind = '1';
-      tg.addEventListener('change', ()=>{ try{ window.renderizar(); }catch(e){} });
-    }
-    setTimeout(()=>{ try{ window.carregar(); }catch(e){ console.warn('Falha na carga V56:', e);} }, 500);
-  });
-})();
-</script>
-
 </body>
 </html>`;
 }
@@ -3102,8 +2973,9 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 
 <script>
+/* V57 — Correção de recuperação, filtros zerando resultados, expansão e dashboards */
 (function(){
-  const LOCAL_RESULT_KEYS = [
+  const LOCAL_RESULT_KEYS_V57 = [
     "matriz_spaece_resultados_locais",
     "resultados_treinamento",
     "matriz_resultados",
@@ -3111,120 +2983,168 @@ document.addEventListener("DOMContentLoaded",()=>{
     "matriz_resultados_backup"
   ];
 
-  function obterLocalJSON(chave){
+  function getJsonV57(key){
     try{
-      const raw = localStorage.getItem(chave);
+      const raw = localStorage.getItem(key);
       if(!raw) return [];
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
+      const obj = JSON.parse(raw);
+      return Array.isArray(obj) ? obj : [];
     }catch(e){ return []; }
   }
 
-  function coletarResultadosLocaisV56(){
-    let lista = [];
-    LOCAL_RESULT_KEYS.forEach(k=>{ lista = lista.concat(obterLocalJSON(k)); });
-    return lista;
+  function localResultsV57(){
+    let all = [];
+    LOCAL_RESULT_KEYS_V57.forEach(k => all = all.concat(getJsonV57(k)));
+    return all;
   }
 
-  function dataDentroFaixa(valor, inicio, fim){
-    if(!valor) return !inicio && !fim;
-    const dt = new Date(valor);
+  function inDateRangeV57(value, inicio, fim){
+    if(!inicio && !fim) return true;
+    const dt = new Date(value || new Date());
     if(isNaN(dt.getTime())) return true;
-    if(inicio){ const di = new Date(inicio + 'T00:00:00'); if(dt < di) return false; }
-    if(fim){ const df = new Date(fim + 'T23:59:59'); if(dt > df) return false; }
+    if(inicio){
+      const di = new Date(inicio + "T00:00:00");
+      if(dt < di) return false;
+    }
+    if(fim){
+      const df = new Date(fim + "T23:59:59");
+      if(dt > df) return false;
+    }
     return true;
   }
 
-  function deduplicarResultadosV56(lista){
+  function normalizeV57(x){
+    try{
+      return (typeof normalizarRegistro === "function") ? normalizarRegistro(x) : x;
+    }catch(e){
+      return x || {};
+    }
+  }
+
+  function dedupV57(list){
     const seen = new Set();
-    const normaliza = (typeof normalizarRegistro === 'function') ? normalizarRegistro : (x=>x);
-    return (Array.isArray(lista)?lista:[]).map(normaliza).filter(d=>{
-      const key = [d.created_at||d.data||'', d.aluno_nome||d.aluno||d.nome||'', d.codigo_avaliacao||d.codigoAvaliacao||'', d.codigo_prova||d.codigoProva||'', d.materia||d.componente_curricular||''].join('|');
+    return (Array.isArray(list) ? list : []).map(normalizeV57).filter(d=>{
+      const key = [
+        d.created_at || d.data || d.finalizado_em || "",
+        d.aluno_nome || d.aluno || d.nome || "",
+        d.codigo_avaliacao || d.codigoAvaliacao || "",
+        d.codigo_prova || d.codigoProva || "",
+        d.materia || d.componente_curricular || d.componente || ""
+      ].join("|");
       if(seen.has(key)) return false;
       seen.add(key);
       return true;
-    }).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+    }).sort((a,b)=>new Date(b.created_at || b.data || 0) - new Date(a.created_at || a.data || 0));
   }
 
-  async function carregarResultadosSupabaseV56(inicio='', fim=''){
-    if(!(typeof supabaseAtivo === 'function' && supabaseAtivo())) return [];
+  async function supabaseResultsV57(inicio="", fim=""){
+    if(!(typeof supabaseAtivo === "function" && supabaseAtivo())) return [];
     try{
-      let query = sb().from('resultados_treinamento').select('*').order('created_at',{ascending:false}).limit(5000);
-      if(inicio) query = query.gte('created_at', new Date(inicio+'T00:00:00').toISOString());
-      if(fim) query = query.lte('created_at', new Date(fim+'T23:59:59').toISOString());
-      const {data,error} = await query;
-      if(error){ console.warn('Supabase V56:', error); return []; }
-      return Array.isArray(data)?data:[];
-    }catch(e){ console.warn('Falha ao carregar Supabase V56:', e); return []; }
+      let q = sb().from("resultados_treinamento").select("*").order("created_at",{ascending:false}).limit(5000);
+      if(inicio) q = q.gte("created_at", new Date(inicio + "T00:00:00").toISOString());
+      if(fim) q = q.lte("created_at", new Date(fim + "T23:59:59").toISOString());
+      const {data,error} = await q;
+      if(error){
+        console.error("Erro Supabase V57:", error);
+        return [];
+      }
+      return Array.isArray(data) ? data : [];
+    }catch(e){
+      console.error("Falha Supabase V57:", e);
+      return [];
+    }
   }
 
-  function atualizarKpisV56(lista){
-    const total = lista.length;
-    const mediaGeral = (typeof media === 'function') ? media(lista) : 0;
-    const maior = lista.reduce((m,d)=>Math.max(m, Number(d.percentual||0)), 0);
-    const abaixo50 = lista.filter(d=>Number(d.percentual||0)<50).length;
-    const faixa50 = lista.filter(d=>Number(d.percentual||0)>=50 && Number(d.percentual||0)<70).length;
-    const evol = (typeof deltaUltimas === 'function') ? deltaUltimas(lista) : 0;
-
-    const el = (id) => document.getElementById(id);
-    if(el('kTotal')) el('kTotal').innerHTML = String(total);
-    if(el('kMedia')) el('kMedia').innerHTML = String(mediaGeral) + '%';
-    if(el('tMedia')) el('tMedia').innerHTML = (typeof trendHtml === 'function') ? trendHtml(evol) : '';
-    if(el('kMaior')) el('kMaior').innerHTML = String(maior) + '%';
-    if(el('kBaixo50')) el('kBaixo50').innerHTML = String(abaixo50);
-    if(el('kAtencao')) el('kAtencao').innerHTML = String(faixa50);
-    if(el('kEvolucao')) el('kEvolucao').innerHTML = String(Math.abs(evol)) + '%';
-    if(el('tEvolucao')) el('tEvolucao').innerHTML = (typeof trendHtml === 'function') ? trendHtml(evol) : '';
+  function clearFilterValuesV57(){
+    ["buscaAluno","filtroEscola"].forEach(id=>{const el=document.getElementById(id); if(el) el.value="";});
+    ["filtroSerie","filtroTurma","filtroComponente","filtroAno","filtroMes"].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el && !el.disabled) el.value="";
+    });
   }
 
-  window.renderizar = function renderizarV56(){
+  function setTextV57(id, html){
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = html;
+  }
+
+  function atualizarKpisV57(){
     const lista = Array.isArray(window.dados) ? window.dados : [];
-    atualizarKpisV56(lista);
-    try{ if(typeof renderComponentes === 'function') renderComponentes(); }catch(e){console.warn(e)}
-    try{ if(typeof renderFaixas === 'function') renderFaixas(); }catch(e){console.warn(e)}
-    try{ if(typeof renderDescritores === 'function') renderDescritores(); }catch(e){console.warn(e)}
-    try{ if(typeof renderRanking === 'function') renderRanking(); }catch(e){console.warn(e)}
-    try{ if(typeof renderHeatmap === 'function') renderHeatmap(); }catch(e){console.warn(e)}
-    try{ if(typeof renderEvolucaoDescritores === 'function') renderEvolucaoDescritores(); }catch(e){console.warn(e)}
-    try{ if(typeof renderPlano === 'function') renderPlano(); }catch(e){console.warn(e)}
-    try{ if(typeof renderMensal === 'function') renderMensal(); }catch(e){console.warn(e)}
-    try{ if(typeof renderTabela === 'function') renderTabela(); }catch(e){console.warn(e)}
-    try{ if(typeof renderDashboardGestaoCoord === 'function') renderDashboardGestaoCoord(); }catch(e){console.warn(e)}
-    try{ if(typeof gerarRelatorioPedagogico === 'function') gerarRelatorioPedagogico(); }catch(e){console.warn(e)}
-    try{ if(typeof prepararFerramentasExpansiveis === 'function') prepararFerramentasExpansiveis(); }catch(e){console.warn(e)}
+    const total = lista.length;
+    const med = (typeof media === "function") ? media(lista) : 0;
+    const maior = lista.reduce((m,d)=>Math.max(m, Number(d.percentual || 0)), 0);
+    const baixo50 = lista.filter(d=>Number(d.percentual || 0) < 50).length;
+    const faixa50 = lista.filter(d=>Number(d.percentual || 0) >= 50 && Number(d.percentual || 0) < 70).length;
+    const evol = (typeof deltaUltimas === "function") ? deltaUltimas(lista) : 0;
+
+    setTextV57("kTotal", String(total));
+    setTextV57("kMedia", med + "%");
+    setTextV57("tMedia", (typeof trendHtml === "function") ? trendHtml(evol) : "");
+    setTextV57("kMaior", maior + "%");
+    setTextV57("kBaixo50", String(baixo50));
+    setTextV57("kAtencao", String(faixa50));
+    setTextV57("kEvolucao", Math.abs(evol) + "%");
+    setTextV57("tEvolucao", (typeof trendHtml === "function") ? trendHtml(evol) : "");
+  }
+
+  window.renderizar = function renderizarV57(){
+    try{ atualizarKpisV57(); }catch(e){ console.warn(e); }
+    [
+      "renderComponentes",
+      "renderFaixas",
+      "renderDescritores",
+      "renderRanking",
+      "renderHeatmap",
+      "renderEvolucaoDescritores",
+      "renderPlano",
+      "renderMensal",
+      "renderDashboardGestaoCoord",
+      "renderTabela",
+      "gerarRelatorioPedagogico"
+    ].forEach(fn=>{
+      try{ if(typeof window[fn] === "function") window[fn](); }catch(e){ console.warn("Falha em "+fn, e); }
+    });
+    try{ if(typeof prepararFerramentasExpansiveis === "function") prepararFerramentasExpansiveis(); }catch(e){}
   };
 
-  window.carregar = async function carregarV56(){
-    const remotos = await carregarResultadosSupabaseV56();
-    const locais = coletarResultadosLocaisV56();
-    window.dadosOriginais = deduplicarResultadosV56([].concat(remotos, locais));
-    if(typeof preencherFiltros === 'function') preencherFiltros();
-    if(typeof aplicarPermissoesUsuario === 'function') aplicarPermissoesUsuario();
-    if(typeof aplicarFiltros === 'function') aplicarFiltros();
-    else window.renderizar();
+  window.carregar = async function carregarV57(){
+    const remote = await supabaseResultsV57();
+    const local = localResultsV57();
+    window.dadosOriginais = dedupV57(remote.concat(local));
+    try{ if(typeof preencherFiltros === "function") preencherFiltros(); }catch(e){}
+    try{ if(typeof aplicarPermissoesUsuario === "function") aplicarPermissoesUsuario(); }catch(e){}
+    try{ if(typeof aplicarFiltros === "function") aplicarFiltros(); else window.renderizar(); }catch(e){ window.dados = window.dadosOriginais || []; window.renderizar(); }
     return window.dadosOriginais;
   };
 
-  window.recuperarDadosPorData = async function recuperarDadosPorDataV56(){
-    const inicio = document.getElementById('dataInicioRecuperar')?.value || '';
-    const fim = document.getElementById('dataFimRecuperar')?.value || '';
-    const remotos = await carregarResultadosSupabaseV56(inicio, fim);
-    const locais = coletarResultadosLocaisV56().filter(d=>dataDentroFaixa(d.created_at || d.data || d.finalizado_em, inicio, fim));
-    window.dadosOriginais = deduplicarResultadosV56([].concat(remotos, locais));
-    if(typeof preencherFiltros === 'function') preencherFiltros();
-    if(typeof aplicarPermissoesUsuario === 'function') aplicarPermissoesUsuario();
-    if(typeof aplicarFiltros === 'function') aplicarFiltros();
-    else window.renderizar();
-    alert(window.dadosOriginais.length + ' avaliações recuperadas para o período informado.');
+  window.recuperarDadosPorData = async function recuperarDadosPorDataV57(){
+    const inicio = document.getElementById("dataInicioRecuperar")?.value || "";
+    const fim = document.getElementById("dataFimRecuperar")?.value || "";
+    const remote = await supabaseResultsV57(inicio, fim);
+    const local = localResultsV57().filter(d=>inDateRangeV57(d.created_at || d.data || d.finalizado_em, inicio, fim));
+    window.dadosOriginais = dedupV57(remote.concat(local));
+
+    /* Importante: limpa filtros de série, turma e componente para as avaliações recuperadas aparecerem. */
+    clearFilterValuesV57();
+
+    try{ if(typeof preencherFiltros === "function") preencherFiltros(); }catch(e){}
+    try{ if(typeof aplicarPermissoesUsuario === "function") aplicarPermissoesUsuario(); }catch(e){}
+    try{ if(typeof aplicarFiltros === "function") aplicarFiltros(); else { window.dados = window.dadosOriginais || []; window.renderizar(); } }catch(e){
+      window.dados = window.dadosOriginais || [];
+      window.renderizar();
+    }
+
+    const total = (window.dadosOriginais || []).length;
+    alert(total + " avaliações recuperadas. Os filtros foram limpos para os dados aparecerem no painel.");
   };
 
-  document.addEventListener('DOMContentLoaded', function(){
-    const tg = document.getElementById('tipoGrafico');
-    if(tg && !tg.dataset.v56bind){
-      tg.dataset.v56bind = '1';
-      tg.addEventListener('change', ()=>{ try{ window.renderizar(); }catch(e){} });
+  document.addEventListener("DOMContentLoaded", ()=>{
+    const tg = document.getElementById("tipoGrafico");
+    if(tg && !tg.dataset.v57bind){
+      tg.dataset.v57bind = "1";
+      tg.addEventListener("change", ()=>{ try{ window.renderizar(); }catch(e){} });
     }
-    setTimeout(()=>{ try{ window.carregar(); }catch(e){ console.warn('Falha na carga V56:', e);} }, 500);
+    setTimeout(()=>{ try{ window.carregar(); }catch(e){ console.warn("Falha carga V57:", e); } }, 500);
   });
 })();
 </script>
