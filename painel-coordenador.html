@@ -281,6 +281,49 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
 .profile-hidden{display:none!important}
 .login-card input+input{margin-top:8px}
 .permissao-chip{display:inline-flex;border:1px solid rgba(56,189,248,.35);background:rgba(56,189,248,.08);border-radius:999px;padding:5px 9px;margin:3px;color:#dbeafe;font-weight:900;font-size:.78rem}
+
+/* V55 - visuais estilo Power BI */
+.line-chart,.area-chart,.combo-chart{
+  width:100%;
+  min-height:260px;
+  border:1px solid rgba(148,163,184,.20);
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(15,35,53,.58),rgba(2,18,31,.72));
+  padding:14px;
+  overflow:auto;
+}
+.line-chart svg,.area-chart svg,.combo-chart svg{width:100%;height:240px;display:block}
+.axis-line{stroke:rgba(203,213,225,.38);stroke-width:1}
+.grid-line{stroke:rgba(148,163,184,.16);stroke-width:1}
+.line-path{fill:none;stroke:var(--blue);stroke-width:4;filter:drop-shadow(0 0 5px rgba(56,189,248,.45))}
+.area-fill{fill:rgba(56,189,248,.20);stroke:none}
+.chart-point{fill:var(--gold);stroke:#071524;stroke-width:2}
+.chart-label{fill:#e2e8f0;font-size:11px;font-weight:800}
+.chart-value{fill:#facc15;font-size:12px;font-weight:900}
+.combo-bar{fill:rgba(56,189,248,.62)}
+.combo-bar.bad{fill:rgba(239,68,68,.70)}
+.combo-bar.warn{fill:rgba(251,191,36,.72)}
+.combo-line{fill:none;stroke:#facc15;stroke-width:4;filter:drop-shadow(0 0 5px rgba(250,204,21,.35))}
+.funnel-chart{display:flex;flex-direction:column;gap:10px;align-items:center;padding:16px}
+.funnel-seg{height:42px;border-radius:12px;display:grid;place-items:center;font-weight:1000;color:#06121f;border:1px solid rgba(255,255,255,.20);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.gauge-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;padding:10px}
+.gauge-card{border:1px solid rgba(148,163,184,.24);border-radius:18px;background:rgba(15,23,42,.45);padding:12px;text-align:center}
+.gauge{width:170px;height:88px;margin:0 auto;position:relative;overflow:hidden;border-radius:170px 170px 0 0;background:conic-gradient(from 180deg at 50% 100%,#ef4444 0deg,#fbbf24 72deg,#22c55e 144deg,#0f172a 144deg 180deg)}
+.gauge::after{content:"";position:absolute;left:24px;right:24px;bottom:0;height:64px;border-radius:120px 120px 0 0;background:var(--card)}
+.gauge-needle{position:absolute;left:50%;bottom:0;width:4px;height:76px;background:#fff;border-radius:8px;transform-origin:bottom center;z-index:2;box-shadow:0 0 10px rgba(255,255,255,.48)}
+.gauge-value{font-size:1.7rem;font-weight:1000;color:#fff;margin-top:8px}
+.gauge-label{font-weight:900;color:var(--gold)}
+.treemap{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:70px;gap:8px;padding:10px}
+.tree-cell{border-radius:14px;padding:10px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;border:1px solid rgba(255,255,255,.16);font-weight:900;color:#03111f;min-height:70px}
+.tree-cell small{font-size:.72rem;color:rgba(3,17,31,.82)}
+.matrix-table{width:100%;border-collapse:separate;border-spacing:6px}
+.matrix-table th{background:rgba(15,35,53,.88);color:#fff;border:0;border-radius:8px;padding:9px}
+.matrix-table td{border:0;border-radius:9px;padding:10px;font-weight:900;text-align:center}
+.matrix-good{background:rgba(34,197,94,.72);color:#03111f}
+.matrix-warn{background:rgba(251,191,36,.78);color:#03111f}
+.matrix-bad{background:rgba(239,68,68,.80);color:#fff}
+.matrix-empty{background:rgba(148,163,184,.16);color:#cbd5e1}
+
 </style>
 </head>
 <body>
@@ -327,7 +370,19 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
     <label>Escola</label><input id="filtroEscola" placeholder="Nome da escola">
     <label>Ano</label><select id="filtroAno"><option value="">Todos</option></select>
     <label>Mês</label><select id="filtroMes"><option value="">Todos</option></select>
-    <label>Gráfico</label><select id="tipoGrafico"><option value="barra">Barras horizontais</option><option value="vertical">Barras verticais</option><option value="pizza">Pizza</option><option value="cards">Cards</option></select>
+    <label>Gráfico</label><select id="tipoGrafico">
+      <option value="barra">Barras horizontais</option>
+      <option value="vertical">Barras verticais</option>
+      <option value="pizza">Pizza / rosca</option>
+      <option value="cards">Cards KPI</option>
+      <option value="linha">Linha de evolução</option>
+      <option value="area">Área</option>
+      <option value="combo">Combo barra + linha</option>
+      <option value="funil">Funil</option>
+      <option value="gauge">Velocímetro / meta</option>
+      <option value="treemap">Mapa de árvore</option>
+      <option value="matriz">Matriz / tabela de calor</option>
+    </select>
     <button onclick="carregar()">Atualizar</button>
     <button class="secondary" onclick="limparFiltrosPainel()">Limpar filtros</button>
     <button class="secondary" onclick="alternarNomes()" id="btnNomes">Ocultar nomes</button>
@@ -962,12 +1017,119 @@ function deltaUltimas(arr){const ord=[...arr].sort((a,b)=>new Date(b.created_at)
 function trendClass(d){return d>0?"up":d<0?"down":"flat"}function trendIcon(d){return d>0?"↑":d<0?"↓":"→"}function trendHtml(d){return `<span class="trend ${trendClass(d)}">${trendIcon(d)} ${Math.abs(d)}%</span>`}
 function statusBadge(p){if(p>=70)return'<span class="badge good">Adequado</span>';if(p>=50)return'<span class="badge warn">Em desenvolvimento</span>';return'<span class="badge bad">Intervenção prioritária</span>'}
 function linhaBarra(label,valor,classe=""){const v=Math.max(0,Math.min(100,Number(valor)||0));return `<div class="bar-row"><span title="${label}">${label.length>42?label.slice(0,42)+"...":label}</span><div class="bar-track"><div class="bar-fill ${classe}" style="width:${v}%"></div></div><span><b>${v}%</b></span></div>`}
-function graficoVertical(lista,classe=""){return `<div class="vertical-chart">${lista.map(x=>`<div class="vbar-wrap"><div class="vvalue">${x.valor}%</div><div class="vbar ${classe}" style="height:${Math.max(3,x.valor)}%"></div><div class="vlabel" title="${x.label}">${x.label}</div></div>`).join("")}</div>`}
-function graficoPizza(lista){const total=lista.reduce((s,x)=>s+Number(x.valor||0),0)||1;const cores=["var(--green)","var(--blue)","var(--gold)","var(--orange)","var(--red)","#8b5cf6","#14b8a6"];let acc=0;const stops=lista.map((x,i)=>{const ini=(acc/total)*100;acc+=Number(x.valor||0);return `${cores[i%cores.length]} ${ini}% ${(acc/total)*100}%`}).join(", ");return `<div class="pie-wrap"><div class="pie" style="background:conic-gradient(${stops})"><span>${lista.length}<br>itens</span></div><div class="legend">${lista.map((x,i)=>`<div class="legend-item"><span class="dot" style="background:${cores[i%cores.length]}"></span>${x.label}: <b>${x.valor}%</b></div>`).join("")}</div></div>`}
-function graficoCards(lista){return `<div class="cards-grid">${lista.map(x=>`<div class="mini-card"><b>${x.label}</b><strong>${x.valor}%</strong>${trendHtml(x.delta||0)}</div>`).join("")}</div>`}
-function renderGrafico(id,lista,classe=""){const tipo=document.getElementById("tipoGrafico").value;const el=document.getElementById(id);if(!lista.length){el.innerHTML='<div class="empty">Sem dados.</div>';return}if(tipo==="vertical")el.innerHTML=graficoVertical(lista,classe);else if(tipo==="pizza")el.innerHTML=graficoPizza(lista);else if(tipo==="cards")el.innerHTML=graficoCards(lista);else el.innerHTML=lista.map(x=>linhaBarra(x.label,x.valor,classe)).join("")}
-function agruparDescritores(){const mapa={};dados.forEach(d=>{const lista=(Array.isArray(d.habilidades_detalhadas)&&d.habilidades_detalhadas.length)?d.habilidades_detalhadas:(Array.isArray(d.respostas)?d.respostas.map(r=>({habilidade:r.habilidade,acertos:r.acertou?1:0,erros:r.acertou?0:1,total:1})):[]);lista.forEach(h=>{const n=h.habilidade||"Sem descritor";if(!mapa[n])mapa[n]={acertos:0,erros:0,total:0};mapa[n].acertos+=Number(h.acertos||0);mapa[n].erros+=Number(h.erros||0);mapa[n].total+=Number(h.total||((h.acertos||0)+(h.erros||0)))})});return Object.entries(mapa).map(([habilidade,v])=>({habilidade,acertos:v.acertos,erros:v.erros,total:v.total,percErro:v.total?Math.round((v.erros/v.total)*100):0,percAcerto:v.total?Math.round((v.acertos/v.total)*100):0}))}
-function renderizar(){const total=dados.length,med=media(dados),maior=total?Math.max(...dados.map(d=>d.percentual||0)):0,baixo50=dados.filter(d=>d.percentual<50).length,atencao=dados.filter(d=>d.percentual>=50&&d.percentual<70).length,delta=deltaUltimas(dados);kTotal.textContent=total;kMedia.textContent=med+"%";kMaior.textContent=maior+"%";kBaixo50.textContent=baixo50;kAtencao.textContent=atencao;kEvolucao.textContent=delta+"%";tMedia.outerHTML=trendHtml(delta).replace('class="trend','id="tMedia" class="trend');tEvolucao.outerHTML=trendHtml(delta).replace('class="trend','id="tEvolucao" class="trend');renderComponentes();renderFaixas();renderDescritores();renderRanking();renderHeatmap();renderEvolucaoDescritores();renderPlano();renderMensal();renderDashboardGestaoCoord();renderTabela()}
+function numeroVisual(v){return Math.max(0,Math.min(100,Math.round(Number(v)||0)))}
+function safeLabel(s,tam=38){s=String(s||"");return s.length>tam?s.slice(0,tam)+"...":s}
+function graficoVertical(lista,classe=""){
+  return `<div class="vertical-chart">${(lista||[]).map(x=>`<div class="vbar-wrap"><div class="vvalue">${numeroVisual(x.valor)}%</div><div class="vbar ${classe}" style="height:${Math.max(3,numeroVisual(x.valor))}%"></div><div class="vlabel" title="${x.label}">${safeLabel(x.label,18)}</div></div>`).join("")}</div>`;
+}
+function graficoPizza(lista){
+  lista=(lista||[]).filter(x=>Number(x.valor||0)>0);
+  if(!lista.length) lista=[{label:"Sem dados",valor:1}];
+  const total=lista.reduce((s,x)=>s+Number(x.valor||0),0)||1;
+  const cores=["var(--green)","var(--blue)","var(--gold)","var(--orange)","var(--red)","#8b5cf6","#14b8a6","#f472b6","#a3e635"];
+  let acc=0;
+  const stops=lista.map((x,i)=>{const ini=(acc/total)*100;acc+=Number(x.valor||0);return `${cores[i%cores.length]} ${ini}% ${(acc/total)*100}%`}).join(", ");
+  return `<div class="pie-wrap"><div class="pie" style="background:conic-gradient(${stops})"><span>${lista.length}<br>itens</span></div><div class="legend">${lista.map((x,i)=>`<div class="legend-item"><span class="dot" style="background:${cores[i%cores.length]}"></span>${safeLabel(x.label,40)}: <b>${numeroVisual(x.valor)}%</b></div>`).join("")}</div></div>`;
+}
+function graficoCards(lista){
+  return `<div class="cards-grid">${(lista||[]).map(x=>`<div class="mini-card"><b>${safeLabel(x.label,42)}</b><strong>${numeroVisual(x.valor)}%</strong>${trendHtml(x.delta||0)}</div>`).join("")}</div>`;
+}
+function graficoLinha(lista,area=false){
+  lista=(lista||[]).slice(0,12);
+  if(!lista.length) return '<div class="empty">Sem dados.</div>';
+  if(lista.length===1) lista=[{...lista[0],label:"Início"},lista[0]];
+  const W=760,H=220,pad=34;
+  const step=(W-pad*2)/Math.max(1,lista.length-1);
+  const pts=lista.map((x,i)=>{
+    const v=numeroVisual(x.valor);
+    const px=pad+i*step;
+    const py=H-pad-(v/100)*(H-pad*2);
+    return {x:px,y:py,v,label:x.label};
+  });
+  const path=pts.map((p,i)=>`${i?"L":"M"} ${p.x} ${p.y}`).join(" ");
+  const areaPath=`M ${pts[0].x} ${H-pad} `+pts.map(p=>`L ${p.x} ${p.y}`).join(" ")+` L ${pts[pts.length-1].x} ${H-pad} Z`;
+  return `<div class="${area?'area-chart':'line-chart'}"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    ${[0,25,50,75,100].map(v=>{const y=H-pad-(v/100)*(H-pad*2);return `<line class="grid-line" x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}"></line><text class="chart-label" x="2" y="${y+4}">${v}%</text>`}).join("")}
+    <line class="axis-line" x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}"></line>
+    ${area?`<path class="area-fill" d="${areaPath}"></path>`:""}
+    <path class="line-path" d="${path}"></path>
+    ${pts.map(p=>`<circle class="chart-point" cx="${p.x}" cy="${p.y}" r="5"></circle><text class="chart-value" x="${p.x-10}" y="${p.y-9}">${p.v}%</text>`).join("")}
+    ${pts.map((p,i)=>`<text class="chart-label" x="${p.x-18}" y="${H-8}">${safeLabel(p.label,9)}</text>`).join("")}
+  </svg></div>`;
+}
+function graficoCombo(lista){
+  lista=(lista||[]).slice(0,10);
+  if(!lista.length) return '<div class="empty">Sem dados.</div>';
+  const W=760,H=240,pad=34,barW=36;
+  const step=(W-pad*2)/Math.max(1,lista.length);
+  const pts=lista.map((x,i)=>{
+    const v=numeroVisual(x.valor);
+    const x0=pad+i*step+step/2;
+    const y=H-pad-(v/100)*(H-pad*2);
+    return {x:x0,y,v,label:x.label};
+  });
+  const path=pts.map((p,i)=>`${i?"L":"M"} ${p.x} ${p.y}`).join(" ");
+  return `<div class="combo-chart"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    ${[0,25,50,75,100].map(v=>{const y=H-pad-(v/100)*(H-pad*2);return `<line class="grid-line" x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}"></line><text class="chart-label" x="2" y="${y+4}">${v}%</text>`}).join("")}
+    ${pts.map(p=>`<rect class="combo-bar ${p.v<50?'bad':p.v<70?'warn':''}" x="${p.x-barW/2}" y="${p.y}" width="${barW}" height="${H-pad-p.y}" rx="6"></rect>`).join("")}
+    <path class="combo-line" d="${path}"></path>
+    ${pts.map(p=>`<circle class="chart-point" cx="${p.x}" cy="${p.y}" r="5"></circle><text class="chart-value" x="${p.x-10}" y="${p.y-9}">${p.v}%</text><text class="chart-label" x="${p.x-18}" y="${H-8}">${safeLabel(p.label,9)}</text>`).join("")}
+  </svg></div>`;
+}
+function graficoFunil(lista){
+  lista=(lista||[]).slice(0,8);
+  if(!lista.length) return '<div class="empty">Sem dados.</div>';
+  const cores=["#22c55e","#38bdf8","#facc15","#fb923c","#ef4444","#a78bfa","#14b8a6","#f472b6"];
+  const max=Math.max(...lista.map(x=>numeroVisual(x.valor)),1);
+  return `<div class="funnel-chart">${lista.map((x,i)=>{
+    const v=numeroVisual(x.valor), w=Math.max(28,Math.round(v/max*100));
+    return `<div class="funnel-seg" style="width:${w}%;background:${cores[i%cores.length]}">${safeLabel(x.label,32)} — ${v}%</div>`;
+  }).join("")}</div>`;
+}
+function graficoGauge(lista){
+  lista=(lista||[]).slice(0,8);
+  if(!lista.length) return '<div class="empty">Sem dados.</div>';
+  return `<div class="gauge-wrap">${lista.map(x=>{
+    const v=numeroVisual(x.valor);
+    const ang=-90+(v*1.8);
+    return `<div class="gauge-card"><div class="gauge"><div class="gauge-needle" style="transform:rotate(${ang}deg)"></div></div><div class="gauge-value">${v}%</div><div class="gauge-label">${safeLabel(x.label,28)}</div></div>`;
+  }).join("")}</div>`;
+}
+function graficoTreemap(lista){
+  lista=(lista||[]).slice(0,14);
+  if(!lista.length) return '<div class="empty">Sem dados.</div>';
+  const cores=["#38bdf8","#22c55e","#facc15","#fb923c","#ef4444","#a78bfa","#14b8a6","#f472b6","#a3e635"];
+  return `<div class="treemap">${lista.map((x,i)=>{
+    const v=numeroVisual(x.valor);
+    const span=v>=70?3:v>=40?2:1;
+    return `<div class="tree-cell" style="grid-column:span ${span};background:${cores[i%cores.length]}"><b>${safeLabel(x.label,28)}</b><small>${v}%</small></div>`;
+  }).join("")}</div>`;
+}
+function graficoMatriz(lista){
+  lista=(lista||[]).slice(0,12);
+  if(!lista.length) return '<div class="empty">Sem dados.</div>';
+  return `<table class="matrix-table"><tr><th>Indicador</th><th>%</th><th>Situação</th></tr>${lista.map(x=>{
+    const v=numeroVisual(x.valor), cls=v<50?"matrix-bad":v<70?"matrix-warn":"matrix-good";
+    return `<tr><td>${safeLabel(x.label,48)}</td><td class="${cls}">${v}%</td><td class="${cls}">${v<50?"Intervenção":v<70?"Atenção":"Adequado"}</td></tr>`;
+  }).join("")}</table>`;
+}
+function renderGrafico(id,lista,classe=""){
+  const tipo=document.getElementById("tipoGrafico")?.value || "barra";
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(!lista || !lista.length){el.innerHTML='<div class="empty">Sem dados.</div>';return}
+  if(tipo==="vertical") el.innerHTML=graficoVertical(lista,classe);
+  else if(tipo==="pizza") el.innerHTML=graficoPizza(lista);
+  else if(tipo==="cards") el.innerHTML=graficoCards(lista);
+  else if(tipo==="linha") el.innerHTML=graficoLinha(lista,false);
+  else if(tipo==="area") el.innerHTML=graficoLinha(lista,true);
+  else if(tipo==="combo") el.innerHTML=graficoCombo(lista);
+  else if(tipo==="funil") el.innerHTML=graficoFunil(lista);
+  else if(tipo==="gauge") el.innerHTML=graficoGauge(lista);
+  else if(tipo==="treemap") el.innerHTML=graficoTreemap(lista);
+  else if(tipo==="matriz") el.innerHTML=graficoMatriz(lista);
+  else el.innerHTML=lista.map(x=>linhaBarra(x.label,x.valor,classe)).join("");
+}
 function renderComponentes(){const lista=["Português","Matemática"].map(m=>{const arr=dados.filter(d=>d.materia===m);return{label:m,valor:media(arr),delta:deltaUltimas(arr)}});renderGrafico("chartComponentes",lista,"gold")}
 function renderFaixas(){const total=dados.length||1;renderGrafico("chartFaixas",[{label:"Intervenção prioritária",valor:Math.round(dados.filter(d=>d.percentual<50).length/total*100)},{label:"Em desenvolvimento",valor:Math.round(dados.filter(d=>d.percentual>=50&&d.percentual<70).length/total*100)},{label:"Adequado",valor:Math.round(dados.filter(d=>d.percentual>=70).length/total*100)}])}
 function renderDescritores(){const lista=agruparDescritores();const erros=[...lista].sort((a,b)=>b.percErro-a.percErro||b.erros-a.erros).slice(0,8).map(x=>({label:x.habilidade,valor:x.percErro}));const acertos=[...lista].sort((a,b)=>b.percAcerto-a.percAcerto||b.acertos-a.acertos).slice(0,8).map(x=>({label:x.habilidade,valor:x.percAcerto}));renderGrafico("chartErros",erros,"red");renderGrafico("chartAcertos",acertos)}
@@ -1012,6 +1174,16 @@ function renderDashboardGestaoCoord(){
   const avaliados = new Set(lista.map(d=>(d.aluno_nome||"").trim()).filter(Boolean)).size;
   const descritores = agruparDescritores();
 
+  const tipoAtual = (document.getElementById("tipoGrafico")?.value || "barra");
+  const nomesTipoGrafico={barra:"Barras horizontais",vertical:"Barras verticais",pizza:"Pizza / rosca",cards:"Cards KPI",linha:"Linha de evolução",area:"Área",combo:"Combo barra + linha",funil:"Funil",gauge:"Velocímetro / meta",treemap:"Mapa de árvore",matriz:"Matriz / tabela de calor"};
+  const nomeTipo = nomesTipoGrafico[tipoAtual] || "Barras horizontais";
+
+  document.querySelectorAll("#dashboardGestaoDetalhado small, #dashboardGestaoIntervencao small, #dashboardGestaoEvolucao small").forEach(s=>{
+    if(s && !String(s.textContent||"").toLowerCase().includes("alunos") && !String(s.textContent||"").toLowerCase().includes("prioridades")) {
+      s.textContent = nomeTipo;
+    }
+  });
+
   const kpis=document.getElementById("dashGestaoKpis");
   if(kpis){
     kpis.innerHTML = `
@@ -1027,20 +1199,18 @@ function renderDashboardGestaoCoord(){
   const porTurma = agruparListaDashboard(lista, turmaRegistroDashboard)
     .sort((a,b)=>a[0].localeCompare(b[0]))
     .map(([label,arr])=>({label,valor:media(arr),delta:deltaUltimas(arr),total:arr.length}));
-  const dashTurmas=document.getElementById("dashTurmas");
-  if(dashTurmas){
-    dashTurmas.innerHTML = porTurma.length
-      ? porTurma.map(x=>`<div class="plan-item"><b>${x.label}</b><br>Média: ${x.valor}% ${trendHtml(x.delta)}<br>Registros: ${x.total}<br>${linhaBarra("Desempenho",x.valor,x.valor<50?"red":x.valor<70?"gold":"")}</div>`).join("")
-      : '<div class="empty">Sem dados para turmas.</div>';
+
+  if(document.getElementById("dashTurmas")){
+    renderGrafico("dashTurmas", porTurma.length ? porTurma : [{label:"Sem dados",valor:0}], "");
   }
 
   const porComponente = ["Português","Matemática"].map(m=>{
     const arr=lista.filter(d=>String(d.materia||d.componente_curricular||"").toLowerCase().includes(m.toLowerCase().slice(0,4)));
     return {label:m,valor:media(arr),delta:deltaUltimas(arr),total:arr.length};
   });
-  const dashComponentes=document.getElementById("dashComponentes");
-  if(dashComponentes){
-    dashComponentes.innerHTML = porComponente.map(x=>`<div class="plan-item"><b>${x.label}</b><br>Média: ${x.valor}% ${trendHtml(x.delta)}<br>Registros: ${x.total}<br>${linhaBarra("Desempenho",x.valor,x.valor<50?"red":x.valor<70?"gold":"")}</div>`).join("");
+
+  if(document.getElementById("dashComponentes")){
+    renderGrafico("dashComponentes", porComponente, "gold");
   }
 
   const alunos = Object.values(porAluno()).map(arr=>{
@@ -1049,6 +1219,7 @@ function renderDashboardGestaoCoord(){
     const ant=ord[1]||null;
     return {nome:ult.aluno_nome||"Aluno não identificado",serie:ult.serie||turmaRegistroDashboard(ult),materia:ult.materia||"",atual:Number(ult.percentual||0),delta:ant?Math.round(Number(ult.percentual||0)-Number(ant.percentual||0)):0};
   }).filter(x=>x.atual<70).sort((a,b)=>a.atual-b.atual).slice(0,12);
+
   const dashAlunos=document.getElementById("dashAlunosAtencao");
   if(dashAlunos){
     dashAlunos.innerHTML = alunos.length
@@ -1056,18 +1227,21 @@ function renderDashboardGestaoCoord(){
       : '<div class="empty">Nenhum aluno em atenção no filtro atual.</div>';
   }
 
-  const criticos = [...descritores].sort((a,b)=>b.percErro-a.percErro||b.erros-a.erros).slice(0,10).map(x=>({label:x.habilidade,valor:x.percErro}));
-  const dashDesc=document.getElementById("dashDescritoresCriticos");
-  if(dashDesc){
-    dashDesc.innerHTML = criticos.length ? criticos.map(x=>linhaBarra(x.label,x.valor,"red")).join("") : '<div class="empty">Sem descritores críticos.</div>';
+  const criticos = [...descritores]
+    .sort((a,b)=>b.percErro-a.percErro||b.erros-a.erros)
+    .slice(0,10)
+    .map(x=>({label:x.habilidade,valor:x.percErro}));
+
+  if(document.getElementById("dashDescritoresCriticos")){
+    renderGrafico("dashDescritoresCriticos", criticos.length ? criticos : [{label:"Sem descritores",valor:0}], "red");
   }
 
   const mapaMes={};
   lista.forEach(d=>{const m=d.mes_ano||mesAno(d.created_at);if(!mapaMes[m])mapaMes[m]=[];mapaMes[m].push(d)});
   const evolucao=Object.entries(mapaMes).sort().slice(-8).map(([m,arr])=>({label:m,valor:media(arr),delta:deltaUltimas(arr)}));
-  const dashEvol=document.getElementById("dashEvolucaoMensal");
-  if(dashEvol){
-    dashEvol.innerHTML = evolucao.length ? graficoCards(evolucao) : '<div class="empty">Sem evolução mensal.</div>';
+
+  if(document.getElementById("dashEvolucaoMensal")){
+    renderGrafico("dashEvolucaoMensal", evolucao.length ? evolucao : [{label:"Sem evolução",valor:0}], "");
   }
 
   const plano=document.getElementById("dashPlanoIntervencao");
@@ -1078,6 +1252,7 @@ function renderDashboardGestaoCoord(){
       : '<div class="empty">Sem dados para plano de intervenção.</div>';
   }
 }
+
 
 function renderTabela(){
   const el=document.getElementById("resultadosCards");
@@ -2780,6 +2955,14 @@ window.addEventListener("DOMContentLoaded",()=>{
   if(filtroTurma){ preencherFiltrosV47(); filtroTurma.addEventListener("input", aplicarFiltros); }
 });
 
+
+document.addEventListener("DOMContentLoaded",()=>{
+  const tg=document.getElementById("tipoGrafico");
+  if(tg && !tg.dataset.v54dashboardPizza){
+    tg.dataset.v54dashboardPizza="1";
+    tg.addEventListener("change",()=>{try{renderizar()}catch(e){}});
+  }
+});
 </script>
 
 </body>
