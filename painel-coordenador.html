@@ -1031,7 +1031,7 @@ function renderTabela(){
 }
 function gerarRelatorioPedagogico(){const lista=agruparDescritores().sort((a,b)=>b.percErro-a.percErro||b.erros-a.erros).slice(0,5);const riscos=dados.filter(d=>d.percentual<70).sort((a,b)=>a.percentual-b.percentual).slice(0,8);const texto=["RELATÓRIO PEDAGÓGICO INTERNO — SISTEMA MATRIZ EDUCACIONAL","","Uso exclusivo da escola/coordenadores. Não divulgar nomes ou resultados individuais publicamente.","","Resumo:","Total de registros: "+dados.length,"Média geral: "+media(dados)+"%","Alunos/registros abaixo de 50%: "+dados.filter(d=>d.percentual<50).length,"Alunos/registros entre 50% e 69%: "+dados.filter(d=>d.percentual>=50&&d.percentual<70).length,"","Descritores prioritários:",...(lista.length?lista.map((x,i)=>(i+1)+". "+x.habilidade+" — "+x.percErro+"% de erro"):["Sem dados."]),"","Alunos em acompanhamento:",...(riscos.length?riscos.map((x,i)=>(i+1)+". "+nomeSeguroTexto(x.aluno_nome)+" — "+x.serie+" — "+x.materia+" — "+x.percentual+"%"):["Sem alunos em atenção no filtro."]),"","Plano sugerido:","1. Revisar os descritores com maior erro.","2. Formar grupos de intervenção por habilidade.","3. Aplicar nova prova de 10 questões.","4. Comparar evolução mensal por aluno e turma."].join("\\n");relatorioPedagogico.textContent=texto}
 function csvEscape(v){return `"${String(v??"").replaceAll('"','""')}"`}
-function exportarCSV(anon=false){if(!dados.length){alert("Sem dados para exportar.");return}const linhas=[["Data","Aluno","Série","Componente Curricular","Escola","Código Prova","Ano","Mês","Acertos","Total","Percentual","Descritores para revisar"]];dados.forEach(d=>{const rev=Array.isArray(d.habilidades_revisar)?d.habilidades_revisar.map(x=>`${x.habilidade} (${x.erros})`).join("; "):"";linhas.push([formatarData(d.created_at),anon?nomeSeguroTexto(d.aluno_nome):d.aluno_nome,d.serie,d.materia,d.escola,d.codigo_prova,d.ano_letivo,d.mes_ano,d.acertos,d.total_questoes,d.percentual,rev])});const csv=linhas.map(l=>l.map(csvEscape).join(";")).join("\\r\\n");const blob=new Blob(["\\ufeffsep=;\\r\\n"+csv],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=anon?"resultados_anonimizados.csv":"resultados_matriz_educacional.csv";a.click();URL.revokeObjectURL(url)}
+function exportarCSV(anon=false){if(!dados.length){alert("Sem dados para exportar.");return}const linhas=[["Data","Aluno","Série","Componente Curricular","Escola","Código Prova","Ano","Mês","Acertos","Total","Percentual","Descritores para revisar"]];dados.forEach(d=>{const rev=Array.isArray(d.habilidades_revisar)?d.habilidades_revisar.map(x=>`${x.habilidade} (${x.erros})`).join("; "):"";linhas.push([formatarData(d.created_at),anon?nomeSeguroTexto(d.aluno_nome):d.aluno_nome,d.serie,d.materia,d.escola,d.codigo_prova,d.ano_letivo,d.mes_ano,d.acertos,d.total_questoes,d.percentual,rev])});const csv=linhas.map(l=>l.map(csvEscape).join(";")).join("\r\n");const blob=new Blob(["\\ufeffsep=;\\r\\n"+csv],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=anon?"resultados_anonimizados.csv":"resultados_matriz_educacional.csv";a.click();URL.revokeObjectURL(url)}
 function obterProva(codigo){
   codigo=String(codigo||"").trim().toUpperCase();
 
@@ -1803,30 +1803,77 @@ function gerarTabelaResumoExcel(){
 }
 
 function exportarPlanilhaCompleta(anon=false){
-  if(!dados.length){alert("Sem dados para exportar.");return}
-  const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
-  const linhas=dados.map(d=>`<tr>
-    <td>${esc(formatarData(d.created_at))}</td>
-    <td>${esc(anon?nomeSeguroTexto(d.aluno_nome):d.aluno_nome)}</td>
-    <td>${esc(d.serie)}</td><td>${esc(d.turma||d.turma_nome||"")}</td><td>${esc(d.materia)}</td><td>${esc(d.escola)}</td>
-    <td>${esc(d.codigo_prova)}</td><td>${esc(d.codigo_avaliacao||"")}</td><td>${esc(d.professor_nome||d.professor_usuario||"")}</td>
-    <td>${esc(d.acertos)}</td><td>${esc(d.total_questoes)}</td><td>${esc(d.percentual)}%</td>
-  </tr>`).join("");
-  const html=`<html><head><meta charset="UTF-8"><style>
-    table{border-collapse:collapse;font-family:Arial;font-size:12px}td,th{border:1px solid #999;padding:6px;vertical-align:top}th{background:#d9eaf7}h1,h2{font-family:Arial}
-  </style></head><body>
-    <h1>Sistema Matriz Educacional — Planilha com gráficos em tabela</h1>
-    ${gerarTabelaResumoExcel()}
-    <h2>Resultados detalhados</h2>
-    <table><tr><th>Data</th><th>Aluno</th><th>Série</th><th>Turma</th><th>Componente</th><th>Escola</th><th>Prova</th><th>Código avaliação</th><th>Professor</th><th>Acertos</th><th>Total</th><th>%</th></tr>${linhas}</table>
-  </body></html>`;
-  const blob=new Blob(["\ufeff"+html],{type:"application/vnd.ms-excel;charset=utf-8"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;
-  a.download="planilha_matriz_com_graficos.xls";
-  a.click();
-  URL.revokeObjectURL(url);
+  try{
+    if(!Array.isArray(dados) || !dados.length){alert("Sem dados para exportar.");return;}
+    const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+    const barras=(valor)=>{
+      const n=Math.max(0,Math.min(100,Number(valor)||0));
+      return `<div style="width:230px;height:18px;background:#e5e7eb;border:1px solid #94a3b8"><div style="height:18px;width:${n}%;background:#38bdf8;color:#111;font-weight:bold;text-align:center;font-size:11px;line-height:18px">${n}%</div></div>`;
+    };
+    const linhas=dados.map(d=>`<tr>
+      <td>${esc(formatarData(d.created_at))}</td>
+      <td>${esc(anon?nomeSeguroTexto(d.aluno_nome):d.aluno_nome)}</td>
+      <td>${esc(d.serie||"")}</td>
+      <td>${esc(typeof turmaRegistroPainelV47==="function"?turmaRegistroPainelV47(d):(d.turma||d.turma_nome||""))}</td>
+      <td>${esc(d.materia||d.componente_curricular||"")}</td>
+      <td>${esc(d.escola||"")}</td>
+      <td>${esc(d.codigo_prova||"")}</td>
+      <td>${esc(d.codigo_avaliacao||"")}</td>
+      <td>${esc(d.professor_nome||d.professor_usuario||"")}</td>
+      <td>${esc(d.acertos||0)}</td>
+      <td>${esc(d.total_questoes||0)}</td>
+      <td>${esc(d.percentual||0)}%</td>
+      <td>${barras(d.percentual||0)}</td>
+    </tr>`).join("");
+
+    const total=dados.length;
+    const mediaGeral=media(dados);
+    const abaixo50=dados.filter(d=>Number(d.percentual||0)<50).length;
+    const faixa50=dados.filter(d=>Number(d.percentual||0)>=50 && Number(d.percentual||0)<70).length;
+    const acima70=dados.filter(d=>Number(d.percentual||0)>=70).length;
+    const porComp=agruparPor(dados,d=>d.materia||d.componente_curricular||"Não informado").map(([label,arr])=>({label,valor:media(arr),total:arr.length}));
+    const desc=agruparDescritores().sort((a,b)=>b.percErro-a.percErro||b.erros-a.erros).slice(0,15);
+
+    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+      body{font-family:Arial,sans-serif;color:#111827}
+      h1{background:#0f2335;color:#fff;padding:16px;text-align:center;border-radius:8px}
+      h2{background:#dbeafe;color:#0f172a;padding:10px;border-left:6px solid #0284c7}
+      table{border-collapse:collapse;width:100%;font-family:Arial;font-size:12px;margin-bottom:18px}
+      th{background:#0f2335;color:#fff;border:1px solid #94a3b8;padding:7px;text-align:left}
+      td{border:1px solid #cbd5e1;padding:7px;vertical-align:top}
+      .valor{font-size:20px;font-weight:bold;color:#0f766e}
+      .obs{background:#fef3c7;border:1px solid #facc15;padding:10px;margin-bottom:14px}
+    </style></head><body>
+      <h1>Sistema Matriz Educacional — Planilha com gráficos</h1>
+      <div class="obs"><b>Gerado em:</b> ${esc(new Date().toLocaleString('pt-BR'))}<br><b>Total filtrado:</b> ${total}<br><b>Observação:</b> arquivo em formato .xls compatível com Excel e LibreOffice.</div>
+      <h2>Resumo geral</h2>
+      <table><tr><th>Indicador</th><th>Valor</th><th>Gráfico visual</th></tr>
+        <tr><td>Total de registros</td><td class="valor">${total}</td><td></td></tr>
+        <tr><td>Média geral</td><td class="valor">${mediaGeral}%</td><td>${barras(mediaGeral)}</td></tr>
+        <tr><td>Abaixo de 50%</td><td>${abaixo50}</td><td>${barras(total?Math.round(abaixo50*100/total):0)}</td></tr>
+        <tr><td>50% a 69%</td><td>${faixa50}</td><td>${barras(total?Math.round(faixa50*100/total):0)}</td></tr>
+        <tr><td>70% ou mais</td><td>${acima70}</td><td>${barras(total?Math.round(acima70*100/total):0)}</td></tr>
+      </table>
+      <h2>Comparativo por componente curricular</h2>
+      <table><tr><th>Componente</th><th>Média</th><th>Registros</th><th>Gráfico</th></tr>${porComp.map(x=>`<tr><td>${esc(x.label)}</td><td>${x.valor}%</td><td>${x.total}</td><td>${barras(x.valor)}</td></tr>`).join("")}</table>
+      <h2>Descritores com maior dificuldade</h2>
+      <table><tr><th>Descritor</th><th>Erros</th><th>Total</th><th>% erro</th><th>Gráfico</th></tr>${desc.map(x=>`<tr><td>${esc(x.habilidade)}</td><td>${x.erros}</td><td>${x.total}</td><td>${x.percErro}%</td><td>${barras(x.percErro)}</td></tr>`).join("")}</table>
+      <h2>Resultados detalhados</h2>
+      <table><tr><th>Data</th><th>Aluno</th><th>Série</th><th>Turma</th><th>Componente</th><th>Escola</th><th>Prova</th><th>Código avaliação</th><th>Professor</th><th>Acertos</th><th>Total</th><th>%</th><th>Gráfico</th></tr>${linhas}</table>
+    </body></html>`;
+
+    const blob=new Blob(["\ufeff"+html],{type:"application/vnd.ms-excel;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=anon?"planilha_matriz_com_graficos_anonimizada.xls":"planilha_matriz_com_graficos.xls";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},500);
+  }catch(e){
+    console.error("Erro ao gerar planilha com gráficos:",e);
+    alert("Erro ao gerar planilha com gráficos. Aperte F12 e veja o console, ou me envie print do erro.");
+  }
 }
 
 function formatarAlternativas(q){
@@ -2314,8 +2361,7 @@ function exportarCSVV47(anon=false){
     const rev=Array.isArray(d.habilidades_revisar)?d.habilidades_revisar.map(x=>`${x.habilidade} (${x.erros})`).join("; "):"";
     linhas.push([formatarData(d.created_at),anon?nomeSeguroTexto(d.aluno_nome):d.aluno_nome,d.serie,turmaRegistroPainelV47(d),d.materia,d.escola,d.codigo_prova,d.codigo_avaliacao||"",d.ano_letivo,d.mes_ano,d.acertos,d.total_questoes,d.percentual,rev]);
   });
-  const csv=linhas.map(l=>l.map(csvEscape).join(";")).join("
-");
+  const csv=linhas.map(l=>l.map(csvEscape).join(";")).join("\r\n");
   const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"});
   const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=anon?"resultados_anonimizados.csv":"resultados_matriz_educacional.csv";a.click();URL.revokeObjectURL(url);
 }
