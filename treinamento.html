@@ -63,12 +63,28 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,1
 footer{text-align:center;color:#cbd5e1;padding:14px;font-size:.78rem}
 footer strong{color:var(--gold)}
 @media(max-width:860px){.qbox{grid-template-columns:1fr}.qactions{position:static}.header p{display:none}}
+
+/* V61 - logotipo olho com lupa no lado direito do cabeçalho */
+.header{position:relative}
+.logo-lupa-corner-v61{
+  position:absolute;
+  right:22px;
+  top:22px;
+  width:74px;
+  height:74px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 12px rgba(56,189,248,.20));
+  animation:logoFloat 4.4s ease-in-out infinite alternate;
+  z-index:2;
+}
+@media(max-width:760px){.logo-lupa-corner-v61{width:54px;height:54px;right:12px;top:12px}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="header">
-    <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo"><span>MATRIZ</span></div><div class="book-mascot-wrap"><img src="livro_animado_com_lupa_e_sorriso.png" alt="Livro com lupa" class="book-mascot"></div>
+    <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo"><span>MATRIZ</span></div><img src="logotipo-olho-lupa.png" alt="Logotipo olho com lupa" class="logo-lupa-corner-v61">
     <div class="badge">Treinamento Escolar • BNCC • Avaliações Externas</div>
     <h1>Sistema MATRIZ EDUCACIONAL</h1>
     <p>Plataforma de Treinamento Escolar por Descritores — 2º, 5º e 9º ano.</p>

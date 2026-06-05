@@ -131,6 +131,20 @@ footer strong{color:var(--gold)}
   .grid-3,.grid-2,.flow{grid-template-columns:1fr}
   .hero-card{padding:24px 16px}
 }
+
+/* V61 - logotipo olho com lupa no lado direito do título */
+.logo-lupa-right-v61{
+  width:62px;
+  height:62px;
+  object-fit:contain;
+  margin-left:10px;
+  flex:0 0 auto;
+  filter:drop-shadow(0 0 12px rgba(56,189,248,.20));
+  animation:logoFloat 4.4s ease-in-out infinite alternate;
+}
+.logo-title-v61{display:flex;align-items:center;gap:10px}
+@media(max-width:760px){.logo-lupa-right-v61{width:50px;height:50px}.logo-title-v61{flex-wrap:wrap}}
+
 </style>
 <script>
 function acessarPainelCoordenador(){
@@ -142,9 +156,9 @@ function acessarPainelCoordenador(){
 <div class="topbar">
   <div class="container nav">
     <div class="logo">
-      <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo-mark"><span>MATRIZ</span></div><div class="book-mascot-wrap"><img src="livro_animado_com_lupa_e_sorriso.png" alt="Livro com lupa" class="book-mascot"></div>
+      <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo-mark"><span>MATRIZ</span></div>
       <div>
-        Sistema MATRIZ EDUCACIONAL
+        <div class="logo-title-v61"><span>Sistema MATRIZ EDUCACIONAL</span><img src="logotipo-olho-lupa.png" alt="Logotipo olho com lupa" class="logo-lupa-right-v61"></div>
         <small>Plataforma de Treinamento Escolar por Descritores</small>
       </div>
     </div>

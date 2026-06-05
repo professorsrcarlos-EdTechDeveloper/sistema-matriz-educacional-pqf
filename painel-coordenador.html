@@ -53,13 +53,10 @@ main{max-width:1360px;margin:0 auto;position:relative;z-index:1}
 .brand-mark::after{content:"";position:absolute;inset:-30% auto -30% -18%;width:48%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.40),transparent);transform:skewX(-24deg);animation:prismSweep 4.6s linear infinite}
 .brand-mark span{position:relative;z-index:1;padding-right:16px;white-space:nowrap}
 
-.book-mascot-wrap{display:none}
-.book-mascot{display:none}
-.panel-title{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0}
-.book-inline-wrap{display:inline-flex;align-items:center;justify-content:center;position:relative;top:2px;flex:0 0 auto}
-.book-inline-wrap::before{content:"";position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.22) 0%,rgba(56,189,248,.10) 48%,rgba(56,189,248,0) 74%);filter:blur(8px)}
-.book-inline{width:64px;height:64px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 10px rgba(56,189,248,.20));animation:logoFloat 4.5s ease-in-out infinite alternate}
-@media(max-width:760px){.book-inline{width:50px;height:50px}.panel-title{gap:8px}}
+.book-mascot-wrap{display:flex;align-items:center;justify-content:center;position:relative;z-index:1;margin-left:2px}
+.book-mascot-wrap::before{content:"";position:absolute;inset:-10px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.26) 0%,rgba(56,189,248,.10) 48%,rgba(56,189,248,0) 74%);filter:blur(10px)}
+.book-mascot{width:68px;height:68px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(56,189,248,.25));animation:logoFloat 4.5s ease-in-out infinite alternate}
+@media(max-width:760px){.book-mascot{width:54px;height:54px}}
 
 @keyframes logoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.03)}}
 @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 10px rgba(56,189,248,.20)) drop-shadow(0 0 16px rgba(14,165,233,.16))}50%{filter:drop-shadow(0 0 15px rgba(125,211,252,.55)) drop-shadow(0 0 28px rgba(99,102,241,.28))}}
@@ -333,6 +330,31 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
 .matrix-bad{background:rgba(239,68,68,.80);color:#fff}
 .matrix-empty{background:rgba(148,163,184,.16);color:#cbd5e1}
 
+
+/* V61 - logotipo olho com lupa depois da palavra Gestor */
+.panel-title-v61{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:nowrap;
+  margin:0;
+}
+.panel-title-v61 .title-text-v61{display:inline-block}
+.logo-lupa-inline-v61{
+  width:66px;
+  height:66px;
+  object-fit:contain;
+  flex:0 0 auto;
+  border-radius:10px;
+  background:transparent;
+  filter:drop-shadow(0 0 12px rgba(56,189,248,.22));
+  animation:logoFloat 4.5s ease-in-out infinite alternate;
+}
+@media(max-width:900px){
+  .panel-title-v61{flex-wrap:wrap}
+  .logo-lupa-inline-v61{width:54px;height:54px}
+}
+
 </style>
 </head>
 <body>
@@ -356,10 +378,7 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
       <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira">
       <div class="brand-mark"><span>MATRIZ</span></div>
       <div>
-        <h1 class="panel-title">
-          <span>Painel PQF — Professor, Coordenador e Gestor</span>
-          <span class="book-inline-wrap"><img src="livro_animado_com_lupa_e_sorriso.png" alt="Livro com lupa" class="book-inline"></span>
-        </h1>
+        <h1 class="panel-title-v61"><span class="title-text-v61">Painel PQF — Professor, Coordenador e Gestor</span><img src="logotipo-olho-lupa.png" alt="Logotipo olho com lupa" class="logo-lupa-inline-v61"></h1>
         <div class="subtitle">Sistema MATRIZ EDUCACIONAL — Controle por usuário, turma, componente e resultados</div>
       </div>
     </div>
@@ -2416,6 +2435,132 @@ ${tabelaResumo}
 </tr>
 ${detalhesHTML}
 </table>
+
+<script>
+/* V61 — complementa os dashboards com todos os tipos do seletor Gráfico */
+(function(){
+  function dadosV61(){
+    try{ if(Array.isArray(dados)) return dados; }catch(e){}
+    try{ if(Array.isArray(dadosOriginais)) return dadosOriginais; }catch(e){}
+    return [];
+  }
+  function n61(v){const n=Number(v||0);return Number.isFinite(n)?n:0}
+  function p61(v){return Math.max(0,Math.min(100,Math.round(n61(v))))}
+  function media61(arr){return arr&&arr.length?Math.round(arr.reduce((s,d)=>s+p61(d.percentual),0)/arr.length):0}
+  function labelCurto61(s,t=32){s=String(s||"");return s.length>t?s.slice(0,t)+"...":s}
+  function grupo61(arr,fn){const m={};(arr||[]).forEach(x=>{const k=fn(x)||"Não informado";(m[k]||(m[k]=[])).push(x)});return Object.entries(m)}
+  function serie61(d){
+    const t=String(d.turma||d.turma_nome||d.turma_vinculada||d.serie||d.ano||"").toLowerCase();
+    if(t.includes("2")) return "2º ano"; if(t.includes("5")) return "5º ano"; if(t.includes("9")) return "9º ano";
+    const c=String(d.codigo_prova||d.codigo_avaliacao||"").toUpperCase();
+    if(c.startsWith("2")) return "2º ano"; if(c.startsWith("5")) return "5º ano"; if(c.startsWith("9")) return "9º ano";
+    return "Não informado";
+  }
+  function comp61(d){return d.materia||d.componente_curricular||d.componente||d.disciplina||"Não informado"}
+  function aluno61(d){return d.aluno_nome||d.nome_aluno||d.aluno||d.nome||d.destinatario||d.codigo_avaliacao||"Aluno não identificado"}
+  function mes61(d){
+    const raw=d.mes_ano||d.created_at||d.data||d.finalizado_em;
+    const dt=new Date(raw);
+    if(raw && !isNaN(dt.getTime())) return String(dt.getMonth()+1).padStart(2,"0")+"/"+dt.getFullYear();
+    return raw?String(raw).slice(0,7):"Sem data";
+  }
+  function descritores61(lista){
+    const mapa={};
+    (lista||[]).forEach(d=>{
+      let fontes=[];
+      if(Array.isArray(d.habilidades_detalhadas)) fontes=fontes.concat(d.habilidades_detalhadas);
+      if(Array.isArray(d.habilidades_revisar)) fontes=fontes.concat(d.habilidades_revisar);
+      if(Array.isArray(d.respostas)) fontes=fontes.concat(d.respostas.map(r=>({habilidade:r.habilidade||r.descritor||"Descritor",erros:r.acertou?0:1,total:1})));
+      fontes.forEach(h=>{
+        const nome=h.habilidade||h.descritor||h.nome||h.codigo||"";
+        if(!nome) return;
+        if(!mapa[nome]) mapa[nome]={label:nome,erros:0,total:0};
+        mapa[nome].erros+=n61(h.erros??h.erro??h.incorretas??0);
+        mapa[nome].total+=n61(h.total??h.questoes??((h.acertos||0)+(h.erros||0))??1)||1;
+      });
+    });
+    return Object.values(mapa).map(x=>({...x,valor:x.total?Math.round((x.erros/x.total)*100):0,extra:`${x.erros}/${x.total} erros`})).sort((a,b)=>b.valor-a.valor).slice(0,10);
+  }
+  function barra61(lista){
+    return lista.length?lista.map(x=>{
+      const v=p61(x.valor), cor=v<50?"linear-gradient(90deg,#ef4444,#f97316)":v<70?"linear-gradient(90deg,#fbbf24,#22c55e)":"linear-gradient(90deg,#38bdf8,#22c55e)";
+      return `<div style="margin:10px 0"><div style="display:grid;grid-template-columns:180px 1fr 54px;gap:10px;align-items:center"><span style="color:#e2e8f0;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${String(x.label).replace(/"/g,'&quot;')}">${labelCurto61(x.label,34)}</span><div style="height:13px;background:rgba(255,255,255,.09);border-radius:999px;overflow:hidden"><div style="height:100%;width:${v}%;background:${cor};border-radius:999px"></div></div><b style="color:#f8fafc">${v}%</b></div>${x.extra?`<small style="color:#94a3b8;margin-left:190px">${x.extra}</small>`:""}</div>`;
+    }).join(""):'<div class="empty">Sem dados para exibir.</div>';
+  }
+  function cards61(lista){return lista.length?`<div class="cards-grid">${lista.map(x=>`<div class="mini-card"><b>${labelCurto61(x.label,42)}</b><strong>${p61(x.valor)}%</strong><span style="color:#cbd5e1">${x.extra||""}</span></div>`).join("")}</div>`:'<div class="empty">Sem dados para exibir.</div>'}
+  function pizza61(lista){
+    lista=(lista||[]).filter(x=>p61(x.valor)>0);
+    if(!lista.length) return '<div class="empty">Sem dados para exibir.</div>';
+    const total=lista.reduce((s,x)=>s+p61(x.valor),0)||1, cores=["#38bdf8","#22c55e","#fbbf24","#f97316","#ef4444","#8b5cf6","#14b8a6","#f472b6"];
+    let acc=0;
+    const stops=lista.map((x,i)=>{const ini=(acc/total)*100;acc+=p61(x.valor);return `${cores[i%cores.length]} ${ini}% ${(acc/total)*100}%`}).join(",");
+    return `<div class="pie-wrap"><div class="pie" style="background:conic-gradient(${stops})"><span>${lista.length}<br>itens</span></div><div class="legend">${lista.map((x,i)=>`<div class="legend-item"><span class="dot" style="background:${cores[i%cores.length]}"></span>${labelCurto61(x.label,38)}: <b>${p61(x.valor)}%</b></div>`).join("")}</div></div>`;
+  }
+  function vertical61(lista){return lista.length?`<div class="vertical-chart">${lista.map(x=>`<div class="vbar-wrap"><div class="vvalue">${p61(x.valor)}%</div><div class="vbar" style="height:${Math.max(3,p61(x.valor))}%"></div><div class="vlabel" title="${x.label}">${labelCurto61(x.label,14)}</div></div>`).join("")}</div>`:'<div class="empty">Sem dados para exibir.</div>'}
+  function svgLine61(lista,area=false,combo=false){
+    lista=(lista||[]).slice(0,10);
+    if(!lista.length) return '<div class="empty">Sem dados para exibir.</div>';
+    if(lista.length===1) lista=[{...lista[0],label:"Início"},lista[0]];
+    const W=760,H=230,pad=34,step=(W-pad*2)/Math.max(1,lista.length-1);
+    const pts=lista.map((x,i)=>{const v=p61(x.valor);return {x:pad+i*step,y:H-pad-(v/100)*(H-pad*2),v,label:x.label}});
+    const path=pts.map((p,i)=>`${i?'L':'M'} ${p.x} ${p.y}`).join(" ");
+    const areaPath=`M ${pts[0].x} ${H-pad} `+pts.map(p=>`L ${p.x} ${p.y}`).join(" ")+` L ${pts[pts.length-1].x} ${H-pad} Z`;
+    const bars=combo?pts.map(p=>`<rect x="${p.x-18}" y="${p.y}" width="36" height="${H-pad-p.y}" rx="6" fill="rgba(56,189,248,.62)"></rect>`).join(""):"";
+    return `<div class="${combo?'combo-chart':area?'area-chart':'line-chart'}"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${[0,25,50,75,100].map(v=>{const y=H-pad-(v/100)*(H-pad*2);return `<line class="grid-line" x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}"></line><text class="chart-label" x="2" y="${y+4}">${v}%</text>`}).join("")}${area?`<path d="${areaPath}" fill="rgba(56,189,248,.20)"></path>`:""}${bars}<path d="${path}" fill="none" stroke="${combo?'#facc15':'#38bdf8'}" stroke-width="4"></path>${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="5" fill="#facc15" stroke="#071524" stroke-width="2"></circle><text class="chart-value" x="${p.x-10}" y="${p.y-9}">${p.v}%</text><text class="chart-label" x="${p.x-18}" y="${H-8}">${labelCurto61(p.label,9)}</text>`).join("")}</svg></div>`;
+  }
+  function funil61(lista){
+    lista=(lista||[]).slice(0,8); if(!lista.length) return '<div class="empty">Sem dados para exibir.</div>';
+    const max=Math.max(...lista.map(x=>p61(x.valor)),1), cores=["#22c55e","#38bdf8","#facc15","#fb923c","#ef4444","#a78bfa","#14b8a6"];
+    return `<div class="funnel-chart">${lista.map((x,i)=>`<div class="funnel-seg" style="width:${Math.max(28,Math.round(p61(x.valor)/max*100))}%;background:${cores[i%cores.length]}">${labelCurto61(x.label,28)} — ${p61(x.valor)}%</div>`).join("")}</div>`;
+  }
+  function gauge61(lista){return lista.length?`<div class="gauge-wrap">${lista.slice(0,8).map(x=>{const v=p61(x.valor),ang=-90+(v*1.8);return `<div class="gauge-card"><div class="gauge"><div class="gauge-needle" style="transform:rotate(${ang}deg)"></div></div><div class="gauge-value">${v}%</div><div class="gauge-label">${labelCurto61(x.label,28)}</div></div>`}).join("")}</div>`:'<div class="empty">Sem dados para exibir.</div>'}
+  function treemap61(lista){return lista.length?`<div class="treemap">${lista.slice(0,14).map((x,i)=>{const v=p61(x.valor),span=v>=70?3:v>=40?2:1,cores=["#38bdf8","#22c55e","#facc15","#fb923c","#ef4444","#a78bfa","#14b8a6"];return `<div class="tree-cell" style="grid-column:span ${span};background:${cores[i%cores.length]}"><b>${labelCurto61(x.label,26)}</b><small>${v}%</small></div>`}).join("")}</div>`:'<div class="empty">Sem dados para exibir.</div>'}
+  function matriz61(lista){return lista.length?`<table class="matrix-table"><tr><th>Indicador</th><th>%</th><th>Situação</th></tr>${lista.map(x=>{const v=p61(x.valor),cls=v<50?'matrix-bad':v<70?'matrix-warn':'matrix-good';return `<tr><td>${labelCurto61(x.label,48)}</td><td class="${cls}">${v}%</td><td class="${cls}">${v<50?'Intervenção':v<70?'Atenção':'Adequado'}</td></tr>`}).join("")}</table>`:'<div class="empty">Sem dados para exibir.</div>'}
+  function graf61(lista,tipo){
+    if(tipo==="vertical") return vertical61(lista);
+    if(tipo==="pizza") return pizza61(lista);
+    if(tipo==="cards") return cards61(lista);
+    if(tipo==="linha") return svgLine61(lista,false,false);
+    if(tipo==="area") return svgLine61(lista,true,false);
+    if(tipo==="combo") return svgLine61(lista,false,true);
+    if(tipo==="funil") return funil61(lista);
+    if(tipo==="gauge") return gauge61(lista);
+    if(tipo==="treemap") return treemap61(lista);
+    if(tipo==="matriz") return matriz61(lista);
+    return barra61(lista);
+  }
+  function abrirDash61(){
+    ["dashboardGestaoCoord","dashboardGestaoDetalhado","dashboardGestaoIntervencao","dashboardGestaoEvolucao"].forEach(id=>{
+      const sec=document.getElementById(id); if(!sec) return;
+      sec.style.display="block"; sec.classList.remove("tool-collapsed");
+      const body=sec.querySelector(".collapse-body"); if(body) body.style.display="block";
+      const btn=sec.querySelector(".tool-toggle"); if(btn) btn.textContent="Recolher";
+    });
+  }
+  window.renderDashboardGestaoCoord=function(){
+    const lista=dadosV61(), tipo=document.getElementById("tipoGrafico")?.value||"barra";
+    abrirDash61();
+    const total=lista.length, med=media61(lista), avaliados=new Set(lista.map(aluno61).filter(Boolean)).size, baixo50=lista.filter(d=>p61(d.percentual)<50).length, atencao=lista.filter(d=>p61(d.percentual)>=50&&p61(d.percentual)<70).length, adequado=lista.filter(d=>p61(d.percentual)>=70).length;
+    const kpis=document.getElementById("dashGestaoKpis");
+    if(kpis) kpis.innerHTML=`<div class="mini-card"><b>Avaliações filtradas</b><strong>${total}</strong><span style="color:#cbd5e1">Total visível no painel</span></div><div class="mini-card"><b>Média geral</b><strong>${med}%</strong><span style="color:#cbd5e1">Resultado médio</span></div><div class="mini-card"><b>Alunos avaliados</b><strong>${avaliados}</strong><span style="color:#cbd5e1">Nomes/códigos únicos</span></div><div class="mini-card"><b>Intervenção prioritária</b><strong>${baixo50}</strong><span style="color:#fecaca">Abaixo de 50%</span></div><div class="mini-card"><b>Em atenção</b><strong>${atencao}</strong><span style="color:#fde68a">50% a 69%</span></div><div class="mini-card"><b>Adequados</b><strong>${adequado}</strong><span style="color:#bbf7d0">70% ou mais</span></div>`;
+    const turmas=grupo61(lista,serie61).sort((a,b)=>a[0].localeCompare(b[0])).map(([label,arr])=>({label,valor:media61(arr),extra:`${arr.length} avaliações`}));
+    const comps=grupo61(lista,comp61).sort((a,b)=>a[0].localeCompare(b[0])).map(([label,arr])=>({label,valor:media61(arr),extra:`${arr.length} avaliações`}));
+    const dt=document.getElementById("dashTurmas"); if(dt) dt.innerHTML=graf61(turmas,tipo);
+    const dc=document.getElementById("dashComponentes"); if(dc) dc.innerHTML=graf61(comps,tipo);
+    const alunos=grupo61(lista,aluno61).map(([nome,arr])=>{const ult=arr.slice().sort((a,b)=>new Date(b.created_at||b.data||0)-new Date(a.created_at||a.data||0))[0]||arr[0];return {nome,turma:serie61(ult),comp:comp61(ult),valor:p61(ult.percentual)}}).filter(x=>x.valor<70).sort((a,b)=>a.valor-b.valor).slice(0,12);
+    const da=document.getElementById("dashAlunosAtencao"); if(da) da.innerHTML=alunos.length?alunos.map((x,i)=>`<div class="rank-item"><div class="rank-pos">${i+1}</div><div><b>${x.nome}</b><br><span style="color:#94a3b8">${x.turma} • ${x.comp}</span></div><div><b>${x.valor}%</b></div></div>`).join(""):'<div class="empty">Nenhum aluno em atenção.</div>';
+    const desc=descritores61(lista);
+    const dd=document.getElementById("dashDescritoresCriticos"); if(dd) dd.innerHTML=graf61(desc,tipo);
+    const mensal=grupo61(lista,mes61).sort((a,b)=>a[0].localeCompare(b[0])).slice(-8).map(([label,arr])=>({label,valor:media61(arr),extra:`${arr.length} avaliações`}));
+    const de=document.getElementById("dashEvolucaoMensal"); if(de) de.innerHTML=graf61(mensal,tipo);
+    const plano=document.getElementById("dashPlanoIntervencao"); if(plano) plano.innerHTML=desc.length?desc.slice(0,5).map((x,i)=>`<div class="plan-item"><b>${i+1}. Reforçar ${x.label}</b><br>Erro identificado: ${x.valor}% (${x.extra}).<br>Ação sugerida: revisão dirigida, atividade curta e nova verificação na próxima semana.</div>`).join(""):'<div class="empty">Sem descritores suficientes para plano.</div>';
+  };
+  const renderAnt61=window.renderizar;
+  window.renderizar=function(){if(typeof renderAnt61==="function"){try{renderAnt61()}catch(e){console.warn(e)}}try{window.renderDashboardGestaoCoord()}catch(e){console.error(e)}abrirDash61()};
+  document.addEventListener("DOMContentLoaded",()=>{const tg=document.getElementById("tipoGrafico");if(tg&&!tg.dataset.v61){tg.dataset.v61="1";tg.addEventListener("change",()=>{try{window.renderizar()}catch(e){}})}setTimeout(()=>{try{window.renderizar()}catch(e){}},900)});
+})();
+</script>
+
 </body>
 </html>`;
 }
