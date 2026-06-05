@@ -1861,16 +1861,32 @@ function montarRelatorioMatrizHTML(anon=false, modo="xls"){
 
   const componente = (d) => d.materia || d.componente_curricular || d.componente || d.componente_vinculado || "Não informado";
 
-  const barra = (valor, cor="#38bdf8") => {
-    const n = Math.max(0, Math.min(100, Math.round(normalizarNumero(valor))));
-    return `<div style="width:240px;height:20px;background:#e5e7eb;border:1px solid #94a3b8;border-radius:4px;overflow:hidden">
-      <div style="height:20px;width:${n}%;background:${cor};color:#0f172a;font-weight:bold;text-align:center;font-size:11px;line-height:20px">${n}%</div>
-    </div>`;
+  const corPorValor = (valor) => {
+    const n = normalizarNumero(valor);
+    if(n < 50) return "#ef4444";
+    if(n < 70) return "#f59e0b";
+    return "#22c55e";
   };
 
-  const barraTexto = (valor) => {
+  // Gráfico compatível com Excel/LibreOffice: 10 blocos coloridos em células.
+  // Esse formato evita a barra preta/estranha que alguns Excels geram com DIV/CSS.
+  const graficoBlocos = (valor) => {
     const n = Math.max(0, Math.min(100, Math.round(normalizarNumero(valor))));
-    return "█".repeat(Math.max(1, Math.round(n/5))) + " " + n + "%";
+    const blocos = Math.round(n / 10);
+    const cor = corPorValor(n);
+    let tds = "";
+    for(let i=1;i<=10;i++){
+      const preenchido = i <= blocos;
+      tds += `<td style="width:18px;height:16px;border:1px solid #94a3b8;background:${preenchido ? cor : '#ffffff'}">&nbsp;</td>`;
+    }
+    return `<table style="border-collapse:collapse;width:auto;margin:0"><tr>${tds}<td style="border:0;padding-left:6px;font-weight:bold;color:#0f172a">${n}%</td></tr></table>`;
+  };
+
+  const conceito = (valor) => {
+    const n = normalizarNumero(valor);
+    if(n < 50) return "Intervenção prioritária";
+    if(n < 70) return "Atenção pedagógica";
+    return "Domínio satisfatório";
   };
 
   const mediaLista = (arr) => {
@@ -1894,8 +1910,8 @@ function montarRelatorioMatrizHTML(anon=false, modo="xls"){
       let fontes = [];
       if(Array.isArray(d.habilidades_revisar)) fontes = fontes.concat(d.habilidades_revisar);
       if(Array.isArray(d.habilidades_detalhadas)) fontes = fontes.concat(d.habilidades_detalhadas);
-      if(typeof d.habilidades_revisar === "string") fontes = fontes.concat(d.habilidades_revisar.split(/[;,\n]/));
-      if(typeof d.habilidades_detalhadas === "string") fontes = fontes.concat(d.habilidades_detalhadas.split(/[;,\n]/));
+      if(typeof d.habilidades_revisar === "string") fontes = fontes.concat(d.habilidades_revisar.split(/[;\n]/));
+      if(typeof d.habilidades_detalhadas === "string") fontes = fontes.concat(d.habilidades_detalhadas.split(/[;\n]/));
 
       fontes.forEach(item => {
         let nome = "";
@@ -1937,12 +1953,12 @@ function montarRelatorioMatrizHTML(anon=false, modo="xls"){
 
   const tabelaResumo = `
     <table>
-      <tr><th>Indicador</th><th>Valor</th><th>Gráfico visual</th><th>Leitura</th></tr>
-      <tr><td>Total de registros</td><td class="valor">${total}</td><td></td><td>Total filtrado no painel.</td></tr>
-      <tr><td>Média geral</td><td class="valor">${mediaGeral}%</td><td>${barra(mediaGeral)}</td><td>${barraTexto(mediaGeral)}</td></tr>
-      <tr><td>Abaixo de 50%</td><td>${abaixo50}</td><td>${barra(total ? (abaixo50*100/total) : 0, "#ef4444")}</td><td>Intervenção prioritária.</td></tr>
-      <tr><td>50% a 69%</td><td>${faixa50}</td><td>${barra(total ? (faixa50*100/total) : 0, "#fbbf24")}</td><td>Aluno em atenção.</td></tr>
-      <tr><td>70% ou mais</td><td>${acima70}</td><td>${barra(total ? (acima70*100/total) : 0, "#22c55e")}</td><td>Domínio satisfatório.</td></tr>
+      <tr><th>Indicador</th><th>Valor</th><th>Gráfico em blocos</th><th>Interpretação</th></tr>
+      <tr><td>Total de registros</td><td class="valor">${total}</td><td></td><td>Total de resultados filtrados no painel.</td></tr>
+      <tr><td>Média geral</td><td class="valor">${mediaGeral}%</td><td>${graficoBlocos(mediaGeral)}</td><td>${conceito(mediaGeral)}</td></tr>
+      <tr><td>Alunos abaixo de 50%</td><td>${abaixo50}</td><td>${graficoBlocos(total ? (abaixo50*100/total) : 0)}</td><td>Quantidade de alunos em intervenção prioritária.</td></tr>
+      <tr><td>Alunos entre 50% e 69%</td><td>${faixa50}</td><td>${graficoBlocos(total ? (faixa50*100/total) : 0)}</td><td>Quantidade de alunos em atenção pedagógica.</td></tr>
+      <tr><td>Alunos com 70% ou mais</td><td>${acima70}</td><td>${graficoBlocos(total ? (acima70*100/total) : 0)}</td><td>Quantidade de alunos com domínio satisfatório.</td></tr>
     </table>
   `;
 
@@ -1952,8 +1968,8 @@ function montarRelatorioMatrizHTML(anon=false, modo="xls"){
       <td>${textoSeguro(nome)}</td>
       <td>${arr.length}</td>
       <td>${mediaLista(arr)}%</td>
-      <td>${barra(mediaLista(arr))}</td>
-      <td>${barraTexto(mediaLista(arr))}</td>
+      <td>${graficoBlocos(mediaLista(arr))}</td>
+      <td>${conceito(mediaLista(arr))}</td>
     </tr>`).join("");
 
   const componentesHTML = agrupar(lista, componente)
@@ -1962,8 +1978,8 @@ function montarRelatorioMatrizHTML(anon=false, modo="xls"){
       <td>${textoSeguro(nome)}</td>
       <td>${arr.length}</td>
       <td>${mediaLista(arr)}%</td>
-      <td>${barra(mediaLista(arr))}</td>
-      <td>${barraTexto(mediaLista(arr))}</td>
+      <td>${graficoBlocos(mediaLista(arr))}</td>
+      <td>${conceito(mediaLista(arr))}</td>
     </tr>`).join("");
 
   const alunosHTML = lista
@@ -1971,14 +1987,13 @@ function montarRelatorioMatrizHTML(anon=false, modo="xls"){
     .sort((a,b)=>percentual(a)-percentual(b))
     .map((d,i) => {
       const p = percentual(d);
-      const cor = p < 50 ? "#ef4444" : p < 70 ? "#fbbf24" : "#22c55e";
       return `<tr>
         <td>${textoSeguro(nomeAluno(d, i))}</td>
         <td>${textoSeguro(turmaAluno(d))}</td>
         <td>${textoSeguro(componente(d))}</td>
         <td>${p}%</td>
-        <td>${barra(p, cor)}</td>
-        <td>${p < 50 ? "Intervenção prioritária" : p < 70 ? "Atenção" : "Bom desempenho"}</td>
+        <td>${graficoBlocos(p)}</td>
+        <td>${conceito(p)}</td>
       </tr>`;
     }).join("");
 
@@ -1988,13 +2003,12 @@ function montarRelatorioMatrizHTML(anon=false, modo="xls"){
     <td>${x.erros}</td>
     <td>${x.total}</td>
     <td>${x.percErro}%</td>
-    <td>${barra(x.percErro, "#ef4444")}</td>
-    <td>${barraTexto(x.percErro)}</td>
+    <td>${graficoBlocos(x.percErro)}</td>
+    <td>${x.percErro >= 50 ? 'Priorizar intervenção' : 'Acompanhar'}</td>
   </tr>`).join("") : `<tr><td colspan="6">Sem descritores registrados nos resultados filtrados.</td></tr>`;
 
   const detalhesHTML = lista.map((d, i) => {
     const p = percentual(d);
-    const cor = p < 50 ? "#ef4444" : p < 70 ? "#fbbf24" : "#22c55e";
     return `<tr>
       <td>${textoSeguro(dataBR(d.created_at || d.data || d.finalizado_em))}</td>
       <td>${textoSeguro(nomeAluno(d, i))}</td>
@@ -2008,13 +2022,13 @@ function montarRelatorioMatrizHTML(anon=false, modo="xls"){
       <td>${textoSeguro(d.acertos ?? 0)}</td>
       <td>${textoSeguro(d.total_questoes ?? d.total ?? 10)}</td>
       <td>${p}%</td>
-      <td>${barra(p, cor)}</td>
-      <td>${barraTexto(p)}</td>
+      <td>${graficoBlocos(p)}</td>
+      <td>${conceito(p)}</td>
     </tr>`;
   }).join("");
 
   return `<!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -2023,7 +2037,7 @@ function montarRelatorioMatrizHTML(anon=false, modo="xls"){
   h2{background:#dbeafe;color:#0f172a;padding:10px;border-left:6px solid #0284c7;margin-top:22px;font-size:19px}
   table{border-collapse:collapse;width:100%;font-family:Arial;font-size:12px;margin-bottom:18px}
   th{background:#0f2335;color:white;border:1px solid #94a3b8;padding:7px;text-align:left}
-  td{border:1px solid #cbd5e1;padding:7px;vertical-align:top}
+  td{border:1px solid #cbd5e1;padding:7px;vertical-align:middle}
   .valor{font-size:20px;font-weight:bold;color:#0f766e}
   .obs{background:#fef3c7;border:1px solid #facc15;padding:10px;margin-bottom:14px}
   .print-note{font-size:11px;color:#475569}
@@ -2042,29 +2056,29 @@ function montarRelatorioMatrizHTML(anon=false, modo="xls"){
   Componente: ${textoSeguro(filtroValor("filtroComponente"))} |
   Ano: ${textoSeguro(filtroValor("filtroAno"))} |
   Mês: ${textoSeguro(filtroValor("filtroMes"))}<br>
-  <span class="print-note">Observação: a planilha é gerada com gráficos visuais em barras, compatível com Excel e LibreOffice.</span>
+  <span class="print-note">Observação: os gráficos foram alterados para blocos coloridos compatíveis com Excel e LibreOffice. O idioma do relatório está em português do Brasil.</span>
 </div>
 
 <h2>Resumo geral com gráficos</h2>
 ${tabelaResumo}
 
 <h2>Comparativo por turma com gráficos</h2>
-<table><tr><th>Turma</th><th>Registros</th><th>Média</th><th>Gráfico visual</th><th>Leitura</th></tr>${turmasHTML}</table>
+<table><tr><th>Turma</th><th>Registros</th><th>Média</th><th>Gráfico em blocos</th><th>Interpretação</th></tr>${turmasHTML}</table>
 
 <h2>Comparativo por componente curricular com gráficos</h2>
-<table><tr><th>Componente</th><th>Registros</th><th>Média</th><th>Gráfico visual</th><th>Leitura</th></tr>${componentesHTML}</table>
+<table><tr><th>Componente</th><th>Registros</th><th>Média</th><th>Gráfico em blocos</th><th>Interpretação</th></tr>${componentesHTML}</table>
 
 <h2>Alunos por desempenho com gráficos</h2>
-<table><tr><th>Aluno</th><th>Turma</th><th>Componente</th><th>%</th><th>Gráfico visual</th><th>Situação</th></tr>${alunosHTML}</table>
+<table><tr><th>Aluno</th><th>Turma</th><th>Componente</th><th>Percentual</th><th>Gráfico em blocos</th><th>Situação</th></tr>${alunosHTML}</table>
 
 <h2>Descritores com maior dificuldade com gráficos</h2>
-<table><tr><th>Descritor</th><th>Erros</th><th>Total</th><th>% erro</th><th>Gráfico visual</th><th>Leitura</th></tr>${descritoresHTML}</table>
+<table><tr><th>Descritor</th><th>Erros</th><th>Total</th><th>Percentual de erro</th><th>Gráfico em blocos</th><th>Encaminhamento</th></tr>${descritoresHTML}</table>
 
 <h2>Resultados detalhados com gráficos</h2>
 <table>
 <tr>
 <th>Data</th><th>Aluno</th><th>Série</th><th>Turma</th><th>Componente</th><th>Escola</th>
-<th>Prova</th><th>Código avaliação</th><th>Professor</th><th>Acertos</th><th>Total</th><th>%</th><th>Gráfico visual</th><th>Leitura</th>
+<th>Prova</th><th>Código da avaliação</th><th>Professor</th><th>Acertos</th><th>Total</th><th>Percentual</th><th>Gráfico em blocos</th><th>Situação</th>
 </tr>
 ${detalhesHTML}
 </table>
