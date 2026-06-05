@@ -331,9 +331,12 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
     <button onclick="carregar()">Atualizar</button>
     <button class="secondary" onclick="limparFiltrosPainel()">Limpar filtros</button>
     <button class="secondary" onclick="alternarNomes()" id="btnNomes">Ocultar nomes</button>
-    <button class="secondary" onclick="exportarCSV(false)">CSV</button>
+    <button class="secondary" onclick="exportarCSV(false)">CSV simples</button>
     <button class="secondary" onclick="exportarCSV(true)">CSV anonimizado</button>
     <button class="secondary" onclick="exportarPlanilhaCompleta(false)">Planilha com gráficos</button>
+    <button class="secondary" onclick="exportarPlanilhaCompleta(true)">Planilha com gráficos anonimizada</button>
+    <button class="secondary" onclick="exportarRelatorioVisualCompleto(false)">Relatório visual com gráficos</button>
+    <button class="secondary" onclick="exportarRelatorioVisualCompleto(true)">Relatório visual anonimizado</button>
     <label>De</label><input id="dataInicioRecuperar" type="date" style="max-width:155px">
     <label>Até</label><input id="dataFimRecuperar" type="date" style="max-width:155px">
     <button class="secondary" onclick="recuperarDadosPorData()">Recuperar dados por data</button>
@@ -1802,254 +1805,309 @@ function gerarTabelaResumoExcel(){
   `;
 }
 
-function exportarPlanilhaCompleta(anon=false){
-  try{
-    const lista = (typeof dados !== "undefined" && Array.isArray(dados)) ? dados : [];
-    if(!lista.length){
-      alert("Sem dados filtrados para gerar a planilha. Clique em Atualizar ou Recuperar dados por data primeiro.");
-      return;
-    }
+function montarRelatorioMatrizHTML(anon=false, modo="xls"){
+  const lista = (typeof dados !== "undefined" && Array.isArray(dados)) ? dados : [];
+  if(!lista.length){
+    throw new Error("Sem dados filtrados para gerar relatório. Clique em Atualizar ou Recuperar dados por data primeiro.");
+  }
 
-    const textoSeguro = (v) => String(v ?? "")
-      .replace(/&/g,"&amp;")
-      .replace(/</g,"&lt;")
-      .replace(/>/g,"&gt;")
-      .replace(/"/g,"&quot;")
-      .replace(/'/g,"&#39;");
+  const textoSeguro = (v) => String(v ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
 
-    const normalizarNumero = (v) => {
-      const n = Number(String(v ?? "0").replace(",", ".").replace("%", ""));
-      return Number.isFinite(n) ? n : 0;
-    };
+  const normalizarNumero = (v) => {
+    const n = Number(String(v ?? "0").replace(",", ".").replace("%", ""));
+    return Number.isFinite(n) ? n : 0;
+  };
 
-    const percentual = (d) => {
-      const p = normalizarNumero(d.percentual);
-      if(p > 0 || d.percentual === 0) return Math.max(0, Math.min(100, Math.round(p)));
-      const ac = normalizarNumero(d.acertos);
-      const total = normalizarNumero(d.total_questoes || d.total || 10) || 10;
-      return Math.max(0, Math.min(100, Math.round((ac / total) * 100)));
-    };
+  const percentual = (d) => {
+    const p = normalizarNumero(d.percentual);
+    if(p > 0 || d.percentual === 0) return Math.max(0, Math.min(100, Math.round(p)));
+    const ac = normalizarNumero(d.acertos);
+    const total = normalizarNumero(d.total_questoes || d.total || 10) || 10;
+    return Math.max(0, Math.min(100, Math.round((ac / total) * 100)));
+  };
 
-    const dataBR = (valor) => {
-      if(!valor) return "";
-      try{
-        const dt = new Date(valor);
-        if(!isNaN(dt.getTime())) return dt.toLocaleString("pt-BR");
-      }catch(e){}
-      return String(valor);
-    };
+  const dataBR = (valor) => {
+    if(!valor) return "";
+    try{
+      const dt = new Date(valor);
+      if(!isNaN(dt.getTime())) return dt.toLocaleString("pt-BR");
+    }catch(e){}
+    return String(valor);
+  };
 
-    const nomeAluno = (d, i) => {
-      const nome = d.aluno_nome || d.nome_aluno || d.aluno || d.destinatario || "";
-      if(anon) return "Aluno " + String(i + 1).padStart(2, "0");
-      return nome || ("Aluno não identificado " + (d.codigo_avaliacao || d.codigo_prova || i + 1));
-    };
+  const nomeAluno = (d, i) => {
+    const nome = d.aluno_nome || d.nome_aluno || d.aluno || d.destinatario || "";
+    if(anon) return "Aluno " + String(i + 1).padStart(2, "0");
+    return nome || ("Aluno não identificado " + (d.codigo_avaliacao || d.codigo_prova || i + 1));
+  };
 
-    const turmaAluno = (d) => {
-      const t = d.turma || d.turma_avaliacao || d.turma_vinculada || d.serie || "";
-      const s = String(t || "").trim();
-      if(["2º ano","5º ano","9º ano"].includes(s)) return s;
-      if(String(d.serie || "").includes("2")) return "2º ano";
-      if(String(d.serie || "").includes("5")) return "5º ano";
-      if(String(d.serie || "").includes("9")) return "9º ano";
-      if(String(d.codigo_prova || d.codigo_avaliacao || "").toUpperCase().includes("2")) return "2º ano";
-      if(String(d.codigo_prova || d.codigo_avaliacao || "").toUpperCase().includes("5")) return "5º ano";
-      if(String(d.codigo_prova || d.codigo_avaliacao || "").toUpperCase().includes("9")) return "9º ano";
-      return s || "Não informado";
-    };
+  const turmaAluno = (d) => {
+    const t = d.turma || d.turma_avaliacao || d.turma_vinculada || d.serie || "";
+    const s = String(t || "").trim();
+    if(["2º ano","5º ano","9º ano"].includes(s)) return s;
+    if(String(d.serie || "").includes("2")) return "2º ano";
+    if(String(d.serie || "").includes("5")) return "5º ano";
+    if(String(d.serie || "").includes("9")) return "9º ano";
+    if(String(d.codigo_prova || d.codigo_avaliacao || "").toUpperCase().includes("2")) return "2º ano";
+    if(String(d.codigo_prova || d.codigo_avaliacao || "").toUpperCase().includes("5")) return "5º ano";
+    if(String(d.codigo_prova || d.codigo_avaliacao || "").toUpperCase().includes("9")) return "9º ano";
+    return s || "Não informado";
+  };
 
-    const componente = (d) => d.materia || d.componente_curricular || d.componente || d.componente_vinculado || "Não informado";
+  const componente = (d) => d.materia || d.componente_curricular || d.componente || d.componente_vinculado || "Não informado";
 
-    const barra = (valor, cor="#38bdf8") => {
-      const n = Math.max(0, Math.min(100, Math.round(normalizarNumero(valor))));
-      return `<div style="width:240px;height:20px;background:#e5e7eb;border:1px solid #94a3b8;border-radius:4px;overflow:hidden">
-        <div style="height:20px;width:${n}%;background:${cor};color:#0f172a;font-weight:bold;text-align:center;font-size:11px;line-height:20px">${n}%</div>
-      </div>`;
-    };
+  const barra = (valor, cor="#38bdf8") => {
+    const n = Math.max(0, Math.min(100, Math.round(normalizarNumero(valor))));
+    return `<div style="width:240px;height:20px;background:#e5e7eb;border:1px solid #94a3b8;border-radius:4px;overflow:hidden">
+      <div style="height:20px;width:${n}%;background:${cor};color:#0f172a;font-weight:bold;text-align:center;font-size:11px;line-height:20px">${n}%</div>
+    </div>`;
+  };
 
-    const mediaLista = (arr) => {
-      if(!arr.length) return 0;
-      return Math.round(arr.reduce((s,d)=>s+percentual(d),0)/arr.length);
-    };
+  const barraTexto = (valor) => {
+    const n = Math.max(0, Math.min(100, Math.round(normalizarNumero(valor))));
+    return "█".repeat(Math.max(1, Math.round(n/5))) + " " + n + "%";
+  };
 
-    const agrupar = (arr, fn) => {
-      const mapa = {};
-      arr.forEach(item => {
-        const chave = fn(item) || "Não informado";
-        if(!mapa[chave]) mapa[chave] = [];
-        mapa[chave].push(item);
+  const mediaLista = (arr) => {
+    if(!arr.length) return 0;
+    return Math.round(arr.reduce((s,d)=>s+percentual(d),0)/arr.length);
+  };
+
+  const agrupar = (arr, fn) => {
+    const mapa = {};
+    arr.forEach(item => {
+      const chave = fn(item) || "Não informado";
+      if(!mapa[chave]) mapa[chave] = [];
+      mapa[chave].push(item);
+    });
+    return Object.entries(mapa);
+  };
+
+  const extrairDescritores = () => {
+    const mapa = {};
+    lista.forEach(d => {
+      let fontes = [];
+      if(Array.isArray(d.habilidades_revisar)) fontes = fontes.concat(d.habilidades_revisar);
+      if(Array.isArray(d.habilidades_detalhadas)) fontes = fontes.concat(d.habilidades_detalhadas);
+      if(typeof d.habilidades_revisar === "string") fontes = fontes.concat(d.habilidades_revisar.split(/[;,\n]/));
+      if(typeof d.habilidades_detalhadas === "string") fontes = fontes.concat(d.habilidades_detalhadas.split(/[;,\n]/));
+
+      fontes.forEach(item => {
+        let nome = "";
+        let erro = 1;
+        let total = 1;
+
+        if(typeof item === "string"){
+          nome = item.trim();
+        }else if(item && typeof item === "object"){
+          nome = item.habilidade || item.descritor || item.nome || item.codigo || "";
+          erro = normalizarNumero(item.erros ?? item.erro ?? item.incorretas ?? 1) || 1;
+          total = normalizarNumero(item.total ?? item.questoes ?? 1) || 1;
+        }
+
+        nome = String(nome || "").trim();
+        if(!nome) return;
+        if(!mapa[nome]) mapa[nome] = {nome, erros:0, total:0};
+        mapa[nome].erros += erro;
+        mapa[nome].total += total;
       });
-      return Object.entries(mapa);
-    };
+    });
 
-    const extrairDescritores = () => {
-      const mapa = {};
-      lista.forEach(d => {
-        let fontes = [];
-        if(Array.isArray(d.habilidades_revisar)) fontes = fontes.concat(d.habilidades_revisar);
-        if(Array.isArray(d.habilidades_detalhadas)) fontes = fontes.concat(d.habilidades_detalhadas);
-        if(typeof d.habilidades_revisar === "string") fontes = fontes.concat(d.habilidades_revisar.split(/[;,\n]/));
-        if(typeof d.habilidades_detalhadas === "string") fontes = fontes.concat(d.habilidades_detalhadas.split(/[;,\n]/));
+    return Object.values(mapa)
+      .map(x => ({...x, percErro: x.total ? Math.round((x.erros/x.total)*100) : 0}))
+      .sort((a,b)=>b.percErro-a.percErro || b.erros-a.erros)
+      .slice(0,20);
+  };
 
-        fontes.forEach(item => {
-          let nome = "";
-          let erro = 1;
-          let total = 1;
+  const total = lista.length;
+  const mediaGeral = mediaLista(lista);
+  const abaixo50 = lista.filter(d => percentual(d) < 50).length;
+  const faixa50 = lista.filter(d => percentual(d) >= 50 && percentual(d) < 70).length;
+  const acima70 = lista.filter(d => percentual(d) >= 70).length;
 
-          if(typeof item === "string"){
-            nome = item.trim();
-          }else if(item && typeof item === "object"){
-            nome = item.habilidade || item.descritor || item.nome || item.codigo || "";
-            erro = normalizarNumero(item.erros ?? item.erro ?? item.incorretas ?? 1) || 1;
-            total = normalizarNumero(item.total ?? item.questoes ?? 1) || 1;
-          }
+  const filtroValor = (id) => {
+    const el = document.getElementById(id);
+    return el ? (el.value || "Todos") : "Não localizado";
+  };
 
-          nome = String(nome || "").trim();
-          if(!nome) return;
-          if(!mapa[nome]) mapa[nome] = {nome, erros:0, total:0};
-          mapa[nome].erros += erro;
-          mapa[nome].total += total;
-        });
-      });
+  const tabelaResumo = `
+    <table>
+      <tr><th>Indicador</th><th>Valor</th><th>Gráfico visual</th><th>Leitura</th></tr>
+      <tr><td>Total de registros</td><td class="valor">${total}</td><td></td><td>Total filtrado no painel.</td></tr>
+      <tr><td>Média geral</td><td class="valor">${mediaGeral}%</td><td>${barra(mediaGeral)}</td><td>${barraTexto(mediaGeral)}</td></tr>
+      <tr><td>Abaixo de 50%</td><td>${abaixo50}</td><td>${barra(total ? (abaixo50*100/total) : 0, "#ef4444")}</td><td>Intervenção prioritária.</td></tr>
+      <tr><td>50% a 69%</td><td>${faixa50}</td><td>${barra(total ? (faixa50*100/total) : 0, "#fbbf24")}</td><td>Aluno em atenção.</td></tr>
+      <tr><td>70% ou mais</td><td>${acima70}</td><td>${barra(total ? (acima70*100/total) : 0, "#22c55e")}</td><td>Domínio satisfatório.</td></tr>
+    </table>
+  `;
 
-      return Object.values(mapa)
-        .map(x => ({...x, percErro: x.total ? Math.round((x.erros/x.total)*100) : 0}))
-        .sort((a,b)=>b.percErro-a.percErro || b.erros-a.erros)
-        .slice(0,20);
-    };
+  const turmasHTML = agrupar(lista, turmaAluno)
+    .sort((a,b)=>a[0].localeCompare(b[0]))
+    .map(([nome, arr]) => `<tr>
+      <td>${textoSeguro(nome)}</td>
+      <td>${arr.length}</td>
+      <td>${mediaLista(arr)}%</td>
+      <td>${barra(mediaLista(arr))}</td>
+      <td>${barraTexto(mediaLista(arr))}</td>
+    </tr>`).join("");
 
-    const total = lista.length;
-    const mediaGeral = mediaLista(lista);
-    const abaixo50 = lista.filter(d => percentual(d) < 50).length;
-    const faixa50 = lista.filter(d => percentual(d) >= 50 && percentual(d) < 70).length;
-    const acima70 = lista.filter(d => percentual(d) >= 70).length;
+  const componentesHTML = agrupar(lista, componente)
+    .sort((a,b)=>a[0].localeCompare(b[0]))
+    .map(([nome, arr]) => `<tr>
+      <td>${textoSeguro(nome)}</td>
+      <td>${arr.length}</td>
+      <td>${mediaLista(arr)}%</td>
+      <td>${barra(mediaLista(arr))}</td>
+      <td>${barraTexto(mediaLista(arr))}</td>
+    </tr>`).join("");
 
-    const resumoHTML = `
-      <table>
-        <tr><th>Indicador</th><th>Valor</th><th>Gráfico</th></tr>
-        <tr><td>Total de registros</td><td class="valor">${total}</td><td></td></tr>
-        <tr><td>Média geral</td><td class="valor">${mediaGeral}%</td><td>${barra(mediaGeral)}</td></tr>
-        <tr><td>Abaixo de 50%</td><td>${abaixo50}</td><td>${barra(total ? (abaixo50*100/total) : 0, "#ef4444")}</td></tr>
-        <tr><td>50% a 69%</td><td>${faixa50}</td><td>${barra(total ? (faixa50*100/total) : 0, "#fbbf24")}</td></tr>
-        <tr><td>70% ou mais</td><td>${acima70}</td><td>${barra(total ? (acima70*100/total) : 0, "#22c55e")}</td></tr>
-      </table>
-    `;
-
-    const componentesHTML = agrupar(lista, componente)
-      .sort((a,b)=>a[0].localeCompare(b[0]))
-      .map(([nome, arr]) => `<tr>
-        <td>${textoSeguro(nome)}</td>
-        <td>${arr.length}</td>
-        <td>${mediaLista(arr)}%</td>
-        <td>${barra(mediaLista(arr))}</td>
-      </tr>`).join("");
-
-    const turmasHTML = agrupar(lista, turmaAluno)
-      .sort((a,b)=>a[0].localeCompare(b[0]))
-      .map(([nome, arr]) => `<tr>
-        <td>${textoSeguro(nome)}</td>
-        <td>${arr.length}</td>
-        <td>${mediaLista(arr)}%</td>
-        <td>${barra(mediaLista(arr))}</td>
-      </tr>`).join("");
-
-    const descritores = extrairDescritores();
-    const descritoresHTML = descritores.length ? descritores.map(x => `<tr>
-      <td>${textoSeguro(x.nome)}</td>
-      <td>${x.erros}</td>
-      <td>${x.total}</td>
-      <td>${x.percErro}%</td>
-      <td>${barra(x.percErro, "#ef4444")}</td>
-    </tr>`).join("") : `<tr><td colspan="5">Sem descritores registrados nos resultados filtrados.</td></tr>`;
-
-    const detalhesHTML = lista.map((d, i) => {
+  const alunosHTML = lista
+    .slice()
+    .sort((a,b)=>percentual(a)-percentual(b))
+    .map((d,i) => {
       const p = percentual(d);
+      const cor = p < 50 ? "#ef4444" : p < 70 ? "#fbbf24" : "#22c55e";
       return `<tr>
-        <td>${textoSeguro(dataBR(d.created_at || d.data || d.finalizado_em))}</td>
         <td>${textoSeguro(nomeAluno(d, i))}</td>
-        <td>${textoSeguro(d.serie || d.serie_codigo || "")}</td>
         <td>${textoSeguro(turmaAluno(d))}</td>
         <td>${textoSeguro(componente(d))}</td>
-        <td>${textoSeguro(d.escola || "")}</td>
-        <td>${textoSeguro(d.codigo_prova || "")}</td>
-        <td>${textoSeguro(d.codigo_avaliacao || "")}</td>
-        <td>${textoSeguro(d.professor_nome || d.professor_usuario || "")}</td>
-        <td>${textoSeguro(d.acertos ?? 0)}</td>
-        <td>${textoSeguro(d.total_questoes ?? d.total ?? 10)}</td>
         <td>${p}%</td>
-        <td>${barra(p)}</td>
+        <td>${barra(p, cor)}</td>
+        <td>${p < 50 ? "Intervenção prioritária" : p < 70 ? "Atenção" : "Bom desempenho"}</td>
       </tr>`;
     }).join("");
 
-    const filtroValor = (id) => {
-      const el = document.getElementById(id);
-      return el ? (el.value || "Todos") : "Não localizado";
-    };
+  const descritores = extrairDescritores();
+  const descritoresHTML = descritores.length ? descritores.map(x => `<tr>
+    <td>${textoSeguro(x.nome)}</td>
+    <td>${x.erros}</td>
+    <td>${x.total}</td>
+    <td>${x.percErro}%</td>
+    <td>${barra(x.percErro, "#ef4444")}</td>
+    <td>${barraTexto(x.percErro)}</td>
+  </tr>`).join("") : `<tr><td colspan="6">Sem descritores registrados nos resultados filtrados.</td></tr>`;
 
-    const html = `<!DOCTYPE html>
+  const detalhesHTML = lista.map((d, i) => {
+    const p = percentual(d);
+    const cor = p < 50 ? "#ef4444" : p < 70 ? "#fbbf24" : "#22c55e";
+    return `<tr>
+      <td>${textoSeguro(dataBR(d.created_at || d.data || d.finalizado_em))}</td>
+      <td>${textoSeguro(nomeAluno(d, i))}</td>
+      <td>${textoSeguro(d.serie || d.serie_codigo || "")}</td>
+      <td>${textoSeguro(turmaAluno(d))}</td>
+      <td>${textoSeguro(componente(d))}</td>
+      <td>${textoSeguro(d.escola || "")}</td>
+      <td>${textoSeguro(d.codigo_prova || "")}</td>
+      <td>${textoSeguro(d.codigo_avaliacao || "")}</td>
+      <td>${textoSeguro(d.professor_nome || d.professor_usuario || "")}</td>
+      <td>${textoSeguro(d.acertos ?? 0)}</td>
+      <td>${textoSeguro(d.total_questoes ?? d.total ?? 10)}</td>
+      <td>${p}%</td>
+      <td>${barra(p, cor)}</td>
+      <td>${barraTexto(p)}</td>
+    </tr>`;
+  }).join("");
+
+  return `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <style>
-  body{font-family:Arial,sans-serif;color:#111827}
-  h1{background:#0f2335;color:white;padding:16px;text-align:center;border-radius:8px}
-  h2{background:#dbeafe;color:#0f172a;padding:10px;border-left:6px solid #0284c7;margin-top:22px}
+  body{font-family:Arial,sans-serif;color:#111827;background:#fff}
+  h1{background:#0f2335;color:white;padding:16px;text-align:center;border-radius:8px;font-size:24px}
+  h2{background:#dbeafe;color:#0f172a;padding:10px;border-left:6px solid #0284c7;margin-top:22px;font-size:19px}
   table{border-collapse:collapse;width:100%;font-family:Arial;font-size:12px;margin-bottom:18px}
   th{background:#0f2335;color:white;border:1px solid #94a3b8;padding:7px;text-align:left}
   td{border:1px solid #cbd5e1;padding:7px;vertical-align:top}
   .valor{font-size:20px;font-weight:bold;color:#0f766e}
   .obs{background:#fef3c7;border:1px solid #facc15;padding:10px;margin-bottom:14px}
+  .print-note{font-size:11px;color:#475569}
 </style>
 </head>
 <body>
-<h1>Sistema Matriz Educacional — Planilha com gráficos</h1>
+<h1>Sistema Matriz Educacional — Relatório com gráficos</h1>
 
 <div class="obs">
   <b>Gerado em:</b> ${textoSeguro(new Date().toLocaleString("pt-BR"))}<br>
   <b>Total filtrado:</b> ${total}<br>
+  <b>Tipo:</b> ${anon ? "Relatório anonimizado" : "Relatório nominal"}<br>
   <b>Filtros:</b>
   Série: ${textoSeguro(filtroValor("filtroSerie"))} |
   Turma: ${textoSeguro(filtroValor("filtroTurma"))} |
   Componente: ${textoSeguro(filtroValor("filtroComponente"))} |
   Ano: ${textoSeguro(filtroValor("filtroAno"))} |
   Mês: ${textoSeguro(filtroValor("filtroMes"))}<br>
-  <b>Observação:</b> arquivo .xls em HTML, compatível com Excel e LibreOffice.
+  <span class="print-note">Observação: a planilha é gerada com gráficos visuais em barras, compatível com Excel e LibreOffice.</span>
 </div>
 
-<h2>Resumo geral</h2>
-${resumoHTML}
+<h2>Resumo geral com gráficos</h2>
+${tabelaResumo}
 
-<h2>Comparativo por turma</h2>
-<table><tr><th>Turma</th><th>Registros</th><th>Média</th><th>Gráfico</th></tr>${turmasHTML}</table>
+<h2>Comparativo por turma com gráficos</h2>
+<table><tr><th>Turma</th><th>Registros</th><th>Média</th><th>Gráfico visual</th><th>Leitura</th></tr>${turmasHTML}</table>
 
-<h2>Comparativo por componente curricular</h2>
-<table><tr><th>Componente</th><th>Registros</th><th>Média</th><th>Gráfico</th></tr>${componentesHTML}</table>
+<h2>Comparativo por componente curricular com gráficos</h2>
+<table><tr><th>Componente</th><th>Registros</th><th>Média</th><th>Gráfico visual</th><th>Leitura</th></tr>${componentesHTML}</table>
 
-<h2>Descritores com maior dificuldade</h2>
-<table><tr><th>Descritor</th><th>Erros</th><th>Total</th><th>% erro</th><th>Gráfico</th></tr>${descritoresHTML}</table>
+<h2>Alunos por desempenho com gráficos</h2>
+<table><tr><th>Aluno</th><th>Turma</th><th>Componente</th><th>%</th><th>Gráfico visual</th><th>Situação</th></tr>${alunosHTML}</table>
 
-<h2>Resultados detalhados</h2>
+<h2>Descritores com maior dificuldade com gráficos</h2>
+<table><tr><th>Descritor</th><th>Erros</th><th>Total</th><th>% erro</th><th>Gráfico visual</th><th>Leitura</th></tr>${descritoresHTML}</table>
+
+<h2>Resultados detalhados com gráficos</h2>
 <table>
 <tr>
 <th>Data</th><th>Aluno</th><th>Série</th><th>Turma</th><th>Componente</th><th>Escola</th>
-<th>Prova</th><th>Código avaliação</th><th>Professor</th><th>Acertos</th><th>Total</th><th>%</th><th>Gráfico</th>
+<th>Prova</th><th>Código avaliação</th><th>Professor</th><th>Acertos</th><th>Total</th><th>%</th><th>Gráfico visual</th><th>Leitura</th>
 </tr>
 ${detalhesHTML}
 </table>
 </body>
 </html>`;
+}
 
-    const blob = new Blob(["\ufeff" + html], {type:"application/vnd.ms-excel;charset=utf-8"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = anon ? "planilha_matriz_com_graficos_anonimizada.xls" : "planilha_matriz_com_graficos.xls";
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(()=>{URL.revokeObjectURL(url); a.remove();}, 700);
+function baixarRelatorioMatriz(nome, conteudo, tipo){
+  const blob = new Blob(["\ufeff" + conteudo], {type: tipo});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url); a.remove();}, 700);
+}
+
+function exportarPlanilhaCompleta(anon=false){
+  try{
+    const html = montarRelatorioMatrizHTML(anon, "xls");
+    baixarRelatorioMatriz(
+      anon ? "planilha_matriz_com_graficos_anonimizada.xls" : "planilha_matriz_com_graficos.xls",
+      html,
+      "application/vnd.ms-excel;charset=utf-8"
+    );
   }catch(e){
     console.error("Erro ao gerar planilha com gráficos:", e);
     alert("Erro ao gerar planilha com gráficos: " + (e && e.message ? e.message : e));
+  }
+}
+
+function exportarRelatorioVisualCompleto(anon=false){
+  try{
+    const html = montarRelatorioMatrizHTML(anon, "html");
+    baixarRelatorioMatriz(
+      anon ? "relatorio_visual_matriz_anonimizado.html" : "relatorio_visual_matriz_com_graficos.html",
+      html,
+      "text/html;charset=utf-8"
+    );
+  }catch(e){
+    console.error("Erro ao gerar relatório visual:", e);
+    alert("Erro ao gerar relatório visual: " + (e && e.message ? e.message : e));
   }
 }
 
