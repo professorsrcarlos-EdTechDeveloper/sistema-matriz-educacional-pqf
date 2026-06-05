@@ -27,6 +27,11 @@ body::before{
   mask-image:linear-gradient(to bottom,black,transparent 82%);
 }
 a{text-decoration:none;color:inherit}
+.book-mascot-wrap{display:flex;align-items:center;justify-content:center;position:relative;margin-left:10px}
+.book-mascot-wrap::before{content:"";position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.22) 0%,rgba(56,189,248,.10) 50%,rgba(56,189,248,0) 78%);filter:blur(10px)}
+.book-mascot{width:58px;height:58px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(56,189,248,.24));animation:float 4.4s ease-in-out infinite alternate}
+@media(max-width:760px){.book-mascot{width:48px;height:48px}}
+
 .container{width:min(1180px,94%);margin:0 auto;position:relative;z-index:1}
 .topbar{
   position:sticky;top:0;z-index:20;
@@ -43,27 +48,20 @@ a{text-decoration:none;color:inherit}
   flex-wrap:wrap;
   padding:10px 0;
 }
-.logo{display:flex;align-items:center;gap:12px;font-weight:1000;position:relative;isolation:isolate;overflow:visible}
-.logo::before,.logo::after{content:"";position:absolute;pointer-events:none;border-radius:50%;left:-6px;top:-8px;width:86px;height:86px;z-index:0}
-.logo::before{background:radial-gradient(circle,rgba(125,211,252,.42) 0%,rgba(56,189,248,.14) 34%,rgba(56,189,248,0) 74%);filter:blur(8px);animation:gemPulse 3.2s ease-in-out infinite}
-.logo::after{background:conic-gradient(from 0deg,transparent 0 14%,rgba(255,255,255,.70) 20%,transparent 26%,rgba(56,189,248,.50) 36%,transparent 42%,rgba(251,191,36,.38) 52%,transparent 58%,rgba(167,139,250,.30) 68%,transparent 74%);filter:blur(11px);mix-blend-mode:screen;animation:prismSpin 8s linear infinite}
-.school-logo{width:70px;height:70px;object-fit:contain;border-radius:50%;background:#fff;padding:5px;box-shadow:0 0 18px rgba(56,189,248,.18);position:relative;z-index:1;animation:logoFloat 4.8s ease-in-out infinite, logoGlow 3s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(56,189,248,.24))}
+.logo{display:flex;align-items:center;gap:12px;font-weight:1000}
+.school-logo{width:70px;height:70px;object-fit:contain;border-radius:50%;background:#fff;padding:5px;box-shadow:0 0 18px rgba(56,189,248,.18)}
 .logo-mark{
   width:132px;height:56px;border-radius:18px;
-  background:radial-gradient(circle at 18% 28%,rgba(255,255,255,.28),transparent 22%),linear-gradient(135deg,#0f2b46,#133d63 44%,#12729a 100%);
+  background:radial-gradient(circle at 18% 28%,rgba(255,255,255,.20),transparent 22%),linear-gradient(135deg,#0f2b46,#133d63 44%,#12729a 100%);
   display:grid;place-items:center;color:#fff;font-weight:1000;font-size:.78rem;letter-spacing:.08em;
-  box-shadow:0 0 24px rgba(56,189,248,.20);position:relative;overflow:hidden;border:1px solid rgba(56,189,248,.34);z-index:1;animation:logoFloat 4.8s ease-in-out infinite reverse, gemFrame 3.6s ease-in-out infinite;
+  box-shadow:0 0 24px rgba(56,189,248,.20);position:relative;overflow:hidden;border:1px solid rgba(56,189,248,.34);
+  animation:logoFloat 4.8s ease-in-out infinite;
 }
-.logo-mark::before{content:"";position:absolute;width:18px;height:18px;right:10px;top:18px;border:2px solid rgba(251,191,36,.72);transform:rotate(45deg);border-radius:4px;box-shadow:0 0 12px rgba(251,191,36,.24)}
-.logo-mark::after{content:"";position:absolute;inset:-30% auto -30% -18%;width:48%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.40),transparent);transform:skewX(-24deg);animation:prismSweep 4.6s linear infinite}
+.logo-mark::before{content:"";position:absolute;width:18px;height:18px;right:10px;top:18px;border:2px solid rgba(251,191,36,.62);transform:rotate(45deg);border-radius:4px}
+.logo-mark::after{content:"";position:absolute;inset:5px;border-radius:13px;border:1px solid rgba(255,255,255,.12)}
 .logo-mark span{position:relative;z-index:1;padding-right:16px;white-space:nowrap}
 .logo small{display:block;color:var(--gold);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
-@keyframes logoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.03)}}
-@keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 10px rgba(56,189,248,.20)) drop-shadow(0 0 16px rgba(14,165,233,.16))}50%{filter:drop-shadow(0 0 15px rgba(125,211,252,.55)) drop-shadow(0 0 28px rgba(99,102,241,.28))}}
-@keyframes gemPulse{0%,100%{opacity:.56;transform:scale(.94)}50%{opacity:1;transform:scale(1.09)}}
-@keyframes prismSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@keyframes prismSweep{0%{transform:translateX(-170%) skewX(-24deg);opacity:0}15%{opacity:0}30%{opacity:.55}55%{opacity:0}100%{transform:translateX(320%) skewX(-24deg);opacity:0}}
-@keyframes gemFrame{0%,100%{box-shadow:0 0 18px rgba(56,189,248,.18), inset 0 0 10px rgba(255,255,255,.04)}50%{box-shadow:0 0 28px rgba(56,189,248,.28),0 0 44px rgba(14,165,233,.12),inset 0 0 16px rgba(255,255,255,.12)}}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .nav-actions{display:flex;gap:10px;flex-wrap:wrap}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
@@ -145,7 +143,7 @@ function acessarPainelCoordenador(){
 <div class="topbar">
   <div class="container nav">
     <div class="logo">
-      <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo-mark"><span>MATRIZ</span></div>
+      <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo-mark"><span>MATRIZ</span></div><div class="book-mascot-wrap"><img src="livro_animado_com_lupa_e_sorriso.png" alt="Livro com lupa" class="book-mascot"></div>
       <div>
         Sistema MATRIZ EDUCACIONAL
         <small>Plataforma de Treinamento Escolar por Descritores</small>

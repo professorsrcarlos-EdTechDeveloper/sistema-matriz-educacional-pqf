@@ -52,6 +52,12 @@ main{max-width:1360px;margin:0 auto;position:relative;z-index:1}
 .brand-mark::before{content:"";position:absolute;width:18px;height:18px;right:10px;top:18px;border:2px solid rgba(251,191,36,.72);transform:rotate(45deg);border-radius:4px;box-shadow:0 0 12px rgba(251,191,36,.28)}
 .brand-mark::after{content:"";position:absolute;inset:-30% auto -30% -18%;width:48%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.40),transparent);transform:skewX(-24deg);animation:prismSweep 4.6s linear infinite}
 .brand-mark span{position:relative;z-index:1;padding-right:16px;white-space:nowrap}
+
+.book-mascot-wrap{display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.book-mascot-wrap::before{content:"";position:absolute;inset:-10px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.26) 0%,rgba(56,189,248,.10) 48%,rgba(56,189,248,0) 74%);filter:blur(10px)}
+.book-mascot{width:68px;height:68px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(56,189,248,.25));animation:logoFloat 4.5s ease-in-out infinite alternate}
+@media(max-width:760px){.book-mascot{width:54px;height:54px}}
+
 @keyframes logoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.03)}}
 @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 10px rgba(56,189,248,.20)) drop-shadow(0 0 16px rgba(14,165,233,.16))}50%{filter:drop-shadow(0 0 15px rgba(125,211,252,.55)) drop-shadow(0 0 28px rgba(99,102,241,.28))}}
 @keyframes gemPulse{0%,100%{opacity:.56;transform:scale(.94)}50%{opacity:1;transform:scale(1.09)}}
@@ -344,7 +350,7 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
 <header class="header no-print">
   <div class="header-top">
     <div class="brand">
-      <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="brand-mark"><span>MATRIZ</span></div>
+      <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="brand-mark"><span>MATRIZ</span></div><div class="book-mascot-wrap"><img src="livro_animado_com_lupa_e_sorriso.png" alt="Livro com lupa" class="book-mascot"></div>
       <div>
         <h1>Painel PQF — Professor, Coordenador e Gestor</h1>
         <div class="subtitle">Sistema MATRIZ EDUCACIONAL — Controle por usuário, turma, componente e resultados</div>
@@ -2403,6 +2409,135 @@ ${tabelaResumo}
 </tr>
 ${detalhesHTML}
 </table>
+
+<script>
+(function(){
+  const LOCAL_RESULT_KEYS = [
+    "matriz_spaece_resultados_locais",
+    "resultados_treinamento",
+    "matriz_resultados",
+    "resultados_matriz",
+    "matriz_resultados_backup"
+  ];
+
+  function obterLocalJSON(chave){
+    try{
+      const raw = localStorage.getItem(chave);
+      if(!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){ return []; }
+  }
+
+  function coletarResultadosLocaisV56(){
+    let lista = [];
+    LOCAL_RESULT_KEYS.forEach(k=>{ lista = lista.concat(obterLocalJSON(k)); });
+    return lista;
+  }
+
+  function dataDentroFaixa(valor, inicio, fim){
+    if(!valor) return !inicio && !fim;
+    const dt = new Date(valor);
+    if(isNaN(dt.getTime())) return true;
+    if(inicio){ const di = new Date(inicio + 'T00:00:00'); if(dt < di) return false; }
+    if(fim){ const df = new Date(fim + 'T23:59:59'); if(dt > df) return false; }
+    return true;
+  }
+
+  function deduplicarResultadosV56(lista){
+    const seen = new Set();
+    const normaliza = (typeof normalizarRegistro === 'function') ? normalizarRegistro : (x=>x);
+    return (Array.isArray(lista)?lista:[]).map(normaliza).filter(d=>{
+      const key = [d.created_at||d.data||'', d.aluno_nome||d.aluno||d.nome||'', d.codigo_avaliacao||d.codigoAvaliacao||'', d.codigo_prova||d.codigoProva||'', d.materia||d.componente_curricular||''].join('|');
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  }
+
+  async function carregarResultadosSupabaseV56(inicio='', fim=''){
+    if(!(typeof supabaseAtivo === 'function' && supabaseAtivo())) return [];
+    try{
+      let query = sb().from('resultados_treinamento').select('*').order('created_at',{ascending:false}).limit(5000);
+      if(inicio) query = query.gte('created_at', new Date(inicio+'T00:00:00').toISOString());
+      if(fim) query = query.lte('created_at', new Date(fim+'T23:59:59').toISOString());
+      const {data,error} = await query;
+      if(error){ console.warn('Supabase V56:', error); return []; }
+      return Array.isArray(data)?data:[];
+    }catch(e){ console.warn('Falha ao carregar Supabase V56:', e); return []; }
+  }
+
+  function atualizarKpisV56(lista){
+    const total = lista.length;
+    const mediaGeral = (typeof media === 'function') ? media(lista) : 0;
+    const maior = lista.reduce((m,d)=>Math.max(m, Number(d.percentual||0)), 0);
+    const abaixo50 = lista.filter(d=>Number(d.percentual||0)<50).length;
+    const faixa50 = lista.filter(d=>Number(d.percentual||0)>=50 && Number(d.percentual||0)<70).length;
+    const evol = (typeof deltaUltimas === 'function') ? deltaUltimas(lista) : 0;
+
+    const el = (id) => document.getElementById(id);
+    if(el('kTotal')) el('kTotal').innerHTML = String(total);
+    if(el('kMedia')) el('kMedia').innerHTML = String(mediaGeral) + '%';
+    if(el('tMedia')) el('tMedia').innerHTML = (typeof trendHtml === 'function') ? trendHtml(evol) : '';
+    if(el('kMaior')) el('kMaior').innerHTML = String(maior) + '%';
+    if(el('kBaixo50')) el('kBaixo50').innerHTML = String(abaixo50);
+    if(el('kAtencao')) el('kAtencao').innerHTML = String(faixa50);
+    if(el('kEvolucao')) el('kEvolucao').innerHTML = String(Math.abs(evol)) + '%';
+    if(el('tEvolucao')) el('tEvolucao').innerHTML = (typeof trendHtml === 'function') ? trendHtml(evol) : '';
+  }
+
+  window.renderizar = function renderizarV56(){
+    const lista = Array.isArray(window.dados) ? window.dados : [];
+    atualizarKpisV56(lista);
+    try{ if(typeof renderComponentes === 'function') renderComponentes(); }catch(e){console.warn(e)}
+    try{ if(typeof renderFaixas === 'function') renderFaixas(); }catch(e){console.warn(e)}
+    try{ if(typeof renderDescritores === 'function') renderDescritores(); }catch(e){console.warn(e)}
+    try{ if(typeof renderRanking === 'function') renderRanking(); }catch(e){console.warn(e)}
+    try{ if(typeof renderHeatmap === 'function') renderHeatmap(); }catch(e){console.warn(e)}
+    try{ if(typeof renderEvolucaoDescritores === 'function') renderEvolucaoDescritores(); }catch(e){console.warn(e)}
+    try{ if(typeof renderPlano === 'function') renderPlano(); }catch(e){console.warn(e)}
+    try{ if(typeof renderMensal === 'function') renderMensal(); }catch(e){console.warn(e)}
+    try{ if(typeof renderTabela === 'function') renderTabela(); }catch(e){console.warn(e)}
+    try{ if(typeof renderDashboardGestaoCoord === 'function') renderDashboardGestaoCoord(); }catch(e){console.warn(e)}
+    try{ if(typeof gerarRelatorioPedagogico === 'function') gerarRelatorioPedagogico(); }catch(e){console.warn(e)}
+    try{ if(typeof prepararFerramentasExpansiveis === 'function') prepararFerramentasExpansiveis(); }catch(e){console.warn(e)}
+  };
+
+  window.carregar = async function carregarV56(){
+    const remotos = await carregarResultadosSupabaseV56();
+    const locais = coletarResultadosLocaisV56();
+    window.dadosOriginais = deduplicarResultadosV56([].concat(remotos, locais));
+    if(typeof preencherFiltros === 'function') preencherFiltros();
+    if(typeof aplicarPermissoesUsuario === 'function') aplicarPermissoesUsuario();
+    if(typeof aplicarFiltros === 'function') aplicarFiltros();
+    else window.renderizar();
+    return window.dadosOriginais;
+  };
+
+  window.recuperarDadosPorData = async function recuperarDadosPorDataV56(){
+    const inicio = document.getElementById('dataInicioRecuperar')?.value || '';
+    const fim = document.getElementById('dataFimRecuperar')?.value || '';
+    const remotos = await carregarResultadosSupabaseV56(inicio, fim);
+    const locais = coletarResultadosLocaisV56().filter(d=>dataDentroFaixa(d.created_at || d.data || d.finalizado_em, inicio, fim));
+    window.dadosOriginais = deduplicarResultadosV56([].concat(remotos, locais));
+    if(typeof preencherFiltros === 'function') preencherFiltros();
+    if(typeof aplicarPermissoesUsuario === 'function') aplicarPermissoesUsuario();
+    if(typeof aplicarFiltros === 'function') aplicarFiltros();
+    else window.renderizar();
+    alert(window.dadosOriginais.length + ' avaliações recuperadas para o período informado.');
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    const tg = document.getElementById('tipoGrafico');
+    if(tg && !tg.dataset.v56bind){
+      tg.dataset.v56bind = '1';
+      tg.addEventListener('change', ()=>{ try{ window.renderizar(); }catch(e){} });
+    }
+    setTimeout(()=>{ try{ window.carregar(); }catch(e){ console.warn('Falha na carga V56:', e);} }, 500);
+  });
+})();
+</script>
+
 </body>
 </html>`;
 }
@@ -2963,6 +3098,135 @@ document.addEventListener("DOMContentLoaded",()=>{
     tg.addEventListener("change",()=>{try{renderizar()}catch(e){}});
   }
 });
+</script>
+
+
+<script>
+(function(){
+  const LOCAL_RESULT_KEYS = [
+    "matriz_spaece_resultados_locais",
+    "resultados_treinamento",
+    "matriz_resultados",
+    "resultados_matriz",
+    "matriz_resultados_backup"
+  ];
+
+  function obterLocalJSON(chave){
+    try{
+      const raw = localStorage.getItem(chave);
+      if(!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){ return []; }
+  }
+
+  function coletarResultadosLocaisV56(){
+    let lista = [];
+    LOCAL_RESULT_KEYS.forEach(k=>{ lista = lista.concat(obterLocalJSON(k)); });
+    return lista;
+  }
+
+  function dataDentroFaixa(valor, inicio, fim){
+    if(!valor) return !inicio && !fim;
+    const dt = new Date(valor);
+    if(isNaN(dt.getTime())) return true;
+    if(inicio){ const di = new Date(inicio + 'T00:00:00'); if(dt < di) return false; }
+    if(fim){ const df = new Date(fim + 'T23:59:59'); if(dt > df) return false; }
+    return true;
+  }
+
+  function deduplicarResultadosV56(lista){
+    const seen = new Set();
+    const normaliza = (typeof normalizarRegistro === 'function') ? normalizarRegistro : (x=>x);
+    return (Array.isArray(lista)?lista:[]).map(normaliza).filter(d=>{
+      const key = [d.created_at||d.data||'', d.aluno_nome||d.aluno||d.nome||'', d.codigo_avaliacao||d.codigoAvaliacao||'', d.codigo_prova||d.codigoProva||'', d.materia||d.componente_curricular||''].join('|');
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  }
+
+  async function carregarResultadosSupabaseV56(inicio='', fim=''){
+    if(!(typeof supabaseAtivo === 'function' && supabaseAtivo())) return [];
+    try{
+      let query = sb().from('resultados_treinamento').select('*').order('created_at',{ascending:false}).limit(5000);
+      if(inicio) query = query.gte('created_at', new Date(inicio+'T00:00:00').toISOString());
+      if(fim) query = query.lte('created_at', new Date(fim+'T23:59:59').toISOString());
+      const {data,error} = await query;
+      if(error){ console.warn('Supabase V56:', error); return []; }
+      return Array.isArray(data)?data:[];
+    }catch(e){ console.warn('Falha ao carregar Supabase V56:', e); return []; }
+  }
+
+  function atualizarKpisV56(lista){
+    const total = lista.length;
+    const mediaGeral = (typeof media === 'function') ? media(lista) : 0;
+    const maior = lista.reduce((m,d)=>Math.max(m, Number(d.percentual||0)), 0);
+    const abaixo50 = lista.filter(d=>Number(d.percentual||0)<50).length;
+    const faixa50 = lista.filter(d=>Number(d.percentual||0)>=50 && Number(d.percentual||0)<70).length;
+    const evol = (typeof deltaUltimas === 'function') ? deltaUltimas(lista) : 0;
+
+    const el = (id) => document.getElementById(id);
+    if(el('kTotal')) el('kTotal').innerHTML = String(total);
+    if(el('kMedia')) el('kMedia').innerHTML = String(mediaGeral) + '%';
+    if(el('tMedia')) el('tMedia').innerHTML = (typeof trendHtml === 'function') ? trendHtml(evol) : '';
+    if(el('kMaior')) el('kMaior').innerHTML = String(maior) + '%';
+    if(el('kBaixo50')) el('kBaixo50').innerHTML = String(abaixo50);
+    if(el('kAtencao')) el('kAtencao').innerHTML = String(faixa50);
+    if(el('kEvolucao')) el('kEvolucao').innerHTML = String(Math.abs(evol)) + '%';
+    if(el('tEvolucao')) el('tEvolucao').innerHTML = (typeof trendHtml === 'function') ? trendHtml(evol) : '';
+  }
+
+  window.renderizar = function renderizarV56(){
+    const lista = Array.isArray(window.dados) ? window.dados : [];
+    atualizarKpisV56(lista);
+    try{ if(typeof renderComponentes === 'function') renderComponentes(); }catch(e){console.warn(e)}
+    try{ if(typeof renderFaixas === 'function') renderFaixas(); }catch(e){console.warn(e)}
+    try{ if(typeof renderDescritores === 'function') renderDescritores(); }catch(e){console.warn(e)}
+    try{ if(typeof renderRanking === 'function') renderRanking(); }catch(e){console.warn(e)}
+    try{ if(typeof renderHeatmap === 'function') renderHeatmap(); }catch(e){console.warn(e)}
+    try{ if(typeof renderEvolucaoDescritores === 'function') renderEvolucaoDescritores(); }catch(e){console.warn(e)}
+    try{ if(typeof renderPlano === 'function') renderPlano(); }catch(e){console.warn(e)}
+    try{ if(typeof renderMensal === 'function') renderMensal(); }catch(e){console.warn(e)}
+    try{ if(typeof renderTabela === 'function') renderTabela(); }catch(e){console.warn(e)}
+    try{ if(typeof renderDashboardGestaoCoord === 'function') renderDashboardGestaoCoord(); }catch(e){console.warn(e)}
+    try{ if(typeof gerarRelatorioPedagogico === 'function') gerarRelatorioPedagogico(); }catch(e){console.warn(e)}
+    try{ if(typeof prepararFerramentasExpansiveis === 'function') prepararFerramentasExpansiveis(); }catch(e){console.warn(e)}
+  };
+
+  window.carregar = async function carregarV56(){
+    const remotos = await carregarResultadosSupabaseV56();
+    const locais = coletarResultadosLocaisV56();
+    window.dadosOriginais = deduplicarResultadosV56([].concat(remotos, locais));
+    if(typeof preencherFiltros === 'function') preencherFiltros();
+    if(typeof aplicarPermissoesUsuario === 'function') aplicarPermissoesUsuario();
+    if(typeof aplicarFiltros === 'function') aplicarFiltros();
+    else window.renderizar();
+    return window.dadosOriginais;
+  };
+
+  window.recuperarDadosPorData = async function recuperarDadosPorDataV56(){
+    const inicio = document.getElementById('dataInicioRecuperar')?.value || '';
+    const fim = document.getElementById('dataFimRecuperar')?.value || '';
+    const remotos = await carregarResultadosSupabaseV56(inicio, fim);
+    const locais = coletarResultadosLocaisV56().filter(d=>dataDentroFaixa(d.created_at || d.data || d.finalizado_em, inicio, fim));
+    window.dadosOriginais = deduplicarResultadosV56([].concat(remotos, locais));
+    if(typeof preencherFiltros === 'function') preencherFiltros();
+    if(typeof aplicarPermissoesUsuario === 'function') aplicarPermissoesUsuario();
+    if(typeof aplicarFiltros === 'function') aplicarFiltros();
+    else window.renderizar();
+    alert(window.dadosOriginais.length + ' avaliações recuperadas para o período informado.');
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    const tg = document.getElementById('tipoGrafico');
+    if(tg && !tg.dataset.v56bind){
+      tg.dataset.v56bind = '1';
+      tg.addEventListener('change', ()=>{ try{ window.renderizar(); }catch(e){} });
+    }
+    setTimeout(()=>{ try{ window.carregar(); }catch(e){ console.warn('Falha na carga V56:', e);} }, 500);
+  });
+})();
 </script>
 
 </body>

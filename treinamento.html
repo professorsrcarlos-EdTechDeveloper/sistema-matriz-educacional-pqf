@@ -20,6 +20,10 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 .logo::before{content:"";position:absolute;width:18px;height:18px;right:10px;top:18px;border:2px solid rgba(251,191,36,.72);transform:rotate(45deg);border-radius:4px;box-shadow:0 0 12px rgba(251,191,36,.26)}
 .logo::after{content:"";position:absolute;inset:-30% auto -30% -18%;width:48%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.40),transparent);transform:skewX(-24deg);animation:prismSweep 4.6s linear infinite}
 .logo span{position:relative;z-index:1;padding-right:16px}
+.book-mascot-wrap{display:flex;justify-content:center;align-items:center;margin:0 auto 8px;position:relative;width:78px;height:78px}
+.book-mascot-wrap::before{content:"";position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.22) 0%,rgba(56,189,248,.10) 50%,rgba(56,189,248,0) 78%);filter:blur(10px)}
+.book-mascot{width:64px;height:64px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(56,189,248,.24));animation:logoFloat 4.4s ease-in-out infinite alternate}
+
 @keyframes logoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.03)}}
 @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 10px rgba(56,189,248,.20)) drop-shadow(0 0 16px rgba(14,165,233,.16))}50%{filter:drop-shadow(0 0 15px rgba(125,211,252,.55)) drop-shadow(0 0 28px rgba(99,102,241,.28))}}
 @keyframes gemPulse{0%,100%{opacity:.56;transform:translateX(-50%) scale(.94)}50%{opacity:1;transform:translateX(-50%) scale(1.09)}}
@@ -65,7 +69,7 @@ footer strong{color:var(--gold)}
 <body>
 <div class="wrap">
   <header class="header">
-    <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo"><span>MATRIZ</span></div>
+    <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo"><span>MATRIZ</span></div><div class="book-mascot-wrap"><img src="livro_animado_com_lupa_e_sorriso.png" alt="Livro com lupa" class="book-mascot"></div>
     <div class="badge">Treinamento Escolar • BNCC • Avaliações Externas</div>
     <h1>Sistema MATRIZ EDUCACIONAL</h1>
     <p>Plataforma de Treinamento Escolar por Descritores — 2º, 5º e 9º ano.</p>
