@@ -3159,5 +3159,245 @@ document.addEventListener("DOMContentLoaded",()=>{
 })();
 </script>
 
+
+<script>
+/* V59 — Correção responsável: dashboards sempre abertos e preenchidos */
+(function(){
+  function dadosAtuaisV59(){
+    try{
+      if(Array.isArray(dados)) return dados;
+    }catch(e){}
+    try{
+      if(Array.isArray(dadosOriginais)) return dadosOriginais;
+    }catch(e){}
+    return [];
+  }
+
+  function numeroV59(v){
+    const n = Number(v || 0);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function pctV59(v){
+    return Math.max(0, Math.min(100, Math.round(numeroV59(v))));
+  }
+
+  function mediaV59(lista){
+    if(!lista || !lista.length) return 0;
+    return Math.round(lista.reduce((s,d)=>s+pctV59(d.percentual),0)/lista.length);
+  }
+
+  function serieV59(d){
+    const direto = String(d.turma || d.turma_nome || d.turma_vinculada || d.serie || d.ano || "").toLowerCase();
+    if(direto.includes("2")) return "2º ano";
+    if(direto.includes("5")) return "5º ano";
+    if(direto.includes("9")) return "9º ano";
+    const cod = String(d.codigo_prova || d.codigo_avaliacao || "").toUpperCase();
+    if(cod.startsWith("2")) return "2º ano";
+    if(cod.startsWith("5")) return "5º ano";
+    if(cod.startsWith("9")) return "9º ano";
+    return "Não informado";
+  }
+
+  function compV59(d){
+    return d.materia || d.componente_curricular || d.componente || d.disciplina || "Não informado";
+  }
+
+  function alunoV59(d){
+    return d.aluno_nome || d.nome_aluno || d.aluno || d.nome || d.destinatario || d.codigo_avaliacao || "Aluno não identificado";
+  }
+
+  function mesV59(d){
+    const raw = d.mes_ano || d.created_at || d.data || d.finalizado_em;
+    if(!raw) return "Sem data";
+    if(String(raw).includes("/") && String(raw).length <= 7) return raw;
+    const dt = new Date(raw);
+    if(isNaN(dt.getTime())) return String(raw).slice(0,7);
+    return String(dt.getMonth()+1).padStart(2,"0") + "/" + dt.getFullYear();
+  }
+
+  function grupoV59(lista, fn){
+    const mapa = {};
+    (lista || []).forEach(item=>{
+      const k = fn(item) || "Não informado";
+      if(!mapa[k]) mapa[k] = [];
+      mapa[k].push(item);
+    });
+    return Object.entries(mapa);
+  }
+
+  function barraV59(label, valor, extra=""){
+    const v = pctV59(valor);
+    const cor = v < 50 ? "linear-gradient(90deg,#ef4444,#f97316)" : v < 70 ? "linear-gradient(90deg,#fbbf24,#22c55e)" : "linear-gradient(90deg,#38bdf8,#22c55e)";
+    return `
+      <div style="margin:10px 0">
+        <div style="display:grid;grid-template-columns:180px 1fr 54px;gap:10px;align-items:center">
+          <span style="color:#e2e8f0;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${String(label).replace(/"/g,'&quot;')}">${label}</span>
+          <div style="height:13px;background:rgba(255,255,255,.09);border-radius:999px;overflow:hidden">
+            <div style="height:100%;width:${v}%;background:${cor};border-radius:999px"></div>
+          </div>
+          <b style="color:#f8fafc">${v}%</b>
+        </div>
+        ${extra ? `<small style="color:#94a3b8;margin-left:190px">${extra}</small>` : ""}
+      </div>`;
+  }
+
+  function cardsV59(lista){
+    if(!lista.length) return '<div class="empty">Sem dados para exibir.</div>';
+    return `<div class="cards-grid">${lista.map(x=>`
+      <div class="mini-card">
+        <b>${x.label}</b>
+        <strong>${pctV59(x.valor)}%</strong>
+        <span style="color:#cbd5e1">${x.extra || ""}</span>
+      </div>`).join("")}</div>`;
+  }
+
+  function graficoV59(lista, tipo){
+    if(!lista.length) return '<div class="empty">Sem dados para exibir.</div>';
+    if(tipo === "cards") return cardsV59(lista);
+    if(tipo === "pizza"){
+      const total = lista.reduce((s,x)=>s+pctV59(x.valor),0) || 1;
+      const cores = ["#38bdf8","#22c55e","#fbbf24","#f97316","#ef4444","#8b5cf6","#14b8a6"];
+      let acc = 0;
+      const stops = lista.map((x,i)=>{
+        const ini = (acc/total)*100;
+        acc += pctV59(x.valor);
+        return `${cores[i%cores.length]} ${ini}% ${(acc/total)*100}%`;
+      }).join(",");
+      return `<div class="pie-wrap">
+        <div class="pie" style="background:conic-gradient(${stops})"><span>${lista.length}<br>itens</span></div>
+        <div class="legend">${lista.map((x,i)=>`<div class="legend-item"><span class="dot" style="background:${cores[i%cores.length]}"></span>${x.label}: <b>${pctV59(x.valor)}%</b></div>`).join("")}</div>
+      </div>`;
+    }
+    if(tipo === "vertical"){
+      return `<div class="vertical-chart">${lista.map(x=>`<div class="vbar-wrap"><div class="vvalue">${pctV59(x.valor)}%</div><div class="vbar" style="height:${Math.max(3,pctV59(x.valor))}%"></div><div class="vlabel" title="${x.label}">${String(x.label).slice(0,14)}</div></div>`).join("")}</div>`;
+    }
+    return lista.map(x=>barraV59(x.label, x.valor, x.extra || "")).join("");
+  }
+
+  function descritoresV59(lista){
+    const mapa = {};
+    lista.forEach(d=>{
+      let fontes = [];
+      if(Array.isArray(d.habilidades_detalhadas)) fontes = fontes.concat(d.habilidades_detalhadas);
+      if(Array.isArray(d.habilidades_revisar)) fontes = fontes.concat(d.habilidades_revisar);
+      if(Array.isArray(d.respostas)){
+        fontes = fontes.concat(d.respostas.map(r=>({
+          habilidade:r.habilidade || r.descritor || "Descritor",
+          erros:r.acertou ? 0 : 1,
+          total:1
+        })));
+      }
+      fontes.forEach(h=>{
+        const nome = h.habilidade || h.descritor || h.nome || h.codigo || "";
+        if(!nome) return;
+        if(!mapa[nome]) mapa[nome] = {label:nome, erros:0, total:0};
+        mapa[nome].erros += numeroV59(h.erros ?? h.erro ?? h.incorretas ?? 0);
+        mapa[nome].total += numeroV59(h.total ?? h.questoes ?? ((h.acertos||0)+(h.erros||0)) ?? 1) || 1;
+      });
+    });
+    return Object.values(mapa).map(x=>({
+      ...x,
+      valor:x.total ? Math.round((x.erros/x.total)*100) : 0,
+      extra:`${x.erros}/${x.total} erros`
+    })).sort((a,b)=>b.valor-a.valor).slice(0,10);
+  }
+
+  function abrirSecoesV59(){
+    ["dashboardGestaoCoord","dashboardGestaoDetalhado","dashboardGestaoIntervencao","dashboardGestaoEvolucao"].forEach(id=>{
+      const sec = document.getElementById(id);
+      if(!sec) return;
+      sec.style.display = "block";
+      sec.classList.remove("tool-collapsed");
+      const body = sec.querySelector(".collapse-body");
+      if(body) body.style.display = "block";
+      const btn = sec.querySelector(".tool-toggle");
+      if(btn) btn.textContent = "Recolher";
+    });
+  }
+
+  window.renderDashboardGestaoCoord = function renderDashboardGestaoCoordV59(){
+    const lista = dadosAtuaisV59();
+    const tipo = document.getElementById("tipoGrafico")?.value || "barra";
+
+    abrirSecoesV59();
+
+    const total = lista.length;
+    const med = mediaV59(lista);
+    const avaliados = new Set(lista.map(alunoV59).filter(Boolean)).size;
+    const baixo50 = lista.filter(d=>pctV59(d.percentual)<50).length;
+    const atencao = lista.filter(d=>pctV59(d.percentual)>=50 && pctV59(d.percentual)<70).length;
+    const adequado = lista.filter(d=>pctV59(d.percentual)>=70).length;
+
+    const kpis = document.getElementById("dashGestaoKpis");
+    if(kpis){
+      kpis.innerHTML = `
+        <div class="mini-card"><b>Avaliações filtradas</b><strong>${total}</strong><span style="color:#cbd5e1">Total visível no painel</span></div>
+        <div class="mini-card"><b>Média geral</b><strong>${med}%</strong><span style="color:#cbd5e1">Resultado médio</span></div>
+        <div class="mini-card"><b>Alunos avaliados</b><strong>${avaliados}</strong><span style="color:#cbd5e1">Nomes/códigos únicos</span></div>
+        <div class="mini-card"><b>Intervenção prioritária</b><strong>${baixo50}</strong><span style="color:#fecaca">Abaixo de 50%</span></div>
+        <div class="mini-card"><b>Em atenção</b><strong>${atencao}</strong><span style="color:#fde68a">50% a 69%</span></div>
+        <div class="mini-card"><b>Adequados</b><strong>${adequado}</strong><span style="color:#bbf7d0">70% ou mais</span></div>`;
+    }
+
+    const turmas = grupoV59(lista, serieV59).sort((a,b)=>a[0].localeCompare(b[0])).map(([label,arr])=>({label,valor:mediaV59(arr),extra:`${arr.length} avaliações`}));
+    const comps = grupoV59(lista, compV59).sort((a,b)=>a[0].localeCompare(b[0])).map(([label,arr])=>({label,valor:mediaV59(arr),extra:`${arr.length} avaliações`}));
+
+    const dashTurmas = document.getElementById("dashTurmas");
+    if(dashTurmas) dashTurmas.innerHTML = graficoV59(turmas, tipo);
+
+    const dashComp = document.getElementById("dashComponentes");
+    if(dashComp) dashComp.innerHTML = graficoV59(comps, tipo);
+
+    const alunos = grupoV59(lista, alunoV59).map(([nome,arr])=>{
+      const ult = arr.slice().sort((a,b)=>new Date(b.created_at||b.data||0)-new Date(a.created_at||a.data||0))[0] || arr[0];
+      return {nome, turma:serieV59(ult), comp:compV59(ult), valor:pctV59(ult.percentual)};
+    }).filter(x=>x.valor<70).sort((a,b)=>a.valor-b.valor).slice(0,12);
+
+    const dashAlunos = document.getElementById("dashAlunosAtencao");
+    if(dashAlunos){
+      dashAlunos.innerHTML = alunos.length ? alunos.map((x,i)=>`
+        <div class="rank-item">
+          <div class="rank-pos">${i+1}</div>
+          <div><b>${x.nome}</b><br><span style="color:#94a3b8">${x.turma} • ${x.comp}</span></div>
+          <div><b>${x.valor}%</b></div>
+        </div>`).join("") : '<div class="empty">Nenhum aluno em atenção.</div>';
+    }
+
+    const desc = descritoresV59(lista);
+    const dashDesc = document.getElementById("dashDescritoresCriticos");
+    if(dashDesc) dashDesc.innerHTML = graficoV59(desc, tipo);
+
+    const mensal = grupoV59(lista, mesV59).sort((a,b)=>a[0].localeCompare(b[0])).slice(-8).map(([label,arr])=>({label,valor:mediaV59(arr),extra:`${arr.length} avaliações`}));
+    const dashEvol = document.getElementById("dashEvolucaoMensal");
+    if(dashEvol) dashEvol.innerHTML = graficoV59(mensal, tipo);
+
+    const plano = document.getElementById("dashPlanoIntervencao");
+    if(plano){
+      plano.innerHTML = desc.length ? desc.slice(0,5).map((x,i)=>`
+        <div class="plan-item">
+          <b>${i+1}. Reforçar ${x.label}</b><br>
+          Erro identificado: ${x.valor}% (${x.extra}).<br>
+          Ação sugerida: revisão dirigida, atividade curta e nova verificação na próxima semana.
+        </div>`).join("") : '<div class="empty">Sem descritores suficientes para plano.</div>';
+    }
+  };
+
+  const renderizarAnteriorV59 = window.renderizar;
+  window.renderizar = function(){
+    if(typeof renderizarAnteriorV59 === "function"){
+      try{ renderizarAnteriorV59(); }catch(e){ console.warn("render anterior:", e); }
+    }
+    try{ window.renderDashboardGestaoCoord(); }catch(e){ console.error("Dashboard V59:", e); }
+    abrirSecoesV59();
+  };
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    setTimeout(()=>{ try{ window.renderDashboardGestaoCoord(); abrirSecoesV59(); }catch(e){} }, 900);
+    setTimeout(()=>{ try{ window.renderDashboardGestaoCoord(); abrirSecoesV59(); }catch(e){} }, 1800);
+  });
+})();
+</script>
+
 </body>
 </html>
