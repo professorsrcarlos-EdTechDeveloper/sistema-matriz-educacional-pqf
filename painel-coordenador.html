@@ -2973,9 +2973,9 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 
 <script>
-/* V57 — Correção de recuperação, filtros zerando resultados, expansão e dashboards */
+/* V58 — Correção final: dados recuperados entram nas variáveis reais do painel */
 (function(){
-  const LOCAL_RESULT_KEYS_V57 = [
+  const LOCAL_RESULT_KEYS_V58 = [
     "matriz_spaece_resultados_locais",
     "resultados_treinamento",
     "matriz_resultados",
@@ -2983,7 +2983,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     "matriz_resultados_backup"
   ];
 
-  function getJsonV57(key){
+  function getJsonV58(key){
     try{
       const raw = localStorage.getItem(key);
       if(!raw) return [];
@@ -2992,13 +2992,13 @@ document.addEventListener("DOMContentLoaded",()=>{
     }catch(e){ return []; }
   }
 
-  function localResultsV57(){
+  function localResultsV58(){
     let all = [];
-    LOCAL_RESULT_KEYS_V57.forEach(k => all = all.concat(getJsonV57(k)));
+    LOCAL_RESULT_KEYS_V58.forEach(k => all = all.concat(getJsonV58(k)));
     return all;
   }
 
-  function inDateRangeV57(value, inicio, fim){
+  function inDateRangeV58(value, inicio, fim){
     if(!inicio && !fim) return true;
     const dt = new Date(value || new Date());
     if(isNaN(dt.getTime())) return true;
@@ -3013,7 +3013,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     return true;
   }
 
-  function normalizeV57(x){
+  function normalizeV58(x){
     try{
       return (typeof normalizarRegistro === "function") ? normalizarRegistro(x) : x;
     }catch(e){
@@ -3021,9 +3021,9 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
   }
 
-  function dedupV57(list){
+  function dedupV58(list){
     const seen = new Set();
-    return (Array.isArray(list) ? list : []).map(normalizeV57).filter(d=>{
+    return (Array.isArray(list) ? list : []).map(normalizeV58).filter(d=>{
       const key = [
         d.created_at || d.data || d.finalizado_em || "",
         d.aluno_nome || d.aluno || d.nome || "",
@@ -3037,7 +3037,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     }).sort((a,b)=>new Date(b.created_at || b.data || 0) - new Date(a.created_at || a.data || 0));
   }
 
-  async function supabaseResultsV57(inicio="", fim=""){
+  async function supabaseResultsV58(inicio="", fim=""){
     if(!(typeof supabaseAtivo === "function" && supabaseAtivo())) return [];
     try{
       let q = sb().from("resultados_treinamento").select("*").order("created_at",{ascending:false}).limit(5000);
@@ -3045,17 +3045,24 @@ document.addEventListener("DOMContentLoaded",()=>{
       if(fim) q = q.lte("created_at", new Date(fim + "T23:59:59").toISOString());
       const {data,error} = await q;
       if(error){
-        console.error("Erro Supabase V57:", error);
+        console.error("Erro Supabase V58:", error);
         return [];
       }
       return Array.isArray(data) ? data : [];
     }catch(e){
-      console.error("Falha Supabase V57:", e);
+      console.error("Falha Supabase V58:", e);
       return [];
     }
   }
 
-  function clearFilterValuesV57(){
+  function colocarDadosNoPainelV58(lista){
+    const final = dedupV58(lista);
+    try{ dadosOriginais = final; }catch(e){ window.dadosOriginais = final; }
+    try{ dados = final; }catch(e){ window.dados = final; }
+    return final;
+  }
+
+  function clearFilterValuesV58(){
     ["buscaAluno","filtroEscola"].forEach(id=>{const el=document.getElementById(id); if(el) el.value="";});
     ["filtroSerie","filtroTurma","filtroComponente","filtroAno","filtroMes"].forEach(id=>{
       const el=document.getElementById(id);
@@ -3063,13 +3070,17 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
   }
 
-  function setTextV57(id, html){
+  function listaDadosV58(){
+    try{ return Array.isArray(dados) ? dados : []; }catch(e){ return Array.isArray(window.dados) ? window.dados : []; }
+  }
+
+  function setTextV58(id, html){
     const el = document.getElementById(id);
     if(el) el.innerHTML = html;
   }
 
-  function atualizarKpisV57(){
-    const lista = Array.isArray(window.dados) ? window.dados : [];
+  function atualizarKpisV58(){
+    const lista = listaDadosV58();
     const total = lista.length;
     const med = (typeof media === "function") ? media(lista) : 0;
     const maior = lista.reduce((m,d)=>Math.max(m, Number(d.percentual || 0)), 0);
@@ -3077,18 +3088,18 @@ document.addEventListener("DOMContentLoaded",()=>{
     const faixa50 = lista.filter(d=>Number(d.percentual || 0) >= 50 && Number(d.percentual || 0) < 70).length;
     const evol = (typeof deltaUltimas === "function") ? deltaUltimas(lista) : 0;
 
-    setTextV57("kTotal", String(total));
-    setTextV57("kMedia", med + "%");
-    setTextV57("tMedia", (typeof trendHtml === "function") ? trendHtml(evol) : "");
-    setTextV57("kMaior", maior + "%");
-    setTextV57("kBaixo50", String(baixo50));
-    setTextV57("kAtencao", String(faixa50));
-    setTextV57("kEvolucao", Math.abs(evol) + "%");
-    setTextV57("tEvolucao", (typeof trendHtml === "function") ? trendHtml(evol) : "");
+    setTextV58("kTotal", String(total));
+    setTextV58("kMedia", med + "%");
+    setTextV58("tMedia", (typeof trendHtml === "function") ? trendHtml(evol) : "");
+    setTextV58("kMaior", maior + "%");
+    setTextV58("kBaixo50", String(baixo50));
+    setTextV58("kAtencao", String(faixa50));
+    setTextV58("kEvolucao", Math.abs(evol) + "%");
+    setTextV58("tEvolucao", (typeof trendHtml === "function") ? trendHtml(evol) : "");
   }
 
-  window.renderizar = function renderizarV57(){
-    try{ atualizarKpisV57(); }catch(e){ console.warn(e); }
+  window.renderizar = function renderizarV58(){
+    try{ atualizarKpisV58(); }catch(e){ console.warn(e); }
     [
       "renderComponentes",
       "renderFaixas",
@@ -3107,44 +3118,43 @@ document.addEventListener("DOMContentLoaded",()=>{
     try{ if(typeof prepararFerramentasExpansiveis === "function") prepararFerramentasExpansiveis(); }catch(e){}
   };
 
-  window.carregar = async function carregarV57(){
-    const remote = await supabaseResultsV57();
-    const local = localResultsV57();
-    window.dadosOriginais = dedupV57(remote.concat(local));
+  window.carregar = async function carregarV58(){
+    const remote = await supabaseResultsV58();
+    const local = localResultsV58();
+    colocarDadosNoPainelV58(remote.concat(local));
     try{ if(typeof preencherFiltros === "function") preencherFiltros(); }catch(e){}
     try{ if(typeof aplicarPermissoesUsuario === "function") aplicarPermissoesUsuario(); }catch(e){}
-    try{ if(typeof aplicarFiltros === "function") aplicarFiltros(); else window.renderizar(); }catch(e){ window.dados = window.dadosOriginais || []; window.renderizar(); }
-    return window.dadosOriginais;
+    try{ if(typeof aplicarFiltros === "function") aplicarFiltros(); else window.renderizar(); }catch(e){ window.renderizar(); }
+    return listaDadosV58();
   };
 
-  window.recuperarDadosPorData = async function recuperarDadosPorDataV57(){
+  window.recuperarDadosPorData = async function recuperarDadosPorDataV58(){
     const inicio = document.getElementById("dataInicioRecuperar")?.value || "";
     const fim = document.getElementById("dataFimRecuperar")?.value || "";
-    const remote = await supabaseResultsV57(inicio, fim);
-    const local = localResultsV57().filter(d=>inDateRangeV57(d.created_at || d.data || d.finalizado_em, inicio, fim));
-    window.dadosOriginais = dedupV57(remote.concat(local));
+    const remote = await supabaseResultsV58(inicio, fim);
+    const local = localResultsV58().filter(d=>inDateRangeV58(d.created_at || d.data || d.finalizado_em, inicio, fim));
 
-    /* Importante: limpa filtros de série, turma e componente para as avaliações recuperadas aparecerem. */
-    clearFilterValuesV57();
+    const final = colocarDadosNoPainelV58(remote.concat(local));
+
+    clearFilterValuesV58();
 
     try{ if(typeof preencherFiltros === "function") preencherFiltros(); }catch(e){}
     try{ if(typeof aplicarPermissoesUsuario === "function") aplicarPermissoesUsuario(); }catch(e){}
-    try{ if(typeof aplicarFiltros === "function") aplicarFiltros(); else { window.dados = window.dadosOriginais || []; window.renderizar(); } }catch(e){
-      window.dados = window.dadosOriginais || [];
-      window.renderizar();
-    }
 
-    const total = (window.dadosOriginais || []).length;
-    alert(total + " avaliações recuperadas. Os filtros foram limpos para os dados aparecerem no painel.");
+    /* Mostra imediatamente tudo recuperado, sem depender do aplicarFiltros antigo. */
+    try{ dados = final; }catch(e){ window.dados = final; }
+    window.renderizar();
+
+    alert(final.length + " avaliações recuperadas e exibidas no painel.");
   };
 
   document.addEventListener("DOMContentLoaded", ()=>{
     const tg = document.getElementById("tipoGrafico");
-    if(tg && !tg.dataset.v57bind){
-      tg.dataset.v57bind = "1";
+    if(tg && !tg.dataset.v58bind){
+      tg.dataset.v58bind = "1";
       tg.addEventListener("change", ()=>{ try{ window.renderizar(); }catch(e){} });
     }
-    setTimeout(()=>{ try{ window.carregar(); }catch(e){ console.warn("Falha carga V57:", e); } }, 500);
+    setTimeout(()=>{ try{ window.carregar(); }catch(e){ console.warn("Falha carga V58:", e); } }, 500);
   });
 })();
 </script>
