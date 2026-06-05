@@ -353,6 +353,50 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
   <div class="kpi info"><b>Evolução recente</b><strong id="kEvolucao">0%</strong><span id="tEvolucao" class="trend flat">→ 0%</span></div>
 </section>
 
+<section id="dashboardGestaoCoord" class="card no-print" style="display:none">
+  <div class="card-tools">
+    <h2>Dashboard da Gestão e Coordenação</h2>
+    <small>visão geral da escola • sem ranking de professores</small>
+  </div>
+  <div class="legal" style="margin-top:0;margin-bottom:12px">
+    Painel exclusivo para gestão e coordenação. O objetivo é acompanhar turmas, componentes, descritores, alunos em atenção, evolução mensal e plano de intervenção, sem exposição ou ranqueamento de professores.
+  </div>
+  <div id="dashGestaoKpis" class="cards-grid"></div>
+</section>
+
+<section id="dashboardGestaoDetalhado" class="grid no-print" style="display:none">
+  <div class="card">
+    <div class="card-tools"><h2>Dashboard por turma</h2><small>média e volume de avaliações</small></div>
+    <div id="dashTurmas"></div>
+  </div>
+  <div class="card">
+    <div class="card-tools"><h2>Dashboard por componente</h2><small>Português e Matemática</small></div>
+    <div id="dashComponentes"></div>
+  </div>
+</section>
+
+<section id="dashboardGestaoIntervencao" class="grid-wide no-print" style="display:none">
+  <div class="card">
+    <div class="card-tools"><h2>Dashboard de alunos em atenção</h2><small>abaixo de 70%</small></div>
+    <div id="dashAlunosAtencao" class="rank-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-tools"><h2>Dashboard de descritores críticos</h2><small>maior percentual de erro</small></div>
+    <div id="dashDescritoresCriticos"></div>
+  </div>
+</section>
+
+<section id="dashboardGestaoEvolucao" class="grid no-print" style="display:none">
+  <div class="card">
+    <div class="card-tools"><h2>Dashboard de evolução mensal</h2><small>média por mês</small></div>
+    <div id="dashEvolucaoMensal"></div>
+  </div>
+  <div class="card">
+    <div class="card-tools"><h2>Dashboard de plano de intervenção</h2><small>prioridades pedagógicas</small></div>
+    <div id="dashPlanoIntervencao" class="plan-list"></div>
+  </div>
+</section>
+
 <section class="grid no-print">
   <div class="card"><div class="card-tools"><h2>Comparativo por Componente Curricular</h2><small id="labelTipo1">Barras</small></div><div id="chartComponentes"></div></div>
   <div class="card"><div class="card-tools"><h2>Faixa de desempenho</h2><small id="labelTipo2">Barras</small></div><div id="chartFaixas"></div></div>
@@ -923,7 +967,7 @@ function graficoPizza(lista){const total=lista.reduce((s,x)=>s+Number(x.valor||0
 function graficoCards(lista){return `<div class="cards-grid">${lista.map(x=>`<div class="mini-card"><b>${x.label}</b><strong>${x.valor}%</strong>${trendHtml(x.delta||0)}</div>`).join("")}</div>`}
 function renderGrafico(id,lista,classe=""){const tipo=document.getElementById("tipoGrafico").value;const el=document.getElementById(id);if(!lista.length){el.innerHTML='<div class="empty">Sem dados.</div>';return}if(tipo==="vertical")el.innerHTML=graficoVertical(lista,classe);else if(tipo==="pizza")el.innerHTML=graficoPizza(lista);else if(tipo==="cards")el.innerHTML=graficoCards(lista);else el.innerHTML=lista.map(x=>linhaBarra(x.label,x.valor,classe)).join("")}
 function agruparDescritores(){const mapa={};dados.forEach(d=>{const lista=(Array.isArray(d.habilidades_detalhadas)&&d.habilidades_detalhadas.length)?d.habilidades_detalhadas:(Array.isArray(d.respostas)?d.respostas.map(r=>({habilidade:r.habilidade,acertos:r.acertou?1:0,erros:r.acertou?0:1,total:1})):[]);lista.forEach(h=>{const n=h.habilidade||"Sem descritor";if(!mapa[n])mapa[n]={acertos:0,erros:0,total:0};mapa[n].acertos+=Number(h.acertos||0);mapa[n].erros+=Number(h.erros||0);mapa[n].total+=Number(h.total||((h.acertos||0)+(h.erros||0)))})});return Object.entries(mapa).map(([habilidade,v])=>({habilidade,acertos:v.acertos,erros:v.erros,total:v.total,percErro:v.total?Math.round((v.erros/v.total)*100):0,percAcerto:v.total?Math.round((v.acertos/v.total)*100):0}))}
-function renderizar(){const total=dados.length,med=media(dados),maior=total?Math.max(...dados.map(d=>d.percentual||0)):0,baixo50=dados.filter(d=>d.percentual<50).length,atencao=dados.filter(d=>d.percentual>=50&&d.percentual<70).length,delta=deltaUltimas(dados);kTotal.textContent=total;kMedia.textContent=med+"%";kMaior.textContent=maior+"%";kBaixo50.textContent=baixo50;kAtencao.textContent=atencao;kEvolucao.textContent=delta+"%";tMedia.outerHTML=trendHtml(delta).replace('class="trend','id="tMedia" class="trend');tEvolucao.outerHTML=trendHtml(delta).replace('class="trend','id="tEvolucao" class="trend');renderComponentes();renderFaixas();renderDescritores();renderRanking();renderHeatmap();renderEvolucaoDescritores();renderPlano();renderMensal();renderTabela()}
+function renderizar(){const total=dados.length,med=media(dados),maior=total?Math.max(...dados.map(d=>d.percentual||0)):0,baixo50=dados.filter(d=>d.percentual<50).length,atencao=dados.filter(d=>d.percentual>=50&&d.percentual<70).length,delta=deltaUltimas(dados);kTotal.textContent=total;kMedia.textContent=med+"%";kMaior.textContent=maior+"%";kBaixo50.textContent=baixo50;kAtencao.textContent=atencao;kEvolucao.textContent=delta+"%";tMedia.outerHTML=trendHtml(delta).replace('class="trend','id="tMedia" class="trend');tEvolucao.outerHTML=trendHtml(delta).replace('class="trend','id="tEvolucao" class="trend');renderComponentes();renderFaixas();renderDescritores();renderRanking();renderHeatmap();renderEvolucaoDescritores();renderPlano();renderMensal();renderDashboardGestaoCoord();renderTabela()}
 function renderComponentes(){const lista=["Português","Matemática"].map(m=>{const arr=dados.filter(d=>d.materia===m);return{label:m,valor:media(arr),delta:deltaUltimas(arr)}});renderGrafico("chartComponentes",lista,"gold")}
 function renderFaixas(){const total=dados.length||1;renderGrafico("chartFaixas",[{label:"Intervenção prioritária",valor:Math.round(dados.filter(d=>d.percentual<50).length/total*100)},{label:"Em desenvolvimento",valor:Math.round(dados.filter(d=>d.percentual>=50&&d.percentual<70).length/total*100)},{label:"Adequado",valor:Math.round(dados.filter(d=>d.percentual>=70).length/total*100)}])}
 function renderDescritores(){const lista=agruparDescritores();const erros=[...lista].sort((a,b)=>b.percErro-a.percErro||b.erros-a.erros).slice(0,8).map(x=>({label:x.habilidade,valor:x.percErro}));const acertos=[...lista].sort((a,b)=>b.percAcerto-a.percAcerto||b.acertos-a.acertos).slice(0,8).map(x=>({label:x.habilidade,valor:x.percAcerto}));renderGrafico("chartErros",erros,"red");renderGrafico("chartAcertos",acertos)}
@@ -933,6 +977,108 @@ function renderHeatmap(){const series=["2","5","9"],mapa={};dados.forEach(d=>{co
 function renderEvolucaoDescritores(){const top=agruparDescritores().sort((a,b)=>b.total-a.total).slice(0,8).map(x=>({label:x.habilidade,valor:x.percAcerto}));evolucaoDescritores.innerHTML=top.length?top.map(x=>linhaBarra(x.label,x.valor,x.valor<50?"red":x.valor<70?"gold":"")).join(""):'<div class="empty">Sem dados.</div>'}
 function renderPlano(){const lista=agruparDescritores().sort((a,b)=>b.percErro-a.percErro||b.erros-a.erros).slice(0,5);planoIntervencao.innerHTML=lista.length?lista.map((x,i)=>`<div class="plan-item"><b>${i+1}. Reforçar ${x.habilidade}</b><br>Erro atual: ${x.percErro}% (${x.erros}/${x.total}).<br>Sugestão: revisar habilidade, aplicar atividade orientada e nova rodada de 10 questões.</div>`).join(""):'<div class="empty">Sem dados para plano.</div>'}
 function renderMensal(){const mapa={};dados.forEach(d=>{const m=d.mes_ano||mesAno(d.created_at);if(!mapa[m])mapa[m]=[];mapa[m].push(d)});const lista=Object.entries(mapa).sort().slice(-8).map(([m,arr])=>({label:m,valor:media(arr),delta:deltaUltimas(arr)}));desempenhoMensal.innerHTML=lista.length?graficoCards(lista):'<div class="empty">Sem dados mensais.</div>'}
+
+function agruparListaDashboard(lista, fn){
+  const mapa={};
+  (lista||[]).forEach(item=>{
+    const chave=fn(item)||"Não informado";
+    if(!mapa[chave]) mapa[chave]=[];
+    mapa[chave].push(item);
+  });
+  return Object.entries(mapa);
+}
+
+function turmaRegistroDashboard(d){
+  const s=serieNumero(d.serie_codigo||d.serie||d.turma);
+  if(s==="2") return "2º ano";
+  if(s==="5") return "5º ano";
+  if(s==="9") return "9º ano";
+  return d.turma||d.serie||"Não informado";
+}
+
+function renderDashboardGestaoCoord(){
+  const u=usuarioAtual();
+  const secoes=["dashboardGestaoCoord","dashboardGestaoDetalhado","dashboardGestaoIntervencao","dashboardGestaoEvolucao"];
+  const permitido = !!(u && u.acesso_geral);
+  secoes.forEach(id=>{const el=document.getElementById(id); if(el) el.style.display=permitido?"block":"none";});
+  if(!permitido) return;
+
+  const lista = Array.isArray(dados) ? dados : [];
+  const total = lista.length;
+  const med = media(lista);
+  const baixo50 = lista.filter(d=>Number(d.percentual||0)<50).length;
+  const atencao = lista.filter(d=>Number(d.percentual||0)>=50 && Number(d.percentual||0)<70).length;
+  const adequado = lista.filter(d=>Number(d.percentual||0)>=70).length;
+  const avaliados = new Set(lista.map(d=>(d.aluno_nome||"").trim()).filter(Boolean)).size;
+  const descritores = agruparDescritores();
+
+  const kpis=document.getElementById("dashGestaoKpis");
+  if(kpis){
+    kpis.innerHTML = `
+      <div class="mini-card"><b>Avaliações filtradas</b><strong>${total}</strong><span style="color:var(--muted)">Registros no período/filtro atual</span></div>
+      <div class="mini-card"><b>Média geral</b><strong>${med}%</strong>${trendHtml(deltaUltimas(lista))}</div>
+      <div class="mini-card"><b>Alunos avaliados</b><strong>${avaliados}</strong><span style="color:var(--muted)">Nomes únicos no filtro</span></div>
+      <div class="mini-card"><b>Intervenção prioritária</b><strong>${baixo50}</strong><span style="color:#fecaca">Abaixo de 50%</span></div>
+      <div class="mini-card"><b>Em atenção</b><strong>${atencao}</strong><span style="color:#fde68a">50% a 69%</span></div>
+      <div class="mini-card"><b>Adequados</b><strong>${adequado}</strong><span style="color:#bbf7d0">70% ou mais</span></div>
+    `;
+  }
+
+  const porTurma = agruparListaDashboard(lista, turmaRegistroDashboard)
+    .sort((a,b)=>a[0].localeCompare(b[0]))
+    .map(([label,arr])=>({label,valor:media(arr),delta:deltaUltimas(arr),total:arr.length}));
+  const dashTurmas=document.getElementById("dashTurmas");
+  if(dashTurmas){
+    dashTurmas.innerHTML = porTurma.length
+      ? porTurma.map(x=>`<div class="plan-item"><b>${x.label}</b><br>Média: ${x.valor}% ${trendHtml(x.delta)}<br>Registros: ${x.total}<br>${linhaBarra("Desempenho",x.valor,x.valor<50?"red":x.valor<70?"gold":"")}</div>`).join("")
+      : '<div class="empty">Sem dados para turmas.</div>';
+  }
+
+  const porComponente = ["Português","Matemática"].map(m=>{
+    const arr=lista.filter(d=>String(d.materia||d.componente_curricular||"").toLowerCase().includes(m.toLowerCase().slice(0,4)));
+    return {label:m,valor:media(arr),delta:deltaUltimas(arr),total:arr.length};
+  });
+  const dashComponentes=document.getElementById("dashComponentes");
+  if(dashComponentes){
+    dashComponentes.innerHTML = porComponente.map(x=>`<div class="plan-item"><b>${x.label}</b><br>Média: ${x.valor}% ${trendHtml(x.delta)}<br>Registros: ${x.total}<br>${linhaBarra("Desempenho",x.valor,x.valor<50?"red":x.valor<70?"gold":"")}</div>`).join("");
+  }
+
+  const alunos = Object.values(porAluno()).map(arr=>{
+    const ord=[...arr].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    const ult=ord[0]||arr[arr.length-1];
+    const ant=ord[1]||null;
+    return {nome:ult.aluno_nome||"Aluno não identificado",serie:ult.serie||turmaRegistroDashboard(ult),materia:ult.materia||"",atual:Number(ult.percentual||0),delta:ant?Math.round(Number(ult.percentual||0)-Number(ant.percentual||0)):0};
+  }).filter(x=>x.atual<70).sort((a,b)=>a.atual-b.atual).slice(0,12);
+  const dashAlunos=document.getElementById("dashAlunosAtencao");
+  if(dashAlunos){
+    dashAlunos.innerHTML = alunos.length
+      ? alunos.map((x,i)=>`<div class="rank-item"><div class="rank-pos">${i+1}</div><div><b>${nomeSeguro(x.nome)}</b><br><span style="color:var(--muted)">${x.serie} • ${x.materia}</span></div><div>${x.atual}%<br>${trendHtml(x.delta)}</div></div>`).join("")
+      : '<div class="empty">Nenhum aluno em atenção no filtro atual.</div>';
+  }
+
+  const criticos = [...descritores].sort((a,b)=>b.percErro-a.percErro||b.erros-a.erros).slice(0,10).map(x=>({label:x.habilidade,valor:x.percErro}));
+  const dashDesc=document.getElementById("dashDescritoresCriticos");
+  if(dashDesc){
+    dashDesc.innerHTML = criticos.length ? criticos.map(x=>linhaBarra(x.label,x.valor,"red")).join("") : '<div class="empty">Sem descritores críticos.</div>';
+  }
+
+  const mapaMes={};
+  lista.forEach(d=>{const m=d.mes_ano||mesAno(d.created_at);if(!mapaMes[m])mapaMes[m]=[];mapaMes[m].push(d)});
+  const evolucao=Object.entries(mapaMes).sort().slice(-8).map(([m,arr])=>({label:m,valor:media(arr),delta:deltaUltimas(arr)}));
+  const dashEvol=document.getElementById("dashEvolucaoMensal");
+  if(dashEvol){
+    dashEvol.innerHTML = evolucao.length ? graficoCards(evolucao) : '<div class="empty">Sem evolução mensal.</div>';
+  }
+
+  const plano=document.getElementById("dashPlanoIntervencao");
+  const prioridades=[...descritores].sort((a,b)=>b.percErro-a.percErro||b.erros-a.erros).slice(0,5);
+  if(plano){
+    plano.innerHTML = prioridades.length
+      ? prioridades.map((x,i)=>`<div class="plan-item"><b>${i+1}. Prioridade: ${x.habilidade}</b><br>Erro identificado: ${x.percErro}% (${x.erros}/${x.total}).<br>Ação sugerida: atividade dirigida, revisão guiada e nova verificação na próxima semana.</div>`).join("")
+      : '<div class="empty">Sem dados para plano de intervenção.</div>';
+  }
+}
+
 function renderTabela(){
   const el=document.getElementById("resultadosCards");
   if(!el) return;
