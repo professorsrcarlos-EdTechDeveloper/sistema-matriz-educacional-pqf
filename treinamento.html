@@ -79,15 +79,180 @@ footer strong{color:var(--gold)}
 }
 @media(max-width:760px){.logo-lupa-corner-v61{width:54px;height:54px;right:12px;top:12px}}
 
+
+/* V62 - topo compacto: escola esquerda, MATRIZ centro alto e lupa direita */
+.header.header-layout-v62{
+  min-height:170px;
+  padding:12px 116px 14px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  position:relative;
+  text-align:center;
+  overflow:hidden;
+}
+
+.header-layout-v62::before{
+  top:-2px;
+  width:126px;
+  height:126px;
+}
+
+.header-layout-v62::after{
+  top:-12px;
+  width:150px;
+  height:150px;
+}
+
+.school-logo.school-logo-v62{
+  position:absolute;
+  left:26px;
+  top:22px;
+  width:78px;
+  height:78px;
+  margin:0;
+}
+
+.header-center-v62{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  gap:6px;
+  width:100%;
+  max-width:760px;
+}
+
+.logo.logo-v62{
+  margin:0 auto 2px;
+  width:136px;
+  height:56px;
+}
+
+.badge.badge-v62{
+  margin:2px 0 4px;
+  padding:6px 12px;
+  font-size:.68rem;
+}
+
+.header-layout-v62 h1{
+  margin:0;
+  font-size:clamp(1.65rem,3.2vw,2.35rem);
+  line-height:1.02;
+}
+
+.header-layout-v62 p{
+  margin:3px 0 0;
+  font-size:.88rem;
+  line-height:1.25;
+}
+
+.logo-lupa-corner-v61.logo-lupa-v62{
+  position:absolute;
+  right:26px;
+  top:22px;
+  width:78px;
+  height:78px;
+  object-fit:contain;
+  z-index:3;
+  margin:0;
+  transform:scaleX(-1);
+  transform-origin:center;
+  filter:drop-shadow(0 0 14px rgba(56,189,248,.30));
+}
+
+.logo-lupa-corner-v61.logo-lupa-v62:hover{
+  transform:scaleX(-1) translateY(-2px);
+}
+
+@media(max-width:760px){
+  .header.header-layout-v62{
+    min-height:155px;
+    padding:10px 76px 12px;
+  }
+
+  .school-logo.school-logo-v62{
+    left:12px;
+    top:16px;
+    width:58px;
+    height:58px;
+  }
+
+  .logo-lupa-corner-v61.logo-lupa-v62{
+    right:12px;
+    top:16px;
+    width:58px;
+    height:58px;
+  }
+
+  .logo.logo-v62{
+    width:112px;
+    height:48px;
+  }
+
+  .badge.badge-v62{
+    margin-top:2px;
+    font-size:.54rem;
+    padding:5px 8px;
+    letter-spacing:.04em;
+  }
+
+  .header-layout-v62 h1{
+    font-size:1.42rem;
+  }
+
+  .header-layout-v62 p{
+    font-size:.74rem;
+    display:block;
+  }
+}
+
+@media(max-width:420px){
+  .header.header-layout-v62{
+    padding-left:66px;
+    padding-right:66px;
+    min-height:150px;
+  }
+
+  .school-logo.school-logo-v62,
+  .logo-lupa-corner-v61.logo-lupa-v62{
+    width:50px;
+    height:50px;
+  }
+
+  .logo.logo-v62{
+    width:98px;
+    height:44px;
+    font-size:.68rem;
+  }
+
+  .badge.badge-v62{
+    font-size:.48rem;
+    line-height:1.2;
+  }
+
+  .header-layout-v62 h1{
+    font-size:1.2rem;
+  }
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="header">
-    <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo"><span>MATRIZ</span></div><img src="logotipo-olho-lupa.png" alt="Logotipo olho com lupa" class="logo-lupa-corner-v61">
-    <div class="badge">Treinamento Escolar • BNCC • Avaliações Externas</div>
-    <h1>Sistema MATRIZ EDUCACIONAL</h1>
-    <p>Plataforma de Treinamento Escolar por Descritores — 2º, 5º e 9º ano.</p>
+  <header class="header header-layout-v62">
+    <img class="school-logo school-logo-v62" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira">
+
+    <div class="header-center-v62">
+      <div class="logo logo-v62"><span>MATRIZ</span></div>
+      <div class="badge badge-v62">Treinamento Escolar • BNCC • Avaliações Externas</div>
+      <h1>Sistema MATRIZ EDUCACIONAL</h1>
+      <p>Plataforma de Treinamento Escolar por Descritores — 2º, 5º e 9º ano.</p>
+    </div>
+
+    <img src="logotipo-olho-lupa.png" alt="Logotipo olho com lupa" class="logo-lupa-corner-v61 logo-lupa-v62">
   </header>
   <div class="legal"><strong>Aviso legal:</strong> Ferramenta independente de treinamento escolar. Não oficial, não vinculada à SEDUC/CE, CAEd/UFJF ou Governo do Estado do Ceará. SPAECE é citado apenas como referência à avaliação educacional.</div>
   <main id="app" class="box"></main>
