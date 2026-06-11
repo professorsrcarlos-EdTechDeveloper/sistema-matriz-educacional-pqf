@@ -3,701 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema MATRIZ EDUCACIONAL — Treinamento</title>
+<title>Sistema Matriz Educacional — Manutenção</title>
 <style>
-:root{--bg:#071524;--card:#0f2335;--blue:#38bdf8;--green:#22c55e;--gold:#fbbf24;--text:#fff;--muted:#cbd5e1;--line:rgba(255,255,255,.12)}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
-body{min-height:100vh;background:radial-gradient(circle at top left,rgba(56,189,248,.16),transparent 36%),radial-gradient(circle at top right,rgba(34,197,94,.12),transparent 36%),linear-gradient(180deg,var(--bg),#020617 62%,#000);color:var(--text);padding:10px}
-body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;mask-image:linear-gradient(to bottom,black,transparent 80%)}
-.wrap{max-width:1120px;margin:0 auto;position:relative;z-index:1}
-.header{border:1px solid rgba(56,189,248,.24);border-radius:18px;padding:14px;background:linear-gradient(135deg,rgba(11,18,36,.95),rgba(16,27,53,.92));box-shadow:0 0 16px rgba(56,189,248,.10), inset 0 0 20px rgba(255,255,255,.03);text-align:center;margin-bottom:10px}
-.header{position:relative;isolation:isolate}
-.header::before,.header::after{content:"";position:absolute;pointer-events:none;left:50%;transform:translateX(-50%);border-radius:50%;z-index:0}
-.header::before{top:6px;width:130px;height:130px;background:radial-gradient(circle,rgba(125,211,252,.34) 0%,rgba(56,189,248,.12) 36%,rgba(56,189,248,0) 74%);filter:blur(8px);animation:gemPulse 3.2s ease-in-out infinite}
-.header::after{top:-2px;width:156px;height:156px;background:conic-gradient(from 0deg,transparent 0 14%,rgba(255,255,255,.72) 20%,transparent 26%,rgba(56,189,248,.44) 36%,transparent 42%,rgba(251,191,36,.34) 52%,transparent 58%,rgba(167,139,250,.28) 68%,transparent 74%);filter:blur(12px);mix-blend-mode:screen;animation:prismSpin 8.5s linear infinite}
-.school-logo{width:82px;height:82px;object-fit:contain;border-radius:50%;background:#fff;padding:5px;margin:0 auto 8px;display:block;position:relative;z-index:1;box-shadow:0 0 18px rgba(56,189,248,.18);animation:logoFloat 4.8s ease-in-out infinite, logoGlow 3s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(56,189,248,.24))}
-.logo{width:132px;height:56px;border-radius:18px;margin:0 auto 8px;background:radial-gradient(circle at 18% 28%,rgba(255,255,255,.26),transparent 22%),linear-gradient(135deg,#0f2b46,#133d63 44%,#12729a 100%);display:grid;place-items:center;color:#fff;font-weight:1000;font-size:.78rem;letter-spacing:.08em;box-shadow:0 0 24px rgba(56,189,248,.20);position:relative;overflow:hidden;border:1px solid rgba(56,189,248,.34);z-index:1;animation:logoFloat 4.8s ease-in-out infinite reverse, gemFrame 3.6s ease-in-out infinite}
-.logo::before{content:"";position:absolute;width:18px;height:18px;right:10px;top:18px;border:2px solid rgba(251,191,36,.72);transform:rotate(45deg);border-radius:4px;box-shadow:0 0 12px rgba(251,191,36,.26)}
-.logo::after{content:"";position:absolute;inset:-30% auto -30% -18%;width:48%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.40),transparent);transform:skewX(-24deg);animation:prismSweep 4.6s linear infinite}
-.logo span{position:relative;z-index:1;padding-right:16px}
-.book-mascot-wrap{display:flex;justify-content:center;align-items:center;margin:0 auto 8px;position:relative;width:78px;height:78px}
-.book-mascot-wrap::before{content:"";position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,rgba(251,191,36,.22) 0%,rgba(56,189,248,.10) 50%,rgba(56,189,248,0) 78%);filter:blur(10px)}
-.book-mascot{width:64px;height:64px;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 14px rgba(56,189,248,.24));animation:logoFloat 4.4s ease-in-out infinite alternate}
-@keyframes logoFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.03)}}
-@keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 10px rgba(56,189,248,.20)) drop-shadow(0 0 16px rgba(14,165,233,.16))}50%{filter:drop-shadow(0 0 15px rgba(125,211,252,.55)) drop-shadow(0 0 28px rgba(99,102,241,.28))}}
-@keyframes gemPulse{0%,100%{opacity:.56;transform:translateX(-50%) scale(.94)}50%{opacity:1;transform:translateX(-50%) scale(1.09)}}
-@keyframes prismSpin{from{transform:translateX(-50%) rotate(0)}to{transform:translateX(-50%) rotate(360deg)}}
-@keyframes prismSweep{0%{transform:translateX(-170%) skewX(-24deg);opacity:0}15%{opacity:0}30%{opacity:.55}55%{opacity:0}100%{transform:translateX(320%) skewX(-24deg);opacity:0}}
-@keyframes gemFrame{0%,100%{box-shadow:0 0 18px rgba(56,189,248,.18), inset 0 0 10px rgba(255,255,255,.04)}50%{box-shadow:0 0 28px rgba(56,189,248,.28),0 0 44px rgba(14,165,233,.12),inset 0 0 16px rgba(255,255,255,.12)}}
-.badge{display:inline-flex;padding:5px 10px;border:1px solid rgba(250,204,21,.32);color:var(--gold);border-radius:999px;font-size:.68rem;font-weight:1000;letter-spacing:.08em;text-transform:uppercase;background:rgba(250,204,21,.08);margin-bottom:8px}
-h1{font-size:clamp(1.35rem,3vw,2.15rem);line-height:1.05;text-shadow:0 0 12px rgba(0,229,255,.28)}
-.header p{color:var(--muted);font-size:.9rem;margin-top:6px;line-height:1.35}
-.legal{border:1px solid rgba(251,191,36,.32);border-radius:14px;background:rgba(251,191,36,.08);color:#fef3c7;padding:9px 10px;font-size:.76rem;line-height:1.35;text-align:center;margin-bottom:10px}
-.box{background:linear-gradient(180deg,rgba(11,18,36,.96),rgba(8,13,28,.98));border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.32)}
-.form{max-width:760px;margin:0 auto;text-align:left}
-label{display:block;margin:12px 0 6px;color:var(--gold);font-weight:900}
-input,select{width:100%;padding:14px 13px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:#061126;color:#fff;font-weight:800;outline:none}
-input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.10)}
-.notice{border:1px solid rgba(250,204,21,.34);background:linear-gradient(135deg,rgba(250,204,21,.12),rgba(0,229,255,.06));color:#fff7cc;border-radius:14px;padding:10px;margin:12px 0;line-height:1.35;font-weight:700}
-.btn{display:inline-flex;align-items:center;justify-content:center;width:100%;gap:8px;margin:8px 0;padding:12px 14px;border:2px solid var(--blue);background:rgba(0,229,255,.05);color:#fff;border-radius:12px;cursor:pointer;font-weight:900;font-size:.95rem;line-height:1.3;transition:.18s}
-.btn:hover:not(:disabled){background:var(--blue);color:#001018;box-shadow:0 0 18px rgba(0,229,255,.36);transform:translateY(-1px)}
-.btn.gold{border-color:var(--gold);color:var(--gold);background:rgba(250,204,21,.06)}
-.btn.gold:hover:not(:disabled){background:var(--gold);color:#090909}
-.btn.muted{border-color:#64748b;color:#e2e8f0;background:rgba(100,116,139,.10)}
-.status{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;color:var(--gold);font-weight:900}
-.progress{height:9px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:12px}
-.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));width:0%}
-.qbox{display:grid;grid-template-columns:1fr 190px;min-height:520px;gap:14px;align-items:start}
-.qactions{position:sticky;top:10px;display:flex;flex-direction:column;gap:8px}
-.qactions .btn{margin:0}
-.question-label{display:block;color:var(--blue);font-weight:1000;margin:10px 0 6px;text-transform:uppercase;letter-spacing:.04em;font-size:.78rem}
-.text-base{display:block;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:12px;margin:6px 0 10px;color:#e5e7eb;line-height:1.45}
-.visual{margin:8px 0;padding:10px;min-height:205px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(56,189,248,.20);border-radius:14px;background:rgba(56,189,248,.05);text-align:center}
-.visual svg{max-width:100%;height:auto}
-.options{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-.option{width:100%;text-align:left;justify-content:flex-start;margin:0;border-color:rgba(56,189,248,.28);background:rgba(255,255,255,.035);color:#fff}
-.option.selected{border-color:var(--gold);background:rgba(251,191,36,.12);color:#fff}
-.final{text-align:center;padding:20px}
-.final h2{color:var(--blue);font-size:2rem;margin-bottom:10px}
-.final p{color:var(--muted);line-height:1.55;margin-bottom:10px}
-footer{text-align:center;color:#cbd5e1;padding:14px;font-size:.78rem}
-footer strong{color:var(--gold)}
-@media(max-width:860px){.qbox{grid-template-columns:1fr}.qactions{position:static}.header p{display:none}}
-
-/* V61 - logotipo olho com lupa no lado direito do cabeçalho */
-.header{position:relative}
-.logo-lupa-corner-v61{
-  position:absolute;
-  right:22px;
-  top:22px;
-  width:74px;
-  height:74px;
-  object-fit:contain;
-  filter:drop-shadow(0 0 12px rgba(56,189,248,.20));
-  animation:logoFloat 4.4s ease-in-out infinite alternate;
-  z-index:2;
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial, Helvetica, sans-serif;
 }
-@media(max-width:760px){.logo-lupa-corner-v61{width:54px;height:54px;right:12px;top:12px}}
-
+body{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(circle at top left, rgba(56,189,248,.18), transparent 35%),
+    radial-gradient(circle at top right, rgba(251,191,36,.14), transparent 35%),
+    linear-gradient(180deg,#071524,#020617 70%,#000);
+  color:white;
+  padding:24px;
+}
+.card{
+  max-width:760px;
+  width:100%;
+  text-align:center;
+  background:linear-gradient(180deg,rgba(15,35,53,.96),rgba(8,19,32,.98));
+  border:1px solid rgba(56,189,248,.35);
+  border-radius:28px;
+  padding:34px 26px;
+  box-shadow:0 20px 55px rgba(0,0,0,.35),0 0 28px rgba(56,189,248,.16);
+}
+.logo{
+  width:96px;
+  height:96px;
+  object-fit:contain;
+  margin-bottom:18px;
+  filter:drop-shadow(0 0 18px rgba(56,189,248,.35));
+}
+h1{
+  font-size:clamp(1.8rem,4vw,3rem);
+  margin-bottom:14px;
+  color:#fbbf24;
+}
+h2{
+  font-size:clamp(1.15rem,2.5vw,1.6rem);
+  margin-bottom:18px;
+  color:#e0f2fe;
+}
+p{
+  font-size:1.05rem;
+  line-height:1.65;
+  color:#cbd5e1;
+  margin-bottom:12px;
+}
+.aviso{
+  margin-top:20px;
+  padding:16px;
+  border-radius:18px;
+  background:rgba(251,191,36,.10);
+  border:1px solid rgba(251,191,36,.35);
+  color:#fde68a;
+  font-weight:bold;
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="header">
-    <img class="school-logo" src="logo-pqf.jpg" alt="Logo EMEF Pedro de Queiroz Ferreira"><div class="logo"><span>MATRIZ</span></div><img src="logotipo-olho-lupa.png" alt="Logotipo olho com lupa" class="logo-lupa-corner-v61">
-    <div class="badge">Treinamento Escolar • BNCC • Avaliações Externas</div>
-    <h1>Sistema MATRIZ EDUCACIONAL</h1>
-    <p>Plataforma de Treinamento Escolar por Descritores — 2º, 5º e 9º ano.</p>
-  </header>
-  <div class="legal"><strong>Aviso legal:</strong> Ferramenta independente de treinamento escolar. Não oficial, não vinculada à SEDUC/CE, CAEd/UFJF ou Governo do Estado do Ceará. SPAECE é citado apenas como referência à avaliação educacional.</div>
-  <main id="app" class="box"></main>
-  <footer><strong>Idealizadores:</strong> Cleilson Paiva — gestor escolar e Carlos Tavares — coordenador / Geografia</footer>
-</div>
+  <main class="card">
+    <img class="logo" src="logotipo-olho-lupa.png" alt="Sistema Matriz Educacional">
+    <h1>Sistema Matriz Educacional</h1>
+    <h2>Portal temporariamente em manutenção</h2>
 
-<script src="questoes.js"></script>
-<script src="simulados-fixos.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script>
-let aluno={nome:"", escola:"", serie:"", codigoProva:""};
-let questoes=[], indice=0, respostas=[], provaAtual=null, audioCtx=null;
+    <p>
+      O sistema está passando por atualização técnica para melhoria da plataforma,
+      organização dos dados, correção de relatórios e ajustes nas avaliações.
+    </p>
 
-function beep(){
-  try{
-    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = "sine";
-    osc.frequency.value = 880;
-    gain.gain.value = 0.035;
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start();
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
-    osc.stop(audioCtx.currentTime + 0.08);
-  }catch(e){}
-}
+    <p>
+      O acesso será restabelecido em breve.
+    </p>
 
-function normalizarCodigo(v){return String(v||"").trim().toUpperCase().replace(/\s+/g,"")}
-function nomeSerie(s){ if(String(s).includes("2")) return "2º ano"; if(String(s).includes("5")) return "5º ano"; if(String(s).includes("9")) return "9º ano"; return s; }
-function componenteDoCodigo(c){ c=normalizarCodigo(c); return c.includes("P") ? "Português" : c.includes("M") ? "Matemática" : ""; }
-function serieDoCodigo(c){ c=normalizarCodigo(c); return c.startsWith("2")?"2":c.startsWith("5")?"5":c.startsWith("9")?"9":""; }
-function serieDaTurmaTreino(turma){ const t=String(turma||""); if(t.includes("2")) return "2"; if(t.includes("5")) return "5"; if(t.includes("9")) return "9"; return ""; }
-function turmaValidaTreino(valor, serieFallback=""){
-  const t=String(valor||"").trim().toLowerCase();
-  if(t === "2º ano" || t === "2o ano" || t === "2 ano" || t === "2") return "2º ano";
-  if(t === "5º ano" || t === "5o ano" || t === "5 ano" || t === "5") return "5º ano";
-  if(t === "9º ano" || t === "9o ano" || t === "9 ano" || t === "9") return "9º ano";
-  const s=String(serieFallback||"");
-  if(s.includes("2")) return "2º ano";
-  if(s.includes("5")) return "5º ano";
-  if(s.includes("9")) return "9º ano";
-  return "";
-}
-
-function obterProvaPorCodigo(codigo){
-  codigo = normalizarCodigo(codigo);
-
-  // V28: prova fixa por código. Não há sorteio na execução.
-  // Ex.: 2P01 sempre abre exatamente as mesmas 10 questões.
-  if(window.SIMULADOS_FIXOS && window.SIMULADOS_FIXOS[codigo]){
-    const s = window.SIMULADOS_FIXOS[codigo];
-    return {
-      codigo: s.codigo,
-      serie: s.serie,
-      componente: s.componente_curricular,
-      questoes: (s.questoes || []).slice(0,10)
-    };
-  }
-
-  // Compatibilidade antiga, caso o arquivo de simulados fixos não carregue.
-  if(window.PROVAS_GERADAS && window.BANCO_QUESTOES && window.PROVAS_GERADAS[codigo]){
-    const meta = window.PROVAS_GERADAS[codigo];
-    const chave = meta.serie + "|" + meta.materia;
-    const banco = window.BANCO_QUESTOES[chave] || [];
-    const lista = (meta.indices || []).map(i => banco[i]).filter(Boolean).slice(0,10);
-    return {codigo, serie:meta.serie, componente:meta.materia, questoes:lista};
-  }
-  return null;
-}
-
-function obterProvasPersonalizadasLocais(){
-  try{return JSON.parse(localStorage.getItem("matriz_provas_personalizadas")||"[]")}catch(e){return []}
-}
-async function buscarProvaPersonalizadaOnline(codigo){
-  codigo=normalizarCodigo(codigo);
-  const local=obterProvasPersonalizadasLocais().find(p=>normalizarCodigo(p.codigo)===codigo);
-  if(local){
-    return {codigo:local.codigo, serie:local.serie, componente:local.componente, aluno_nome:local.aluno_nome||"", turma:local.turma||"", escola:local.escola||"", professor_nome:local.professor_nome||"", professor_usuario:local.professor_usuario||"", questoes:(local.questoes||[]).slice(0,10)};
-  }
-  try{
-    if(supabaseAtivoTreinamento()){
-      const sb=clienteSupabaseTreinamento();
-      const {data,error}=await sb.from("provas_personalizadas").select("*").eq("codigo",codigo).limit(1).maybeSingle();
-      if(error) console.warn("Erro ao buscar prova personalizada online. Verifique se o SQL V36 foi aplicado:", error);
-      if(data){
-        return {codigo:data.codigo, serie:data.serie, componente:data.componente, aluno_nome:data.aluno_nome||"", turma:data.turma||"", escola:data.escola||"", professor_nome:data.professor_nome||"", professor_usuario:data.professor_usuario||"", questoes:(data.questoes||[]).slice(0,10)};
-      }
-    }
-  }catch(e){console.warn("Falha ao buscar prova personalizada:", e);}
-  return null;
-}
-async function obterProvaPorCodigoAsync(codigo){
-  return obterProvaPorCodigo(codigo) || await buscarProvaPersonalizadaOnline(codigo);
-}
-
-function svgCasa(){return `<svg viewBox="0 0 360 220" width="320" role="img" aria-label="Casa"><rect width="360" height="220" rx="22" fill="#0b2438"/><rect x="86" y="92" width="188" height="96" rx="8" fill="#f8fafc"/><polygon points="70,98 180,28 290,98" fill="#ef4444"/><rect x="158" y="126" width="46" height="62" rx="6" fill="#8b5e3c"/><rect x="108" y="118" width="34" height="28" rx="4" fill="#93c5fd"/><rect x="218" y="118" width="34" height="28" rx="4" fill="#93c5fd"/><rect x="42" y="186" width="278" height="10" rx="5" fill="#22c55e"/><circle cx="304" cy="56" r="16" fill="#fbbf24"/></svg>`}
-function svgPato(){return `<svg viewBox="0 0 360 220" width="320" role="img" aria-label="Pato"><rect width="360" height="220" rx="22" fill="#0b2438"/><ellipse cx="160" cy="120" rx="70" ry="44" fill="#fbbf24"/><circle cx="230" cy="94" r="34" fill="#fbbf24"/><polygon points="252,95 304,82 304,108" fill="#fb923c"/><circle cx="240" cy="86" r="5" fill="#111"/><path d="M42 154 Q180 188 318 154" stroke="#38bdf8" stroke-width="10" fill="none"/><path d="M116 156 L102 180 M152 158 L142 181" stroke="#f59e0b" stroke-width="6"/></svg>`}
-function svgBola(){return `<svg viewBox="0 0 360 220" width="320"><rect width="360" height="220" rx="22" fill="#0b2438"/><circle cx="180" cy="110" r="64" fill="#3b82f6"/><path d="M180 46 Q146 78 142 114 Q146 150 180 174 Q214 150 218 114 Q214 78 180 46Z" fill="none" stroke="#fff" stroke-width="6"/><path d="M118 88 L142 114 L118 140 M242 88 L218 114 L242 140 M180 46 L180 72 M180 156 L180 174" stroke="#fff" stroke-width="6" fill="none"/></svg>`}
-function svgBanana(){return `<svg viewBox="0 0 360 220" width="320"><rect width="360" height="220" rx="22" fill="#0b2438"/><path d="M96 132 C126 60, 222 46, 278 82 C246 118, 192 154, 124 158 C112 158,102 148,96 132Z" fill="#facc15" stroke="#eab308" stroke-width="5"/><path d="M100 130 C124 124, 172 116, 246 90" stroke="#fde68a" stroke-width="4" fill="none"/></svg>`}
-function svgChuva(){return `<svg viewBox="0 0 360 220" width="320"><rect width="360" height="220" rx="22" fill="#0b2438"/><ellipse cx="170" cy="88" rx="56" ry="28" fill="#94a3b8"/><ellipse cx="214" cy="96" rx="44" ry="24" fill="#94a3b8"/><line x1="132" y1="126" x2="118" y2="164" stroke="#38bdf8" stroke-width="7"/><line x1="176" y1="126" x2="162" y2="164" stroke="#38bdf8" stroke-width="7"/><line x1="218" y1="126" x2="204" y2="164" stroke="#38bdf8" stroke-width="7"/><line x1="258" y1="126" x2="244" y2="164" stroke="#38bdf8" stroke-width="7"/></svg>`}
-function svgTriangulo(){return `<svg viewBox="0 0 360 220" width="320"><rect width="360" height="220" rx="22" fill="#0b2438"/><polygon points="180,46 286,172 74,172" fill="#22c55e" stroke="#86efac" stroke-width="7"/></svg>`}
-function svgCirculo(){return `<svg viewBox="0 0 360 220" width="320"><rect width="360" height="220" rx="22" fill="#0b2438"/><circle cx="180" cy="110" r="72" fill="#f472b6" stroke="#fbcfe8" stroke-width="7"/></svg>`}
-function svgRegua(){return `<svg viewBox="0 0 360 220" width="320"><rect width="360" height="220" rx="22" fill="#0b2438"/><rect x="70" y="92" width="220" height="42" rx="10" fill="#f59e0b"/><g stroke="#78350f" stroke-width="4">${Array.from({length:11}).map((_,i)=>`<line x1="${92+i*18}" y1="92" x2="${92+i*18}" y2="${i%2?112:126}"/>`).join("")}</g></svg>`}
-function svgRelogio(){return `<svg viewBox="0 0 360 220" width="320"><rect width="360" height="220" rx="22" fill="#0b2438"/><circle cx="180" cy="110" r="72" fill="#f8fafc" stroke="#38bdf8" stroke-width="8"/><line x1="180" y1="110" x2="180" y2="72" stroke="#111827" stroke-width="7"/><line x1="180" y1="110" x2="214" y2="110" stroke="#111827" stroke-width="7"/></svg>`}
-function svgMoedas(){return `<svg viewBox="0 0 360 220" width="320"><rect width="360" height="220" rx="22" fill="#0b2438"/><ellipse cx="136" cy="126" rx="46" ry="18" fill="#fbbf24"/><ellipse cx="202" cy="104" rx="46" ry="18" fill="#f59e0b"/><ellipse cx="242" cy="138" rx="46" ry="18" fill="#fde68a"/></svg>`}
-
-function limparHtmlIconeTreino(v){return String(v||"").replace(/[<>&"']/g, m=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;","'":"&#39;"}[m]));}
-function iconeTreinoEhImagem(valor){
-  const v=String(valor||"").trim().toLowerCase();
-  return /^(https?:\/\/|\.\/|\/|icones\/)/.test(v) || /\.(png|jpg|jpeg|webp|svg|gif)(\?.*)?$/.test(v);
-}
-function emojiFallbackTreino(valor){
-  const t=String(valor||"").toLowerCase();
-  if(t.includes("grafico")||t.includes("dados")||t.includes("tabela")||t.includes("media")||t.includes("probabilidade")) return "📊";
-  if(t.includes("matematica")||t.includes("calculadora")||t.includes("numero")||t.includes("adicao")||t.includes("subtracao")||t.includes("multiplicacao")||t.includes("divisao")||t.includes("fracao")||t.includes("porcentagem")||t.includes("razao")||t.includes("proporcao")) return "🧮";
-  if(t.includes("regua")||t.includes("medida")||t.includes("comprimento")||t.includes("area")||t.includes("perimetro")||t.includes("geometria")||t.includes("forma")||t.includes("solido")||t.includes("angulo")||t.includes("malha")||t.includes("localizacao")) return "📏";
-  if(t.includes("portugues")||t.includes("leitura")||t.includes("texto")||t.includes("livro")||t.includes("noticia")||t.includes("palavra")||t.includes("frase")||t.includes("silaba")||t.includes("poema")||t.includes("bilhete")||t.includes("genero")) return "📖";
-  if(t.includes("aluno")) return "👨‍🎓";
-  if(t.includes("professor")) return "👩‍🏫";
-  if(t.includes("escola")) return "🏫";
-  if(t.includes("atencao")) return "⚠️";
-  if(t.includes("desafio")||t.includes("dificil")) return "🧩";
-  if(t.includes("audio")) return "🔊";
-  return "⭐";
-}
-function htmlIconeTreino(valor){
-  const v=String(valor||"").trim();
-  if(!v) return "";
-  const safe=limparHtmlIconeTreino(v);
-  const fallback=limparHtmlIconeTreino(emojiFallbackTreino(v));
-  if(iconeTreinoEhImagem(v)){
-    return `<div style="text-align:center;padding:12px"><img src="${safe}" alt="ícone da questão" style="width:170px;max-width:45%;height:170px;object-fit:contain" onerror="this.onerror=null;this.outerHTML='<div style=&quot;font-size:4rem&quot;>${fallback}</div>'"></div>`;
-  }
-  return `<div style="font-size:4rem;text-align:center;padding:12px">${safe}</div>`;
-}
-function visualPorQuestao(q){
-  if(q && q.icone){return htmlIconeTreino(q.icone);}
-  const t=((q.base||"")+" "+(q.q||"")).toLowerCase();
-  if(t.includes("casa")) return svgCasa();
-  if(t.includes("pato")) return svgPato();
-  if(t.includes("bola")) return svgBola();
-  if(t.includes("banana")) return svgBanana();
-  if(t.includes("choveu") || t.includes("chuva")) return svgChuva();
-  if(t.includes("triângulo") || t.includes("3 lados")) return svgTriangulo();
-  if(t.includes("círculo") || t.includes("sem lados retos")) return svgCirculo();
-  if(t.includes("régua") || t.includes("comprimento")) return svgRegua();
-  if(t.includes("relógio") || t.includes("tempo")) return svgRelogio();
-  if(t.includes("moeda") || t.includes("r$")) return svgMoedas();
-  return "";
-}
-
-
-// V29 — avaliações liberadas pelo coordenador/professor
-function obterAvaliacoesCriadas(){
-  return JSON.parse(localStorage.getItem("matriz_avaliacoes_criadas") || "[]");
-}
-function salvarAvaliacoesCriadas(lista){
-  localStorage.setItem("matriz_avaliacoes_criadas", JSON.stringify(lista));
-}
-function obterAvaliacaoPorCodigo(codigo){
-  codigo = normalizarCodigo(codigo);
-  return obterAvaliacoesCriadas().find(a => normalizarCodigo(a.codigo) === codigo) || null;
-}
-function supabaseAtivoTreinamento(){
-  return !!(window.MATRIZ_SUPABASE && window.MATRIZ_SUPABASE.enabled && window.MATRIZ_SUPABASE.url && window.MATRIZ_SUPABASE.anonKey && window.supabase);
-}
-function clienteSupabaseTreinamento(){
-  return window.supabase.createClient(window.MATRIZ_SUPABASE.url, window.MATRIZ_SUPABASE.anonKey);
-}
-async function buscarAvaliacaoPorCodigoOnline(codigo){
-  codigo=normalizarCodigo(codigo);
-  const local=obterAvaliacaoPorCodigo(codigo);
-  if(local) return local;
-  try{
-    if(supabaseAtivoTreinamento()){
-      const sb=clienteSupabaseTreinamento();
-      const {data,error}=await sb.from("avaliacoes_criadas").select("*").eq("codigo",codigo).limit(1).maybeSingle();
-      if(error) console.warn("Erro ao buscar avaliação online:", error);
-      if(data){
-        return {
-          codigo:data.codigo,
-          tipo:data.tipo || "aluno",
-          aluno_nome:data.aluno_nome || data.destinatario || "",
-          aluno_nome_completo:data.aluno_nome || data.destinatario || "",
-          destinatario:data.destinatario || data.aluno_nome || "",
-          turma:data.turma || "",
-          escola:data.escola || "",
-          serie:data.serie || "",
-          codigoProva:data.codigo_prova || data.codigoProva || "",
-          finalizado:!!data.finalizado,
-          status:data.status || "liberada",
-          professor_nome:data.professor_nome || "",
-          professor_usuario:data.professor_usuario || "",
-          professor_perfil:data.professor_perfil || "",
-          componente_vinculado:data.componente_vinculado || "",
-          created_at:data.created_at
-        };
-      }
-    }
-  }catch(e){console.warn("Falha ao consultar código no Supabase:", e);}
-  return null;
-}
-async function codigoJaFinalizadoOnline(codigo){
-  codigo=normalizarCodigo(codigo);
-  if(codigoJaFinalizado(codigo)) return true;
-  try{
-    if(supabaseAtivoTreinamento()){
-      const sb=clienteSupabaseTreinamento();
-      const {data}=await sb.from("codigos_finalizados").select("codigo").eq("codigo",codigo).limit(1).maybeSingle();
-      if(data) return true;
-      const {data:av}=await sb.from("avaliacoes_criadas").select("finalizado").eq("codigo",codigo).limit(1).maybeSingle();
-      if(av && av.finalizado) return true;
-    }
-  }catch(e){console.warn("Falha ao verificar código finalizado:", e);}
-  return false;
-}
-async function marcarCodigoFinalizadoOnline(codigo){
-  codigo=normalizarCodigo(codigo);
-  marcarCodigoFinalizado(codigo);
-  try{
-    if(supabaseAtivoTreinamento()){
-      const sb=clienteSupabaseTreinamento();
-      await sb.from("codigos_finalizados").insert([{
-        codigo,
-        aluno_nome:aluno.nome,
-        escola:aluno.escola,
-        turma:aluno.turma || "",
-        codigo_prova:aluno.codigoProva || provaAtual.codigo
-      }]);
-      await sb.from("avaliacoes_criadas").update({finalizado:true,status:"finalizada"}).eq("codigo",codigo);
-    }
-  }catch(e){console.warn("Falha ao marcar código finalizado online:", e);}
-}
-function codigoJaFinalizado(codigo){
-  const finalizados = JSON.parse(localStorage.getItem("matriz_codigos_finalizados") || "[]");
-  return finalizados.includes(normalizarCodigo(codigo));
-}
-function marcarCodigoFinalizado(codigo){
-  const c = normalizarCodigo(codigo);
-  const finalizados = JSON.parse(localStorage.getItem("matriz_codigos_finalizados") || "[]");
-  if(!finalizados.includes(c)){
-    finalizados.push(c);
-    localStorage.setItem("matriz_codigos_finalizados", JSON.stringify(finalizados));
-  }
-}
-function avaliacaoEhCodigoUnico(){
-  return !!(provaAtual && provaAtual.codigoAvaliacaoUnica);
-}
-async function tentarReconhecerCodigoAluno(){
-  const campo = document.getElementById("nomeAluno");
-  if(!campo) return;
-  const codigo = normalizarCodigo(campo.value);
-  const box = document.getElementById("avisoCodigoReconhecido");
-  const campoNomeDireto=document.getElementById("campoNomeAlunoDireto");
-  if(campoNomeDireto) campoNomeDireto.style.display="none";
-  if(!codigo){ if(box){box.style.display="none";box.innerHTML="";} return; }
-  let av = obterAvaliacaoPorCodigo(codigo);
-  if(!av) av = await buscarAvaliacaoPorCodigoOnline(codigo);
-  if(av){
-    if(box){
-      box.innerHTML = `<strong>Código reconhecido:</strong> avaliação individual ${av.codigo} vinculada à prova ${av.codigoProva || av.codigo_prova}.<br>${av.aluno_nome_completo || av.aluno_nome ? "Aluno: "+(av.aluno_nome_completo||av.aluno_nome)+"<br>" : ""}Turma: ${av.turma || av.destinatario || "não informado"}.`;
-      box.style.display = "block";
-    }
-    if(av.escola) document.getElementById("nomeEscola").value = av.escola;
-    if(av.serie) document.getElementById("serieAluno").value = String(av.serie).replace(/\D/g,"") || av.serie;
-    if(av.codigoProva || av.codigo_prova) document.getElementById("codigoProva").value = av.codigoProva || av.codigo_prova;
-    return;
-  }
-  const prova = await obterProvaPorCodigoAsync(codigo);
-  if(prova){
-    if(box){
-      const temAluno=!!prova.aluno_nome;
-      box.innerHTML = temAluno
-        ? `<strong>Código reconhecido:</strong> prova personalizada ${prova.codigo}.<br>Aluno vinculado: ${prova.aluno_nome}.`
-        : `<strong>Código reconhecido:</strong> prova personalizada ${prova.codigo}.<br><b>Nome do aluno é opcional. Se não preencher, o painel registrará como aluno não identificado.</b>`;
-      box.style.display = "block";
-    }
-    if(prova.escola) document.getElementById("nomeEscola").value=prova.escola;
-    if(prova.serie) document.getElementById("serieAluno").value=String(prova.serie).replace(/\D/g,"") || prova.serie;
-    document.getElementById("codigoProva").value=prova.codigo;
-    if(campoNomeDireto && !prova.aluno_nome) campoNomeDireto.style.display="block";
-  }else if(box){
-    box.style.display = "none";
-    box.innerHTML = "";
-  }
-}
-
-
-function mostrarEntrada(){
-  document.getElementById("app").innerHTML = `
-    <div class="form">
-      <label>Nome ou código do aluno</label>
-      <input id="nomeAluno" oninput="tentarReconhecerCodigoAluno()" placeholder="Nome do aluno ou código da avaliação criada pelo coordenador">
-      <div id="campoNomeAlunoDireto" style="display:none">
-        <label>Nome completo do aluno (opcional)</label>
-        <input id="nomeAlunoDireto" placeholder="Opcional: preencha para identificar melhor no painel">
-      </div>
-      <label>Nome da escola</label>
-      <input id="nomeEscola" placeholder="Ex.: EMEF Pedro de Queiroz Ferreira">
-      <label>Série/Ano</label>
-      <select id="serieAluno">
-        <option value="">Selecione</option>
-        <option value="2">2º ano</option>
-        <option value="5">5º ano</option>
-        <option value="9">9º ano</option>
-      </select>
-      <div id="avisoCodigoReconhecido" class="notice" style="display:none"></div>
-      <label>Código da prova</label>
-      <input id="codigoProva" placeholder="Ex.: 2P01, 2M01, 5P01, 5M01, 9P01, 9M01">
-      <div class="notice"><strong>Aviso LGPD:</strong> use esta ferramenta apenas com orientação da escola/professor. Não informe CPF, endereço, telefone ou dados sensíveis.</div>
-      <label style="display:flex;gap:8px;align-items:flex-start;color:#e2e8f0;font-size:.92rem;line-height:1.4">
-        <input id="aceiteLgpd" type="checkbox" style="width:auto;margin-top:3px;accent-color:#fbbf24">
-        Confirmo que estou usando esta ferramenta com orientação da escola/professor e para fins pedagógicos.
-      </label>
-      <button class="btn gold" onclick="iniciar()">ENTRAR NO TREINAMENTO</button>
-      <div class="notice"><strong>Acesso por código:</strong> digite somente o código entregue pela escola/professor. Não use códigos de prova que não foram liberados para você.</div>
-    </div>`;
-}
-
-async function iniciar(){
-  const nomeDigitado=document.getElementById("nomeAluno").value.trim();
-  const codigoAlunoOuAvaliacao=normalizarCodigo(nomeDigitado);
-  const avaliacaoCriada=await buscarAvaliacaoPorCodigoOnline(codigoAlunoOuAvaliacao);
-  let provaDireta=null;
-  if(!avaliacaoCriada && codigoAlunoOuAvaliacao){
-    provaDireta=await obterProvaPorCodigoAsync(codigoAlunoOuAvaliacao);
-  }
-  if(avaliacaoCriada && await codigoJaFinalizadoOnline(avaliacaoCriada.codigo)){
-    alert("Esta avaliação já foi finalizada. Procure o professor/coordenador para nova liberação.");
-    return;
-  }
-  const codigoProvaBase=(avaliacaoCriada && (avaliacaoCriada.codigoProva || avaliacaoCriada.codigo_prova)) ? (avaliacaoCriada.codigoProva || avaliacaoCriada.codigo_prova) : (provaDireta ? provaDireta.codigo : document.getElementById("codigoProva").value);
-  const codigo=normalizarCodigo(codigoProvaBase);
-  const serieAuto=(avaliacaoCriada && (avaliacaoCriada.serie || serieDaTurmaTreino(avaliacaoCriada.turma) || serieDoCodigo(codigo))) || (provaDireta && (provaDireta.serie || serieDoCodigo(codigo))) || document.getElementById("serieAluno").value;
-  const nomeDireto=(document.getElementById("nomeAlunoDireto")?.value||"").trim();
-  const nome=avaliacaoCriada
-    ? (avaliacaoCriada.aluno_nome_completo || avaliacaoCriada.aluno_nome || avaliacaoCriada.destinatario || avaliacaoCriada.codigo)
-    : (provaDireta && provaDireta.aluno_nome ? provaDireta.aluno_nome : (provaDireta ? (nomeDireto || ("Aluno não identificado - "+provaDireta.codigo)) : nomeDigitado));
-  const turma=turmaValidaTreino((avaliacaoCriada && avaliacaoCriada.turma) ? avaliacaoCriada.turma : (provaDireta?.turma || ""), serieAuto);
-  const escola=(avaliacaoCriada && avaliacaoCriada.escola) ? avaliacaoCriada.escola : (provaDireta?.escola || document.getElementById("nomeEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira");
-  const serie=String(serieAuto||"");
-  const aceite=document.getElementById("aceiteLgpd").checked;
-  if(!codigo){alert("Digite o código da prova ou use o código individual entregue pela escola/professor.");return;}
-  if(!serie){alert("Não foi possível identificar a série/ano. Se for teste livre, selecione a série manualmente.");return;}
-  if(!provaDireta && !avaliacaoCriada && nome.length<2){alert("Digite o nome do aluno, o código da avaliação ou o código da prova personalizada.");return;}
-  if(!aceite){alert("Confirme o uso com orientação da escola/professor.");return;}
-  if(serieDoCodigo(codigo) && serieDoCodigo(codigo)!==serie){alert("O código da prova não corresponde à série selecionada.");return;}
-  const prova = provaDireta || await obterProvaPorCodigoAsync(codigo);
-  if(!prova || !Array.isArray(prova.questoes) || !prova.questoes.length){alert("Código de prova não encontrado.");return;}
-  aluno={nome, turma, escola, serie, codigoProva:codigo};
-  provaAtual=prova;
-  if(avaliacaoCriada){
-    provaAtual.codigoAvaliacaoUnica=avaliacaoCriada.codigo;
-    provaAtual.tipoAvaliacao=avaliacaoCriada.tipo || "aluno";
-    provaAtual.destinatario=avaliacaoCriada.destinatario || avaliacaoCriada.aluno_nome_completo || "";
-    provaAtual.turma=turmaValidaTreino(avaliacaoCriada.turma || "", serieAuto);
-    provaAtual.professor_nome=avaliacaoCriada.professor_nome || "";
-    provaAtual.professor_usuario=avaliacaoCriada.professor_usuario || "";
-    provaAtual.professor_perfil=avaliacaoCriada.professor_perfil || "";
-    provaAtual.componente_vinculado=avaliacaoCriada.componente_vinculado || prova.componente || "";
-  }else if(provaDireta){
-    provaAtual.codigoAvaliacaoUnica="";
-    provaAtual.tipoAvaliacao="prova_personalizada_direta";
-    provaAtual.destinatario=nome;
-    provaAtual.turma=turmaValidaTreino(turma, serieAuto);
-    provaAtual.professor_nome=provaDireta.professor_nome || "";
-    provaAtual.professor_usuario=provaDireta.professor_usuario || "";
-    provaAtual.professor_perfil="professor";
-    provaAtual.componente_vinculado=provaDireta.componente || "";
-  }
-  questoes=prova.questoes.slice(0,10);
-  respostas=[]; indice=0;
-  preCarregarImagemProximaQuestao();
-  mostrarQuestao();
-}
-
-
-function preCarregarImagemProximaQuestao(){
-  try{
-    const prox=questoes[indice+1];
-    if(prox && prox.icone && iconeTreinoEhImagem(prox.icone)){ const img=new Image(); img.src=prox.icone; }
-  }catch(e){}
-}
-
-function mostrarQuestao(){
-  const q=questoes[indice];
-  const progresso=Math.round((indice/questoes.length)*100);
-  const visual=visualPorQuestao(q);
-  const mostrarBase = ((q.base||"").trim().toUpperCase()==="CASA") ? "" : `<div class="text-base">${q.base||"Observe a situação apresentada."}</div>`;
-  document.getElementById("app").innerHTML = `
-    <div class="status">
-      <span>Aluno/Código: ${aluno.nome}</span>
-      <span>Escola: ${aluno.escola}</span>
-      ${aluno.turma?`<span>Turma: ${aluno.turma}</span>`:""}
-      <span>Série: ${nomeSerie(aluno.serie)}</span>
-      <span>Prova: ${provaAtual.codigo}</span>
-      <span>Componente Curricular: ${provaAtual.componente}</span>
+    <div class="aviso">
+      Manutenção temporária — aguarde a liberação do portal.
     </div>
-    <div class="progress"><span style="width:${progresso}%"></span></div>
-    <div class="qbox">
-      <div>
-        <div class="question-label">Questão ${indice+1}/10</div>
-        ${mostrarBase}
-        ${visual?`<div class="visual">${visual}</div>`:""}
-        <div class="question-label">Pergunta</div>
-        <div style="font-size:1.08rem;line-height:1.45;margin-bottom:10px">${q.q}</div>
-        <div class="options">
-          ${(q.o||[]).map((op,i)=>`<button class="btn option" onclick="selecionar(${i})" id="op${i}">${String.fromCharCode(65+i)}) ${op}</button>`).join("")}
-        </div>
-      </div>
-      <div class="qactions">
-        <button class="btn gold" onclick="avancar()">Avançar</button>
-      </div>
-    </div>`;
-}
-
-function selecionar(i){
-  beep();
-  respostas[indice]=i;
-  document.querySelectorAll(".option").forEach(btn=>btn.classList.remove("selected"));
-  const b=document.getElementById("op"+i);
-  if(b) b.classList.add("selected");
-}
-
-function avancar(){
-  if(respostas[indice]===undefined){alert("Selecione uma alternativa para continuar.");return;}
-  if(indice < questoes.length-1){indice++;preCarregarImagemProximaQuestao();requestAnimationFrame(()=>mostrarQuestao());}else{mostrarConferencia();}
-}
-
-function salvarLocal(resultado){
-  ["matriz_spaece_resultados_locais","resultados_treinamento"].forEach(ch=>{
-    const lista=JSON.parse(localStorage.getItem(ch)||"[]");
-    lista.unshift(resultado);
-    localStorage.setItem(ch, JSON.stringify(lista.slice(0,1000)));
-  });
-}
-async function salvarSupabase(resultado){
-  const cfg = window.MATRIZ_SUPABASE || {};
-  if(!(cfg.enabled && cfg.url && cfg.anonKey && window.supabase)){
-    localStorage.setItem("matriz_ultimo_erro_supabase", JSON.stringify({quando:new Date().toISOString(), erro:"Supabase desativado ou configuração ausente."}));
-    return false;
-  }
-
-  const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
-  const base = {
-    created_at: resultado.created_at || new Date().toISOString(),
-    aluno_nome: resultado.aluno_nome || "",
-    escola: resultado.escola || "EMEF Pedro de Queiroz Ferreira",
-    turma: resultado.turma || resultado.turma_avaliacao || "",
-    serie: resultado.serie || "",
-    serie_codigo: resultado.serie_codigo || "",
-    componente_curricular: resultado.materia || resultado.componente_vinculado || "",
-    materia: resultado.materia || resultado.componente_vinculado || "",
-    codigo_prova: resultado.codigo_prova || "",
-    codigo_avaliacao: resultado.codigo_avaliacao || "",
-    professor_nome: resultado.professor_nome || "",
-    professor_usuario: resultado.professor_usuario || "",
-    professor_perfil: resultado.professor_perfil || "",
-    componente_vinculado: resultado.componente_vinculado || resultado.materia || "",
-    avaliacao_unica: !!resultado.avaliacao_unica,
-    tipo_avaliacao: resultado.tipo_avaliacao || "teste_livre",
-    destinatario_avaliacao: resultado.destinatario_avaliacao || resultado.aluno_nome || "",
-    turma_avaliacao: resultado.turma_avaliacao || resultado.turma || "",
-    acertos: Number(resultado.acertos || 0),
-    erros: Number(resultado.erros || 0),
-    total_questoes: Number(resultado.total_questoes || 10),
-    percentual: Number(resultado.percentual || 0),
-    respostas: resultado.respostas || [],
-    habilidades_detalhadas: resultado.habilidades_detalhadas || [],
-    habilidades_revisar: resultado.habilidades_revisar || [],
-    uso_pedagogico_interno: true,
-    lgpd_orientacao_confirmada: true,
-    ano_letivo: String(new Date(resultado.created_at || Date.now()).getFullYear()),
-    mes_referencia: String(new Date(resultado.created_at || Date.now()).getMonth()+1).padStart(2,"0")+"/"+String(new Date(resultado.created_at || Date.now()).getFullYear())
-  };
-
-  const tentativas = [
-    base,
-    {
-      created_at: base.created_at,
-      aluno_nome: base.aluno_nome,
-      escola: base.escola,
-      turma: base.turma,
-      serie: base.serie,
-      serie_codigo: base.serie_codigo,
-      componente_curricular: base.componente_curricular,
-      materia: base.materia,
-      codigo_prova: base.codigo_prova,
-      codigo_avaliacao: base.codigo_avaliacao,
-      professor_nome: base.professor_nome,
-      professor_usuario: base.professor_usuario,
-      professor_perfil: base.professor_perfil,
-      componente_vinculado: base.componente_vinculado,
-      acertos: base.acertos,
-      erros: base.erros,
-      total_questoes: base.total_questoes,
-      percentual: base.percentual,
-      respostas: base.respostas,
-      habilidades_detalhadas: base.habilidades_detalhadas,
-      habilidades_revisar: base.habilidades_revisar,
-      ano_letivo: base.ano_letivo,
-      mes_referencia: base.mes_referencia
-    },
-    {
-      created_at: base.created_at,
-      aluno_nome: base.aluno_nome,
-      escola: base.escola,
-      turma: base.turma,
-      serie: base.serie,
-      componente_curricular: base.componente_curricular,
-      materia: base.materia,
-      codigo_prova: base.codigo_prova,
-      acertos: base.acertos,
-      erros: base.erros,
-      total_questoes: base.total_questoes,
-      percentual: base.percentual,
-      respostas: base.respostas,
-      habilidades_detalhadas: base.habilidades_detalhadas,
-      habilidades_revisar: base.habilidades_revisar
-    }
-  ];
-
-  let ultimoErro = null;
-  for(const payload of tentativas){
-    const limpo = Object.fromEntries(Object.entries(payload).filter(([_,v]) => v !== undefined));
-    const {error} = await sb.from("resultados_treinamento").insert([limpo]);
-    if(!error){
-      localStorage.removeItem("matriz_ultimo_erro_supabase");
-      localStorage.setItem("matriz_ultimo_envio_supabase", JSON.stringify({quando:new Date().toISOString(), status:"ok", aluno:base.aluno_nome, prova:base.codigo_prova}));
-      return true;
-    }
-    ultimoErro = error;
-  }
-
-  console.error("ERRO AO SALVAR RESULTADO NO SUPABASE:", ultimoErro);
-  localStorage.setItem("matriz_ultimo_erro_supabase", JSON.stringify({quando:new Date().toISOString(), erro:ultimoErro?.message || String(ultimoErro), details:ultimoErro?.details || "", hint:ultimoErro?.hint || "", payload:base}));
-  return false;
-}
-
-function mostrarConferencia(){
-  const itens = questoes.map((q,i)=>`
-    <div class="text-base" style="text-align:left">
-      <b>Questão ${i+1}</b><br>
-      ${q.q}<br>
-      <small>Resposta marcada: <b>${respostas[i] !== undefined ? String.fromCharCode(65+respostas[i]) : "não respondida"}</b></small>
-      <button class="btn muted" onclick="indice=${i};mostrarQuestao()">Alterar resposta da questão ${i+1}</button>
-    </div>`).join("");
-  document.getElementById("app").innerHTML = `
-    <div class="final">
-      <h2>Conferir respostas</h2>
-      <p>Confira se todas as questões foram respondidas. Você pode alterar qualquer resposta antes de finalizar.</p>
-      ${itens}
-      <button class="btn gold" onclick="finalizar()">FINALIZAR E ENVIAR AO COORDENADOR</button>
-      <button class="btn muted" onclick="indice=questoes.length-1;mostrarQuestao()">VOLTAR À ÚLTIMA QUESTÃO</button>
-    </div>`;
-}
-
-async function finalizar(){
-  const detalhadas=questoes.map((q,i)=>({questao:i+1, habilidade:q.hab||"Sem descritor", acertou:respostas[i]===q.c, marcada:respostas[i], correta:q.c}));
-  const acertos=detalhadas.filter(x=>x.acertou).length;
-  const total=questoes.length;
-  const percentual=Math.round((acertos/total)*100);
-  const mapa={};
-  detalhadas.forEach(r=>{
-    if(!mapa[r.habilidade]) mapa[r.habilidade]={habilidade:r.habilidade, acertos:0, erros:0, total:0};
-    mapa[r.habilidade].total++;
-    if(r.acertou) mapa[r.habilidade].acertos++; else mapa[r.habilidade].erros++;
-  });
-  const resultado={
-    created_at:new Date().toISOString(),
-    aluno_nome:aluno.nome,
-    turma:aluno.turma || provaAtual.turma || "",
-    escola:aluno.escola,
-    serie:nomeSerie(aluno.serie),
-    serie_codigo:aluno.serie,
-    codigo_prova:provaAtual.codigo,
-    codigo_avaliacao:provaAtual.codigoAvaliacaoUnica || "",
-    professor_nome:provaAtual.professor_nome || "",
-    professor_usuario:provaAtual.professor_usuario || "",
-    professor_perfil:provaAtual.professor_perfil || "",
-    componente_vinculado:provaAtual.componente_vinculado || provaAtual.componente || "",
-    avaliacao_unica:!!provaAtual.codigoAvaliacaoUnica,
-    tipo_avaliacao:provaAtual.tipoAvaliacao || "teste_livre",
-    destinatario_avaliacao:provaAtual.destinatario || "",
-    turma_avaliacao:provaAtual.turma || aluno.turma || "",
-    materia:provaAtual.componente,
-    acertos,
-    erros:total-acertos,
-    total_questoes:total,
-    percentual,
-    respostas:detalhadas,
-    habilidades_detalhadas:Object.values(mapa),
-    habilidades_revisar:Object.values(mapa).filter(x=>x.erros>0),
-    uso_pedagogico_interno:true,
-    lgpd_orientacao_confirmada:true
-  };
-  salvarLocal(resultado);
-  await salvarSupabase(resultado);
-  if(provaAtual.codigoAvaliacaoUnica){ await marcarCodigoFinalizadoOnline(provaAtual.codigoAvaliacaoUnica); }
-  document.getElementById("app").innerHTML=`
-    <div class="final">
-      <h2>Treinamento concluído</h2>
-      <p>Suas respostas foram registradas e enviadas para acompanhamento do professor responsável e da coordenação.</p>
-      <p>O resultado individual não será exibido nesta tela.</p><p>Se esta avaliação foi liberada por código individual/turma, o acesso fica bloqueado após o envio.</p>
-      <button class="btn gold" onclick="mostrarEntrada()">FAZER OUTRO TREINAMENTO</button>
-    </div>`;
-}
-mostrarEntrada();
-</script>
+  </main>
 </body>
 </html>
