@@ -718,302 +718,10 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
 </footer>
 </main>
 
-<script src="questoes.js">
-function obterAvaliacoesCriadas(){
-  return JSON.parse(localStorage.getItem("matriz_avaliacoes_criadas") || "[]");
-}
-function salvarAvaliacoesCriadas(lista){
-  localStorage.setItem("matriz_avaliacoes_criadas", JSON.stringify(lista));
-}
-function obterCodigosFinalizados(){
-  return JSON.parse(localStorage.getItem("matriz_codigos_finalizados") || "[]");
-}
-function gerarCodigoAvaliacao(){
-  const tipo=(document.getElementById("avalTipo")?.value || "aluno").toUpperCase();
-  const serie=document.getElementById("avalSerie")?.value || "X";
-  const prova=(document.getElementById("avalProva")?.value || "").trim().toUpperCase();
-  if(!prova){alert("Digite o código da prova fixa antes de gerar.");return}
-  const rand=Math.random().toString(36).substring(2,6).toUpperCase();
-  const cod=`${tipo.slice(0,1)}${serie}${prova}${rand}`;
-  document.getElementById("avalCodigo").value=cod;
-}
-function salvarAvaliacaoCriada(){
-  const tipo=document.getElementById("avalTipo").value;
-  const destinatario=document.getElementById("avalDestinatario").value.trim();
-  const escola=document.getElementById("avalEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira";
-  const serie=document.getElementById("avalSerie").value;
-  const codigoProva=document.getElementById("avalProva").value.trim().toUpperCase();
-  const codigo=document.getElementById("avalCodigo").value.trim().toUpperCase();
-  if(!destinatario){alert("Informe o aluno ou turma.");return}
-  if(!codigoProva){alert("Informe a prova fixa vinculada.");return}
-  if(!codigo){alert("Clique em gerar código.");return}
-  if(!obterProva(codigoProva)){alert("Código de prova fixa não encontrado.");return}
-  const lista=obterAvaliacoesCriadas();
-  if(lista.some(a=>a.codigo===codigo)){alert("Este código já existe. Gere outro.");return}
-  lista.unshift({
-    codigo,tipo,destinatario,escola,serie,codigoProva,
-    created_at:new Date().toISOString(),
-    finalizado:false
-  });
-  salvarAvaliacoesCriadas(lista);
-  renderAvaliacoesCriadas();
-  alert("Avaliação criada. Entregue o código ao aluno/turma: "+codigo);
-}
-function renderAvaliacoesCriadas(){
-  const el=document.getElementById("avaliacoesCriadas");
-  if(!el) return;
-  const lista=obterAvaliacoesCriadas();
-  const finalizados=obterCodigosFinalizados();
-  if(!lista.length){el.textContent="Nenhuma avaliação criada.";return}
-  el.innerHTML=lista.map(a=>{
-    const fim=finalizados.includes(a.codigo);
-    return `<div class="plan-item">
-      <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
-      Tipo: ${a.tipo} • Destino: ${a.destinatario}<br>
-      Escola: ${a.escola} • Turma: ${a.turma||nomeSerieCurta(a.serie)||"—"} • Prova: ${a.codigoProva}<br>
-      <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
-      <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
-    </div>`;
-  }).join("");
-}
-function copiarCodigoAvaliacao(codigo){
-  navigator.clipboard?.writeText(codigo);
-  alert("Código copiado: "+codigo);
-}
-function excluirAvaliacaoCriada(codigo){
-  if(!confirm("Excluir avaliação "+codigo+"?")) return;
-  salvarAvaliacoesCriadas(obterAvaliacoesCriadas().filter(a=>a.codigo!==codigo));
-  renderAvaliacoesCriadas();
-}
-const carregarOriginalV29 = carregar;
-carregar = async function(){
-  await carregarOriginalV29();
-  renderAvaliacoesCriadas();
-};
-
-</script>
-<script src="simulados-fixos.js">
-function obterAvaliacoesCriadas(){
-  return JSON.parse(localStorage.getItem("matriz_avaliacoes_criadas") || "[]");
-}
-function salvarAvaliacoesCriadas(lista){
-  localStorage.setItem("matriz_avaliacoes_criadas", JSON.stringify(lista));
-}
-function obterCodigosFinalizados(){
-  return JSON.parse(localStorage.getItem("matriz_codigos_finalizados") || "[]");
-}
-function gerarCodigoAvaliacao(){
-  const tipo=(document.getElementById("avalTipo")?.value || "aluno").toUpperCase();
-  const serie=document.getElementById("avalSerie")?.value || "X";
-  const prova=(document.getElementById("avalProva")?.value || "").trim().toUpperCase();
-  if(!prova){alert("Digite o código da prova fixa antes de gerar.");return}
-  const rand=Math.random().toString(36).substring(2,6).toUpperCase();
-  const cod=`${tipo.slice(0,1)}${serie}${prova}${rand}`;
-  document.getElementById("avalCodigo").value=cod;
-}
-function salvarAvaliacaoCriada(){
-  const tipo=document.getElementById("avalTipo").value;
-  const destinatario=document.getElementById("avalDestinatario").value.trim();
-  const escola=document.getElementById("avalEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira";
-  const serie=document.getElementById("avalSerie").value;
-  const codigoProva=document.getElementById("avalProva").value.trim().toUpperCase();
-  const codigo=document.getElementById("avalCodigo").value.trim().toUpperCase();
-  if(!destinatario){alert("Informe o aluno ou turma.");return}
-  if(!codigoProva){alert("Informe a prova fixa vinculada.");return}
-  if(!codigo){alert("Clique em gerar código.");return}
-  if(!obterProva(codigoProva)){alert("Código de prova fixa não encontrado.");return}
-  const lista=obterAvaliacoesCriadas();
-  if(lista.some(a=>a.codigo===codigo)){alert("Este código já existe. Gere outro.");return}
-  lista.unshift({
-    codigo,tipo,destinatario,escola,serie,codigoProva,
-    created_at:new Date().toISOString(),
-    finalizado:false
-  });
-  salvarAvaliacoesCriadas(lista);
-  renderAvaliacoesCriadas();
-  alert("Avaliação criada. Entregue o código ao aluno/turma: "+codigo);
-}
-function renderAvaliacoesCriadas(){
-  const el=document.getElementById("avaliacoesCriadas");
-  if(!el) return;
-  const lista=obterAvaliacoesCriadas();
-  const finalizados=obterCodigosFinalizados();
-  if(!lista.length){el.textContent="Nenhuma avaliação criada.";return}
-  el.innerHTML=lista.map(a=>{
-    const fim=finalizados.includes(a.codigo);
-    return `<div class="plan-item">
-      <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
-      Tipo: ${a.tipo} • Destino: ${a.destinatario}<br>
-      Escola: ${a.escola} • Turma: ${a.turma||nomeSerieCurta(a.serie)||"—"} • Prova: ${a.codigoProva}<br>
-      <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
-      <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
-    </div>`;
-  }).join("");
-}
-function copiarCodigoAvaliacao(codigo){
-  navigator.clipboard?.writeText(codigo);
-  alert("Código copiado: "+codigo);
-}
-function excluirAvaliacaoCriada(codigo){
-  if(!confirm("Excluir avaliação "+codigo+"?")) return;
-  salvarAvaliacoesCriadas(obterAvaliacoesCriadas().filter(a=>a.codigo!==codigo));
-  renderAvaliacoesCriadas();
-}
-const carregarOriginalV29 = carregar;
-carregar = async function(){
-  await carregarOriginalV29();
-  renderAvaliacoesCriadas();
-};
-
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-function obterAvaliacoesCriadas(){
-  return JSON.parse(localStorage.getItem("matriz_avaliacoes_criadas") || "[]");
-}
-function salvarAvaliacoesCriadas(lista){
-  localStorage.setItem("matriz_avaliacoes_criadas", JSON.stringify(lista));
-}
-function obterCodigosFinalizados(){
-  return JSON.parse(localStorage.getItem("matriz_codigos_finalizados") || "[]");
-}
-function gerarCodigoAvaliacao(){
-  const tipo=(document.getElementById("avalTipo")?.value || "aluno").toUpperCase();
-  const serie=document.getElementById("avalSerie")?.value || "X";
-  const prova=(document.getElementById("avalProva")?.value || "").trim().toUpperCase();
-  if(!prova){alert("Digite o código da prova fixa antes de gerar.");return}
-  const rand=Math.random().toString(36).substring(2,6).toUpperCase();
-  const cod=`${tipo.slice(0,1)}${serie}${prova}${rand}`;
-  document.getElementById("avalCodigo").value=cod;
-}
-function salvarAvaliacaoCriada(){
-  const tipo=document.getElementById("avalTipo").value;
-  const destinatario=document.getElementById("avalDestinatario").value.trim();
-  const escola=document.getElementById("avalEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira";
-  const serie=document.getElementById("avalSerie").value;
-  const codigoProva=document.getElementById("avalProva").value.trim().toUpperCase();
-  const codigo=document.getElementById("avalCodigo").value.trim().toUpperCase();
-  if(!destinatario){alert("Informe o aluno ou turma.");return}
-  if(!codigoProva){alert("Informe a prova fixa vinculada.");return}
-  if(!codigo){alert("Clique em gerar código.");return}
-  if(!obterProva(codigoProva)){alert("Código de prova fixa não encontrado.");return}
-  const lista=obterAvaliacoesCriadas();
-  if(lista.some(a=>a.codigo===codigo)){alert("Este código já existe. Gere outro.");return}
-  lista.unshift({
-    codigo,tipo,destinatario,escola,serie,codigoProva,
-    created_at:new Date().toISOString(),
-    finalizado:false
-  });
-  salvarAvaliacoesCriadas(lista);
-  renderAvaliacoesCriadas();
-  alert("Avaliação criada. Entregue o código ao aluno/turma: "+codigo);
-}
-function renderAvaliacoesCriadas(){
-  const el=document.getElementById("avaliacoesCriadas");
-  if(!el) return;
-  const lista=obterAvaliacoesCriadas();
-  const finalizados=obterCodigosFinalizados();
-  if(!lista.length){el.textContent="Nenhuma avaliação criada.";return}
-  el.innerHTML=lista.map(a=>{
-    const fim=finalizados.includes(a.codigo);
-    return `<div class="plan-item">
-      <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
-      Tipo: ${a.tipo} • Destino: ${a.destinatario}<br>
-      Escola: ${a.escola} • Turma: ${a.turma||nomeSerieCurta(a.serie)||"—"} • Prova: ${a.codigoProva}<br>
-      <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
-      <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
-    </div>`;
-  }).join("");
-}
-function copiarCodigoAvaliacao(codigo){
-  navigator.clipboard?.writeText(codigo);
-  alert("Código copiado: "+codigo);
-}
-function excluirAvaliacaoCriada(codigo){
-  if(!confirm("Excluir avaliação "+codigo+"?")) return;
-  salvarAvaliacoesCriadas(obterAvaliacoesCriadas().filter(a=>a.codigo!==codigo));
-  renderAvaliacoesCriadas();
-}
-const carregarOriginalV29 = carregar;
-carregar = async function(){
-  await carregarOriginalV29();
-  renderAvaliacoesCriadas();
-};
-
-</script>
-<script src="supabase-config.js">
-function obterAvaliacoesCriadas(){
-  return JSON.parse(localStorage.getItem("matriz_avaliacoes_criadas") || "[]");
-}
-function salvarAvaliacoesCriadas(lista){
-  localStorage.setItem("matriz_avaliacoes_criadas", JSON.stringify(lista));
-}
-function obterCodigosFinalizados(){
-  return JSON.parse(localStorage.getItem("matriz_codigos_finalizados") || "[]");
-}
-function gerarCodigoAvaliacao(){
-  const tipo=(document.getElementById("avalTipo")?.value || "aluno").toUpperCase();
-  const serie=document.getElementById("avalSerie")?.value || "X";
-  const prova=(document.getElementById("avalProva")?.value || "").trim().toUpperCase();
-  if(!prova){alert("Digite o código da prova fixa antes de gerar.");return}
-  const rand=Math.random().toString(36).substring(2,6).toUpperCase();
-  const cod=`${tipo.slice(0,1)}${serie}${prova}${rand}`;
-  document.getElementById("avalCodigo").value=cod;
-}
-function salvarAvaliacaoCriada(){
-  const tipo=document.getElementById("avalTipo").value;
-  const destinatario=document.getElementById("avalDestinatario").value.trim();
-  const escola=document.getElementById("avalEscola").value.trim() || "EMEF Pedro de Queiroz Ferreira";
-  const serie=document.getElementById("avalSerie").value;
-  const codigoProva=document.getElementById("avalProva").value.trim().toUpperCase();
-  const codigo=document.getElementById("avalCodigo").value.trim().toUpperCase();
-  if(!destinatario){alert("Informe o aluno ou turma.");return}
-  if(!codigoProva){alert("Informe a prova fixa vinculada.");return}
-  if(!codigo){alert("Clique em gerar código.");return}
-  if(!obterProva(codigoProva)){alert("Código de prova fixa não encontrado.");return}
-  const lista=obterAvaliacoesCriadas();
-  if(lista.some(a=>a.codigo===codigo)){alert("Este código já existe. Gere outro.");return}
-  lista.unshift({
-    codigo,tipo,destinatario,escola,serie,codigoProva,
-    created_at:new Date().toISOString(),
-    finalizado:false
-  });
-  salvarAvaliacoesCriadas(lista);
-  renderAvaliacoesCriadas();
-  alert("Avaliação criada. Entregue o código ao aluno/turma: "+codigo);
-}
-function renderAvaliacoesCriadas(){
-  const el=document.getElementById("avaliacoesCriadas");
-  if(!el) return;
-  const lista=obterAvaliacoesCriadas();
-  const finalizados=obterCodigosFinalizados();
-  if(!lista.length){el.textContent="Nenhuma avaliação criada.";return}
-  el.innerHTML=lista.map(a=>{
-    const fim=finalizados.includes(a.codigo);
-    return `<div class="plan-item">
-      <b>${a.codigo}</b> — ${fim?'<span class="badge bad">Finalizada/bloqueada</span>':'<span class="badge good">Liberada</span>'}<br>
-      Tipo: ${a.tipo} • Destino: ${a.destinatario}<br>
-      Escola: ${a.escola} • Turma: ${a.turma||nomeSerieCurta(a.serie)||"—"} • Prova: ${a.codigoProva}<br>
-      <button class="secondary" onclick="copiarCodigoAvaliacao('${a.codigo}')">Copiar código</button>
-      <button class="danger" onclick="excluirAvaliacaoCriada('${a.codigo}')">Excluir</button>
-    </div>`;
-  }).join("");
-}
-function copiarCodigoAvaliacao(codigo){
-  navigator.clipboard?.writeText(codigo);
-  alert("Código copiado: "+codigo);
-}
-function excluirAvaliacaoCriada(codigo){
-  if(!confirm("Excluir avaliação "+codigo+"?")) return;
-  salvarAvaliacoesCriadas(obterAvaliacoesCriadas().filter(a=>a.codigo!==codigo));
-  renderAvaliacoesCriadas();
-}
-const carregarOriginalV29 = carregar;
-carregar = async function(){
-  await carregarOriginalV29();
-  renderAvaliacoesCriadas();
-};
-
-</script>
+<script src="questoes.js"></script>
+<script src="simulados-fixos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script>
 let dadosOriginais=[], dados=[], nomesOcultos=false;
 
@@ -2436,130 +2144,7 @@ ${tabelaResumo}
 ${detalhesHTML}
 </table>
 
-<script>
-/* V61 — complementa os dashboards com todos os tipos do seletor Gráfico */
-(function(){
-  function dadosV61(){
-    try{ if(Array.isArray(dados)) return dados; }catch(e){}
-    try{ if(Array.isArray(dadosOriginais)) return dadosOriginais; }catch(e){}
-    return [];
-  }
-  function n61(v){const n=Number(v||0);return Number.isFinite(n)?n:0}
-  function p61(v){return Math.max(0,Math.min(100,Math.round(n61(v))))}
-  function media61(arr){return arr&&arr.length?Math.round(arr.reduce((s,d)=>s+p61(d.percentual),0)/arr.length):0}
-  function labelCurto61(s,t=32){s=String(s||"");return s.length>t?s.slice(0,t)+"...":s}
-  function grupo61(arr,fn){const m={};(arr||[]).forEach(x=>{const k=fn(x)||"Não informado";(m[k]||(m[k]=[])).push(x)});return Object.entries(m)}
-  function serie61(d){
-    const t=String(d.turma||d.turma_nome||d.turma_vinculada||d.serie||d.ano||"").toLowerCase();
-    if(t.includes("2")) return "2º ano"; if(t.includes("5")) return "5º ano"; if(t.includes("9")) return "9º ano";
-    const c=String(d.codigo_prova||d.codigo_avaliacao||"").toUpperCase();
-    if(c.startsWith("2")) return "2º ano"; if(c.startsWith("5")) return "5º ano"; if(c.startsWith("9")) return "9º ano";
-    return "Não informado";
-  }
-  function comp61(d){return d.materia||d.componente_curricular||d.componente||d.disciplina||"Não informado"}
-  function aluno61(d){return d.aluno_nome||d.nome_aluno||d.aluno||d.nome||d.destinatario||d.codigo_avaliacao||"Aluno não identificado"}
-  function mes61(d){
-    const raw=d.mes_ano||d.created_at||d.data||d.finalizado_em;
-    const dt=new Date(raw);
-    if(raw && !isNaN(dt.getTime())) return String(dt.getMonth()+1).padStart(2,"0")+"/"+dt.getFullYear();
-    return raw?String(raw).slice(0,7):"Sem data";
-  }
-  function descritores61(lista){
-    const mapa={};
-    (lista||[]).forEach(d=>{
-      let fontes=[];
-      if(Array.isArray(d.habilidades_detalhadas)) fontes=fontes.concat(d.habilidades_detalhadas);
-      if(Array.isArray(d.habilidades_revisar)) fontes=fontes.concat(d.habilidades_revisar);
-      if(Array.isArray(d.respostas)) fontes=fontes.concat(d.respostas.map(r=>({habilidade:r.habilidade||r.descritor||"Descritor",erros:r.acertou?0:1,total:1})));
-      fontes.forEach(h=>{
-        const nome=h.habilidade||h.descritor||h.nome||h.codigo||"";
-        if(!nome) return;
-        if(!mapa[nome]) mapa[nome]={label:nome,erros:0,total:0};
-        mapa[nome].erros+=n61(h.erros??h.erro??h.incorretas??0);
-        mapa[nome].total+=n61(h.total??h.questoes??((h.acertos||0)+(h.erros||0))??1)||1;
-      });
-    });
-    return Object.values(mapa).map(x=>({...x,valor:x.total?Math.round((x.erros/x.total)*100):0,extra:`${x.erros}/${x.total} erros`})).sort((a,b)=>b.valor-a.valor).slice(0,10);
-  }
-  function barra61(lista){
-    return lista.length?lista.map(x=>{
-      const v=p61(x.valor), cor=v<50?"linear-gradient(90deg,#ef4444,#f97316)":v<70?"linear-gradient(90deg,#fbbf24,#22c55e)":"linear-gradient(90deg,#38bdf8,#22c55e)";
-      return `<div style="margin:10px 0"><div style="display:grid;grid-template-columns:180px 1fr 54px;gap:10px;align-items:center"><span style="color:#e2e8f0;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${String(x.label).replace(/"/g,'&quot;')}">${labelCurto61(x.label,34)}</span><div style="height:13px;background:rgba(255,255,255,.09);border-radius:999px;overflow:hidden"><div style="height:100%;width:${v}%;background:${cor};border-radius:999px"></div></div><b style="color:#f8fafc">${v}%</b></div>${x.extra?`<small style="color:#94a3b8;margin-left:190px">${x.extra}</small>`:""}</div>`;
-    }).join(""):'<div class="empty">Sem dados para exibir.</div>';
-  }
-  function cards61(lista){return lista.length?`<div class="cards-grid">${lista.map(x=>`<div class="mini-card"><b>${labelCurto61(x.label,42)}</b><strong>${p61(x.valor)}%</strong><span style="color:#cbd5e1">${x.extra||""}</span></div>`).join("")}</div>`:'<div class="empty">Sem dados para exibir.</div>'}
-  function pizza61(lista){
-    lista=(lista||[]).filter(x=>p61(x.valor)>0);
-    if(!lista.length) return '<div class="empty">Sem dados para exibir.</div>';
-    const total=lista.reduce((s,x)=>s+p61(x.valor),0)||1, cores=["#38bdf8","#22c55e","#fbbf24","#f97316","#ef4444","#8b5cf6","#14b8a6","#f472b6"];
-    let acc=0;
-    const stops=lista.map((x,i)=>{const ini=(acc/total)*100;acc+=p61(x.valor);return `${cores[i%cores.length]} ${ini}% ${(acc/total)*100}%`}).join(",");
-    return `<div class="pie-wrap"><div class="pie" style="background:conic-gradient(${stops})"><span>${lista.length}<br>itens</span></div><div class="legend">${lista.map((x,i)=>`<div class="legend-item"><span class="dot" style="background:${cores[i%cores.length]}"></span>${labelCurto61(x.label,38)}: <b>${p61(x.valor)}%</b></div>`).join("")}</div></div>`;
-  }
-  function vertical61(lista){return lista.length?`<div class="vertical-chart">${lista.map(x=>`<div class="vbar-wrap"><div class="vvalue">${p61(x.valor)}%</div><div class="vbar" style="height:${Math.max(3,p61(x.valor))}%"></div><div class="vlabel" title="${x.label}">${labelCurto61(x.label,14)}</div></div>`).join("")}</div>`:'<div class="empty">Sem dados para exibir.</div>'}
-  function svgLine61(lista,area=false,combo=false){
-    lista=(lista||[]).slice(0,10);
-    if(!lista.length) return '<div class="empty">Sem dados para exibir.</div>';
-    if(lista.length===1) lista=[{...lista[0],label:"Início"},lista[0]];
-    const W=760,H=230,pad=34,step=(W-pad*2)/Math.max(1,lista.length-1);
-    const pts=lista.map((x,i)=>{const v=p61(x.valor);return {x:pad+i*step,y:H-pad-(v/100)*(H-pad*2),v,label:x.label}});
-    const path=pts.map((p,i)=>`${i?'L':'M'} ${p.x} ${p.y}`).join(" ");
-    const areaPath=`M ${pts[0].x} ${H-pad} `+pts.map(p=>`L ${p.x} ${p.y}`).join(" ")+` L ${pts[pts.length-1].x} ${H-pad} Z`;
-    const bars=combo?pts.map(p=>`<rect x="${p.x-18}" y="${p.y}" width="36" height="${H-pad-p.y}" rx="6" fill="rgba(56,189,248,.62)"></rect>`).join(""):"";
-    return `<div class="${combo?'combo-chart':area?'area-chart':'line-chart'}"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${[0,25,50,75,100].map(v=>{const y=H-pad-(v/100)*(H-pad*2);return `<line class="grid-line" x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}"></line><text class="chart-label" x="2" y="${y+4}">${v}%</text>`}).join("")}${area?`<path d="${areaPath}" fill="rgba(56,189,248,.20)"></path>`:""}${bars}<path d="${path}" fill="none" stroke="${combo?'#facc15':'#38bdf8'}" stroke-width="4"></path>${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="5" fill="#facc15" stroke="#071524" stroke-width="2"></circle><text class="chart-value" x="${p.x-10}" y="${p.y-9}">${p.v}%</text><text class="chart-label" x="${p.x-18}" y="${H-8}">${labelCurto61(p.label,9)}</text>`).join("")}</svg></div>`;
-  }
-  function funil61(lista){
-    lista=(lista||[]).slice(0,8); if(!lista.length) return '<div class="empty">Sem dados para exibir.</div>';
-    const max=Math.max(...lista.map(x=>p61(x.valor)),1), cores=["#22c55e","#38bdf8","#facc15","#fb923c","#ef4444","#a78bfa","#14b8a6"];
-    return `<div class="funnel-chart">${lista.map((x,i)=>`<div class="funnel-seg" style="width:${Math.max(28,Math.round(p61(x.valor)/max*100))}%;background:${cores[i%cores.length]}">${labelCurto61(x.label,28)} — ${p61(x.valor)}%</div>`).join("")}</div>`;
-  }
-  function gauge61(lista){return lista.length?`<div class="gauge-wrap">${lista.slice(0,8).map(x=>{const v=p61(x.valor),ang=-90+(v*1.8);return `<div class="gauge-card"><div class="gauge"><div class="gauge-needle" style="transform:rotate(${ang}deg)"></div></div><div class="gauge-value">${v}%</div><div class="gauge-label">${labelCurto61(x.label,28)}</div></div>`}).join("")}</div>`:'<div class="empty">Sem dados para exibir.</div>'}
-  function treemap61(lista){return lista.length?`<div class="treemap">${lista.slice(0,14).map((x,i)=>{const v=p61(x.valor),span=v>=70?3:v>=40?2:1,cores=["#38bdf8","#22c55e","#facc15","#fb923c","#ef4444","#a78bfa","#14b8a6"];return `<div class="tree-cell" style="grid-column:span ${span};background:${cores[i%cores.length]}"><b>${labelCurto61(x.label,26)}</b><small>${v}%</small></div>`}).join("")}</div>`:'<div class="empty">Sem dados para exibir.</div>'}
-  function matriz61(lista){return lista.length?`<table class="matrix-table"><tr><th>Indicador</th><th>%</th><th>Situação</th></tr>${lista.map(x=>{const v=p61(x.valor),cls=v<50?'matrix-bad':v<70?'matrix-warn':'matrix-good';return `<tr><td>${labelCurto61(x.label,48)}</td><td class="${cls}">${v}%</td><td class="${cls}">${v<50?'Intervenção':v<70?'Atenção':'Adequado'}</td></tr>`}).join("")}</table>`:'<div class="empty">Sem dados para exibir.</div>'}
-  function graf61(lista,tipo){
-    if(tipo==="vertical") return vertical61(lista);
-    if(tipo==="pizza") return pizza61(lista);
-    if(tipo==="cards") return cards61(lista);
-    if(tipo==="linha") return svgLine61(lista,false,false);
-    if(tipo==="area") return svgLine61(lista,true,false);
-    if(tipo==="combo") return svgLine61(lista,false,true);
-    if(tipo==="funil") return funil61(lista);
-    if(tipo==="gauge") return gauge61(lista);
-    if(tipo==="treemap") return treemap61(lista);
-    if(tipo==="matriz") return matriz61(lista);
-    return barra61(lista);
-  }
-  function abrirDash61(){
-    ["dashboardGestaoCoord","dashboardGestaoDetalhado","dashboardGestaoIntervencao","dashboardGestaoEvolucao"].forEach(id=>{
-      const sec=document.getElementById(id); if(!sec) return;
-      sec.style.display="block"; sec.classList.remove("tool-collapsed");
-      const body=sec.querySelector(".collapse-body"); if(body) body.style.display="block";
-      const btn=sec.querySelector(".tool-toggle"); if(btn) btn.textContent="Recolher";
-    });
-  }
-  window.renderDashboardGestaoCoord=function(){
-    const lista=dadosV61(), tipo=document.getElementById("tipoGrafico")?.value||"barra";
-    abrirDash61();
-    const total=lista.length, med=media61(lista), avaliados=new Set(lista.map(aluno61).filter(Boolean)).size, baixo50=lista.filter(d=>p61(d.percentual)<50).length, atencao=lista.filter(d=>p61(d.percentual)>=50&&p61(d.percentual)<70).length, adequado=lista.filter(d=>p61(d.percentual)>=70).length;
-    const kpis=document.getElementById("dashGestaoKpis");
-    if(kpis) kpis.innerHTML=`<div class="mini-card"><b>Avaliações filtradas</b><strong>${total}</strong><span style="color:#cbd5e1">Total visível no painel</span></div><div class="mini-card"><b>Média geral</b><strong>${med}%</strong><span style="color:#cbd5e1">Resultado médio</span></div><div class="mini-card"><b>Alunos avaliados</b><strong>${avaliados}</strong><span style="color:#cbd5e1">Nomes/códigos únicos</span></div><div class="mini-card"><b>Intervenção prioritária</b><strong>${baixo50}</strong><span style="color:#fecaca">Abaixo de 50%</span></div><div class="mini-card"><b>Em atenção</b><strong>${atencao}</strong><span style="color:#fde68a">50% a 69%</span></div><div class="mini-card"><b>Adequados</b><strong>${adequado}</strong><span style="color:#bbf7d0">70% ou mais</span></div>`;
-    const turmas=grupo61(lista,serie61).sort((a,b)=>a[0].localeCompare(b[0])).map(([label,arr])=>({label,valor:media61(arr),extra:`${arr.length} avaliações`}));
-    const comps=grupo61(lista,comp61).sort((a,b)=>a[0].localeCompare(b[0])).map(([label,arr])=>({label,valor:media61(arr),extra:`${arr.length} avaliações`}));
-    const dt=document.getElementById("dashTurmas"); if(dt) dt.innerHTML=graf61(turmas,tipo);
-    const dc=document.getElementById("dashComponentes"); if(dc) dc.innerHTML=graf61(comps,tipo);
-    const alunos=grupo61(lista,aluno61).map(([nome,arr])=>{const ult=arr.slice().sort((a,b)=>new Date(b.created_at||b.data||0)-new Date(a.created_at||a.data||0))[0]||arr[0];return {nome,turma:serie61(ult),comp:comp61(ult),valor:p61(ult.percentual)}}).filter(x=>x.valor<70).sort((a,b)=>a.valor-b.valor).slice(0,12);
-    const da=document.getElementById("dashAlunosAtencao"); if(da) da.innerHTML=alunos.length?alunos.map((x,i)=>`<div class="rank-item"><div class="rank-pos">${i+1}</div><div><b>${x.nome}</b><br><span style="color:#94a3b8">${x.turma} • ${x.comp}</span></div><div><b>${x.valor}%</b></div></div>`).join(""):'<div class="empty">Nenhum aluno em atenção.</div>';
-    const desc=descritores61(lista);
-    const dd=document.getElementById("dashDescritoresCriticos"); if(dd) dd.innerHTML=graf61(desc,tipo);
-    const mensal=grupo61(lista,mes61).sort((a,b)=>a[0].localeCompare(b[0])).slice(-8).map(([label,arr])=>({label,valor:media61(arr),extra:`${arr.length} avaliações`}));
-    const de=document.getElementById("dashEvolucaoMensal"); if(de) de.innerHTML=graf61(mensal,tipo);
-    const plano=document.getElementById("dashPlanoIntervencao"); if(plano) plano.innerHTML=desc.length?desc.slice(0,5).map((x,i)=>`<div class="plan-item"><b>${i+1}. Reforçar ${x.label}</b><br>Erro identificado: ${x.valor}% (${x.extra}).<br>Ação sugerida: revisão dirigida, atividade curta e nova verificação na próxima semana.</div>`).join(""):'<div class="empty">Sem descritores suficientes para plano.</div>';
-  };
-  const renderAnt61=window.renderizar;
-  window.renderizar=function(){if(typeof renderAnt61==="function"){try{renderAnt61()}catch(e){console.warn(e)}}try{window.renderDashboardGestaoCoord()}catch(e){console.error(e)}abrirDash61()};
-  document.addEventListener("DOMContentLoaded",()=>{const tg=document.getElementById("tipoGrafico");if(tg&&!tg.dataset.v61){tg.dataset.v61="1";tg.addEventListener("change",()=>{try{window.renderizar()}catch(e){}})}setTimeout(()=>{try{window.renderizar()}catch(e){}},900)});
-})();
-<\/script>
+
 
 </body>
 </html>`;
@@ -3551,5 +3136,157 @@ document.addEventListener("DOMContentLoaded",()=>{
 })();
 </script>
 
+<script>
+/* V62 — correções pós-teste na sala de informática
+   - Relatório visual e planilha completa
+   - agruparDescritores
+   - CSV limpo UTF-8
+   - Prova por descritores respeitando seleção
+   - Fallback de ícones para não travar provas personalizadas
+*/
+(function(){
+  const ICONES_PADRAO_V62 = [
+    ["📘","Texto/Leitura","portugues"],["📐","Geometria","matematica"],["🔢","Números","matematica"],["🧠","Raciocínio","geral"],
+    ["✏️","Escrita","portugues"],["📊","Gráfico/Dados","matematica"],["✅","Acerto","geral"],["❌","Erro","geral"],
+    ["⭐","Destaque","geral"],["🎯","Descritor/Alvo","geral"],["🏫","Escola","escola"],["👩‍🏫","Professor","escola"]
+  ];
+  function listaDadosV62(){ try{return Array.isArray(dados)?dados:[]}catch(e){return [];} }
+  function esc(v){return String(v??"").replace(/[<>&"']/g,m=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;","'":"&#39;"}[m]));}
+  function baixarV62(nome, conteudo, tipo){
+    const blob=new Blob([conteudo],{type:tipo||"text/plain;charset=utf-8"});
+    const url=URL.createObjectURL(blob); const a=document.createElement("a");
+    a.href=url; a.download=nome; document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url); a.remove();},700);
+  }
+  function csvEscapeV62(v){ return '"'+String(v??"").replaceAll('"','""')+'"'; }
+  window.exportarCSV=function(anon=false){
+    const lista=listaDadosV62(); if(!lista.length){alert("Sem dados para exportar.");return;}
+    const linhas=[["Data","Aluno","Série","Componente Curricular","Escola","Código Prova","Ano","Mês","Acertos","Total","Percentual","Descritores para revisar"]];
+    lista.forEach(d=>{
+      const rev=Array.isArray(d.habilidades_revisar)?d.habilidades_revisar.map(x=>`${x.habilidade||x.descritor||"Descritor"} (${x.erros??x.total??""})`).join("; "):"";
+      let aluno = d.aluno_nome || d.aluno || d.nome || "";
+      try{ if(anon && typeof nomeSeguroTexto==="function") aluno=nomeSeguroTexto(aluno); }catch(e){ if(anon) aluno="ALUNO"; }
+      linhas.push([
+        (typeof formatarData==="function"?formatarData(d.created_at||d.data):d.created_at||d.data||""), aluno,
+        d.serie||d.serie_codigo||"", d.materia||d.componente_curricular||d.disciplina||"", d.escola||"", d.codigo_prova||"",
+        d.ano_letivo||"", d.mes_ano||"", d.acertos??"", d.total_questoes??d.total??"", d.percentual??"", rev
+      ]);
+    });
+    const csv=linhas.map(l=>l.map(csvEscapeV62).join(";")).join("\r\n");
+    baixarV62(anon?"resultados_anonimizados.csv":"resultados_matriz_educacional.csv", "\ufeff"+csv, "text/csv;charset=utf-8");
+  };
+  window.agruparDescritores=function(lista){
+    const arr=Array.isArray(lista)?lista:listaDadosV62(); const mapa=new Map();
+    function add(nome, acertos, erros, total){
+      nome=String(nome||"").trim()||"Sem descritor"; acertos=Number(acertos||0); erros=Number(erros||0); total=Number(total||acertos+erros||1);
+      if(!mapa.has(nome)) mapa.set(nome,{habilidade:nome,acertos:0,erros:0,total:0});
+      const item=mapa.get(nome); item.acertos+=acertos; item.erros+=erros; item.total+=total;
+    }
+    arr.forEach(d=>{
+      if(Array.isArray(d.habilidades_detalhadas) && d.habilidades_detalhadas.length){
+        d.habilidades_detalhadas.forEach(h=>add(h.habilidade||h.descritor||h.nome||h.codigo, h.acertos, h.erros, h.total));
+      } else if(Array.isArray(d.respostas) && d.respostas.length){
+        d.respostas.forEach(r=>add(r.habilidade||r.descritor||r.hab, r.acertou?1:0, r.acertou?0:1, 1));
+      } else if(Array.isArray(d.habilidades_revisar) && d.habilidades_revisar.length){
+        d.habilidades_revisar.forEach(h=>add(h.habilidade||h.descritor||h.nome||h.codigo, 0, h.erros||1, h.total||h.erros||1));
+      }
+    });
+    return Array.from(mapa.values()).map(x=>({
+      ...x,
+      percAcerto:x.total?Math.round((x.acertos/x.total)*100):0,
+      percErro:x.total?Math.round((x.erros/x.total)*100):0
+    }));
+  };
+  function mediaV62(arr){ return arr.length?Math.round(arr.reduce((s,d)=>s+Number(d.percentual||0),0)/arr.length):0; }
+  function tabelaLinhasV62(lista, anon){
+    return lista.map((d,i)=>{
+      let aluno=d.aluno_nome||d.aluno||d.nome||""; try{if(anon&&typeof nomeSeguroTexto==="function") aluno=nomeSeguroTexto(aluno);}catch(e){if(anon)aluno="ALUNO";}
+      return `<tr><td>${i+1}</td><td>${esc(aluno)}</td><td>${esc(d.serie||d.serie_codigo||"")}</td><td>${esc(d.materia||d.componente_curricular||d.disciplina||"")}</td><td>${esc(d.codigo_prova||"")}</td><td>${esc(d.acertos??"")}</td><td>${esc(d.total_questoes??d.total??"")}</td><td>${esc(d.percentual??"")}%</td></tr>`;
+    }).join("");
+  }
+  function barrasDescritoresV62(desc){
+    return desc.slice(0,10).map(d=>`<div style="margin:8px 0"><b>${esc(d.habilidade)}</b> — ${d.percErro}% erro (${d.erros}/${d.total})<div style="height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden"><div style="width:${Math.min(100,d.percErro)}%;height:100%;background:#ef4444"></div></div></div>`).join("") || "<p>Sem descritores registrados.</p>";
+  }
+  function montarRelatorioHTMLV62(anon=false){
+    const lista=listaDadosV62(); const desc=window.agruparDescritores(lista).sort((a,b)=>b.percErro-a.percErro||b.erros-a.erros);
+    const abaixo50=lista.filter(d=>Number(d.percentual||0)<50).length; const media=mediaV62(lista);
+    return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Relatório Sistema Matriz</title><style>
+      body{font-family:Arial,Helvetica,sans-serif;margin:24px;color:#111827} h1{color:#0f172a} h2{color:#075985;margin-top:24px}
+      .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.kpi{border:1px solid #cbd5e1;border-radius:12px;padding:12px;background:#f8fafc}.kpi b{display:block;color:#475569}.kpi strong{font-size:28px;color:#0f172a}
+      table{border-collapse:collapse;width:100%;margin-top:12px} th,td{border:1px solid #cbd5e1;padding:7px;font-size:12px;text-align:left} th{background:#0f2335;color:white}.note{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;margin:12px 0}@media print{button{display:none}}
+    </style></head><body>
+      <h1>Sistema Matriz Educacional — Relatório Visual</h1><p><b>Gerado em:</b> ${new Date().toLocaleString("pt-BR")}</p>
+      <div class="kpis"><div class="kpi"><b>Total</b><strong>${lista.length}</strong></div><div class="kpi"><b>Média geral</b><strong>${media}%</strong></div><div class="kpi"><b>Abaixo de 50%</b><strong>${abaixo50}</strong></div><div class="kpi"><b>Descritores críticos</b><strong>${desc.length}</strong></div></div>
+      <h2>Descritores críticos</h2>${barrasDescritoresV62(desc)}
+      <h2>Resultados filtrados</h2><table><thead><tr><th>#</th><th>Aluno</th><th>Série</th><th>Componente</th><th>Código</th><th>Acertos</th><th>Total</th><th>%</th></tr></thead><tbody>${tabelaLinhasV62(lista, anon)}</tbody></table>
+      <h2>Plano de intervenção sugerido</h2><div class="note">Revisar os descritores com maior percentual de erro, organizar grupos de intervenção por habilidade e aplicar nova verificação curta após o reforço.</div>
+    </body></html>`;
+  }
+  window.exportarRelatorioVisualCompleto=function(anon=false){
+    try{ const html=montarRelatorioHTMLV62(anon); baixarV62(anon?"relatorio_visual_matriz_anonimizado.html":"relatorio_visual_matriz.html", "\ufeff"+html, "text/html;charset=utf-8"); }
+    catch(e){ console.error(e); alert("Erro ao gerar relatório visual: "+(e.message||e)); }
+  };
+  window.exportarPlanilhaCompleta=function(anon=false){
+    try{ const html=montarRelatorioHTMLV62(anon); baixarV62(anon?"planilha_matriz_anonimizada.xls":"planilha_matriz_com_graficos.xls", "\ufeff"+html, "application/vnd.ms-excel;charset=utf-8"); }
+    catch(e){ console.error(e); alert("Erro ao gerar planilha: "+(e.message||e)); }
+  };
+  function obterProvasManuaisV62(){ try{return JSON.parse(localStorage.getItem("matriz_provas_personalizadas")||"[]");}catch(e){return [];} }
+  function salvarProvasManuaisV62(lista){ localStorage.setItem("matriz_provas_personalizadas", JSON.stringify(lista)); }
+  function codigoProvaDescV62(serie, comp){ return `DESC-${serie}${String(comp||"").startsWith("Port")?"P":"M"}-${String(Date.now()).slice(-5)}`; }
+  function embaralharV62(a){ return [...a].sort(()=>Math.random()-.5); }
+  window.listarDescritoresDev=function(){
+    const serie=document.getElementById("devSerie")?.value||"5", comp=document.getElementById("devComponente")?.value||"Português";
+    const banco=(window.BANCO_QUESTOES||{})[serie+"|"+comp]||[]; const mapa=new Map();
+    banco.forEach(q=>{const h=q.hab||"Sem descritor"; mapa.set(h,(mapa.get(h)||0)+1);});
+    const box=document.getElementById("descritoresDev"); if(!box) return;
+    if(!mapa.size){box.textContent="Sem descritores para essa série/componente.";return;}
+    box.innerHTML=Array.from(mapa.entries()).map(([d,qtd],i)=>`<label style="display:block;margin:5px 0;padding:6px;border:1px solid rgba(255,255,255,.15);border-radius:10px"><input type="checkbox" class="descDevCheck" value="${esc(d)}"> <b>${esc(d)}</b> — ${qtd} questões</label>`).join("")+`<div style="margin-top:8px"><button class="secondary" onclick="aplicarDescritoresMarcadosV62()">Usar descritores marcados</button></div>`;
+  };
+  window.aplicarDescritoresMarcadosV62=function(){
+    const marcados=[...document.querySelectorAll(".descDevCheck:checked")].map(x=>x.value);
+    const ta=document.getElementById("devDescritores"); if(ta) ta.value=marcados.join("\n");
+  };
+  window.gerarProvaDev=async function(imprimir=false){
+    const serie=document.getElementById("devSerie")?.value||"5", comp=document.getElementById("devComponente")?.value||"Português";
+    const ta=document.getElementById("devDescritores"); const saida=document.getElementById("saidaDev");
+    const termos=(ta?.value||"").split(/\n|;/).map(x=>x.trim()).filter(Boolean);
+    const banco=(window.BANCO_QUESTOES||{})[serie+"|"+comp]||[];
+    if(!banco.length){alert("Banco de questões não encontrado para "+serie+"º ano / "+comp);return;}
+    if(!termos.length){alert("Escolha ou digite pelo menos um descritor.");return;}
+    const selecionadas=[]; const avisos=[];
+    termos.forEach(t=>{
+      const tl=t.toLowerCase(); const achadas=banco.filter(q=>String(q.hab||"").toLowerCase().includes(tl));
+      if(!achadas.length) avisos.push(`Sem questões para: ${t}`);
+      embaralharV62(achadas).forEach(q=>{if(!selecionadas.includes(q) && selecionadas.length<10) selecionadas.push(q);});
+    });
+    if(selecionadas.length<10){
+      alert(`Foram encontradas apenas ${selecionadas.length} questões nos descritores selecionados. A prova não foi criada. Escolha mais descritores ou cadastre mais questões.`); return;
+    }
+    const codigo=codigoProvaDescV62(serie, comp);
+    const prova={codigo,titulo:`Prova por descritores — ${serie}º ${comp}`,serie,componente:comp,professor_nome:(typeof usuarioAtual==="function"?(usuarioAtual()?.nome||""):"")||"Professor",professor_usuario:(typeof usuarioAtual==="function"?(usuarioAtual()?.usuario||""):""),aluno_nome:"",turma:(typeof nomeSerieCurta==="function"?nomeSerieCurta(serie):serie+"º ano"),escola:"EMEF Pedro de Queiroz Ferreira",questoes:selecionadas.map((q,i)=>({...q,ordem_na_prova:i+1,codigo_prova:codigo,serie_codigo:serie,componente_curricular:comp})),created_at:new Date().toISOString(),descritores_selecionados:termos};
+    const lista=obterProvasManuaisV62().filter(p=>String(p.codigo).toUpperCase()!==codigo); lista.unshift(prova); salvarProvasManuaisV62(lista.slice(0,300));
+    try{ if(typeof salvarProvaManualOnline==="function") await salvarProvaManualOnline(prova); }catch(e){console.warn("Salvar online prova descritor:",e);}
+    if(saida){
+      saida.innerHTML=`<b>Prova por descritores criada com sucesso:</b> ${codigo}<br><b>Série:</b> ${serie}º ano<br><b>Componente:</b> ${esc(comp)}<br><b>Descritores usados:</b><br>${termos.map(esc).join("<br>")}<br><br><b>Questões:</b><br>`+prova.questoes.map((q,i)=>`${i+1}. ${esc(q.q||"")}<br><small>${esc(q.hab||"")}</small>`).join("<br><br>")+(avisos.length?`<br><br><b>Avisos:</b><br>${avisos.map(esc).join("<br>")}`:"");
+    }
+    if(imprimir){ try{ if(typeof htmlProva==="function"){ const printArea=document.getElementById("printArea"); printArea.innerHTML=htmlProva({codigo,meta:{serie,materia:comp},questoes:prova.questoes},false); printArea.style.display="block"; window.print(); printArea.style.display="none"; } }catch(e){} }
+  };
+  function fallbackIconesV62(msg){
+    try{ window.BANCO_ICONES_MATRIZ = Array.isArray(window.BANCO_ICONES_MATRIZ)?window.BANCO_ICONES_MATRIZ:ICONES_PADRAO_V62; }catch(e){}
+    try{ if(typeof BANCO_ICONES_MATRIZ!=="undefined" && (!Array.isArray(BANCO_ICONES_MATRIZ)||!BANCO_ICONES_MATRIZ.length)) BANCO_ICONES_MATRIZ=ICONES_PADRAO_V62; }catch(e){}
+    try{ if(typeof popularIconesManual==="function") popularIconesManual(); }catch(e){}
+    try{ if(typeof renderBancoIconesDev==="function") renderBancoIconesDev(msg||"Ícones padrão carregados. A criação de prova foi liberada."); }catch(e){
+      const el=document.getElementById("bancoIconesStatus"); if(el) el.innerHTML="<b>Ícones padrão carregados. A criação de prova foi liberada.</b>";
+    }
+    try{ if(!document.getElementById("manualQuestoesBox")?.innerHTML && typeof montarFormularioQuestoesManual==="function") montarFormularioQuestoesManual(); }catch(e){}
+  }
+  window.addEventListener("DOMContentLoaded",()=>{
+    setTimeout(()=>{
+      const st=document.getElementById("bancoIconesStatus");
+      if(st && /carregando/i.test(st.textContent||"")) fallbackIconesV62("Ícones externos não carregaram. Usando ícones padrão.");
+    },2500);
+  });
+})();
+</script>
 </body>
 </html>

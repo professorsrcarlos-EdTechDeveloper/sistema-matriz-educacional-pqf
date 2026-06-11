@@ -13465,12 +13465,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Os estudantes, que participaram da feira, receberam certificados.",
         "q": "O trecho entre vírgulas é:",
         "o": [
-          "Explicativo",
           "Interrogativo",
+          "Explicativo",
           "Imperativo",
           "Contrário"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "Oração explicativa",
         "codigo_prova": "9P01",
         "serie_codigo": "9",
@@ -13481,12 +13481,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Artigo de opinião apresenta ponto de vista.",
         "q": "O que se espera encontrar?",
         "o": [
-          "Argumentos",
           "Ingredientes",
           "Personagens mágicos",
+          "Argumentos",
           "Tabela de preços"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P01",
         "serie_codigo": "9",
@@ -13497,12 +13497,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Ele tem um coração de pedra.",
         "q": "A linguagem usada é:",
         "o": [
-          "Conotativa",
           "Denotativa",
           "Técnica",
-          "Numérica"
+          "Numérica",
+          "Conotativa"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P01",
         "serie_codigo": "9",
@@ -13529,12 +13529,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Campanha educativa sobre trânsito.",
         "q": "A finalidade é:",
         "o": [
-          "Conscientizar",
           "Contar lenda",
+          "Conscientizar",
           "Vender sempre",
           "Descrever paisagem"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Identificar finalidade de textos de diferentes gêneros",
         "codigo_prova": "9P01",
         "serie_codigo": "9",
@@ -13545,12 +13545,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A escola realizou reunião ontem.",
         "q": "Essa frase apresenta:",
         "o": [
-          "Fato",
           "Opinião",
           "Ironia",
+          "Fato",
           "Dúvida"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P01",
         "serie_codigo": "9",
@@ -13561,12 +13561,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Entrevista com um atleta.",
         "q": "Esse gênero normalmente apresenta:",
         "o": [
-          "Perguntas e respostas",
           "Versos",
           "Ingredientes",
-          "Mapa"
+          "Mapa",
+          "Perguntas e respostas"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P01",
         "serie_codigo": "9",
@@ -13593,12 +13593,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A notícia espalhou-se rapidamente.",
         "q": "'Rapidamente' indica:",
         "o": [
-          "Modo",
           "Lugar",
+          "Modo",
           "Pessoa",
           "Tempo fixo"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P01",
         "serie_codigo": "9",
@@ -13633,12 +13633,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Ele tem um coração de pedra.",
         "q": "A linguagem usada é:",
         "o": [
-          "Conotativa",
           "Denotativa",
+          "Conotativa",
           "Técnica",
           "Numérica"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P02",
         "serie_codigo": "9",
@@ -13649,12 +13649,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A crônica reflete situações do cotidiano.",
         "q": "Esse gênero geralmente apresenta:",
         "o": [
-          "Cotidiano e reflexão",
           "Normas técnicas",
           "Lista de produtos",
+          "Cotidiano e reflexão",
           "Problemas matemáticos"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P02",
         "serie_codigo": "9",
@@ -13665,12 +13665,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Campanha educativa sobre trânsito.",
         "q": "A finalidade é:",
         "o": [
-          "Conscientizar",
           "Contar lenda",
           "Vender sempre",
-          "Descrever paisagem"
+          "Descrever paisagem",
+          "Conscientizar"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D09 — Identificar finalidade de textos de diferentes gêneros",
         "codigo_prova": "9P02",
         "serie_codigo": "9",
@@ -13697,12 +13697,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Entrevista com um atleta.",
         "q": "Esse gênero normalmente apresenta:",
         "o": [
-          "Perguntas e respostas",
           "Versos",
+          "Perguntas e respostas",
           "Ingredientes",
           "Mapa"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P02",
         "serie_codigo": "9",
@@ -13713,12 +13713,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Estudaram para que obtivessem bons resultados.",
         "q": "Há ideia de:",
         "o": [
-          "Finalidade",
           "Oposição",
           "Comparação",
+          "Finalidade",
           "Dúvida"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D09 — Identificar finalidade de textos de diferentes gêneros",
         "codigo_prova": "9P02",
         "serie_codigo": "9",
@@ -13729,12 +13729,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A notícia espalhou-se rapidamente.",
         "q": "'Rapidamente' indica:",
         "o": [
-          "Modo",
           "Lugar",
           "Pessoa",
-          "Tempo fixo"
+          "Tempo fixo",
+          "Modo"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P02",
         "serie_codigo": "9",
@@ -13761,12 +13761,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Documento oficial.",
         "q": "A linguagem esperada é:",
         "o": [
-          "Norma-padrão",
           "Gíria",
+          "Norma-padrão",
           "Mensagem íntima",
           "Linguagem infantil"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D13 — Identificar marcas linguísticas e variação linguística",
         "codigo_prova": "9P02",
         "serie_codigo": "9",
@@ -13801,12 +13801,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A cidade acordou em festa.",
         "q": "A expressão apresenta:",
         "o": [
-          "Personificação",
           "Enumeração",
+          "Personificação",
           "Citação",
           "Comparação literal"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P03",
         "serie_codigo": "9",
@@ -13817,12 +13817,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Muitos usam internet; entretanto, é preciso cuidado.",
         "q": "'Entretanto' indica:",
         "o": [
-          "Oposição",
           "Adição",
           "Causa",
+          "Oposição",
           "Tempo"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P03",
         "serie_codigo": "9",
@@ -13833,12 +13833,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A leitura amplia horizontes.",
         "q": "A frase sugere que a leitura:",
         "o": [
-          "Aumenta conhecimentos",
           "Diminui ideias",
           "Fecha caminhos",
-          "Impede estudo"
+          "Impede estudo",
+          "Aumenta conhecimentos"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D04 — Inferir uma informação implícita em um texto",
         "codigo_prova": "9P03",
         "serie_codigo": "9",
@@ -13849,12 +13849,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A palestra foi excelente.",
         "q": "Essa frase apresenta:",
         "o": [
-          "Fato",
           "Opinião",
+          "Fato",
           "Dado exato",
           "Ordem"
         ],
-        "c": 1,
+        "c": 0,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P03",
         "serie_codigo": "9",
@@ -13865,12 +13865,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Segundo especialistas, ler melhora a escrita.",
         "q": "'Segundo especialistas' indica:",
         "o": [
-          "Fonte",
           "Lugar",
+          "Fonte",
           "Ironia",
           "Ordem"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Reconhecer estratégia argumentativa/fonte de informação",
         "codigo_prova": "9P03",
         "serie_codigo": "9",
@@ -13881,12 +13881,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Um texto cita outro texto conhecido.",
         "q": "Isso é exemplo de:",
         "o": [
-          "Intertextualidade",
           "Pontuação",
           "Silabação",
+          "Intertextualidade",
           "Denotação"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D20 — Reconhecer diferentes formas de tratar uma informação em textos",
         "codigo_prova": "9P03",
         "serie_codigo": "9",
@@ -13897,12 +13897,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Ainda que chova, haverá aula.",
         "q": "A expressão indica:",
         "o": [
-          "Concessão",
           "Causa",
           "Conclusão",
-          "Adição"
+          "Adição",
+          "Concessão"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P03",
         "serie_codigo": "9",
@@ -13929,12 +13929,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Não apenas estudou, como também ajudou os colegas.",
         "q": "Há ideia de:",
         "o": [
-          "Adição",
           "Oposição",
+          "Adição",
           "Causa",
           "Tempo"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P03",
         "serie_codigo": "9",
@@ -13969,12 +13969,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A leitura amplia horizontes.",
         "q": "A frase sugere que a leitura:",
         "o": [
-          "Aumenta conhecimentos",
           "Diminui ideias",
+          "Aumenta conhecimentos",
           "Fecha caminhos",
           "Impede estudo"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D04 — Inferir uma informação implícita em um texto",
         "codigo_prova": "9P04",
         "serie_codigo": "9",
@@ -13986,11 +13986,11 @@ window.SIMULADOS_FIXOS = {
         "q": "Essa frase apresenta:",
         "o": [
           "Fato",
-          "Opinião",
           "Dado exato",
+          "Opinião",
           "Ordem"
         ],
-        "c": 1,
+        "c": 2,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P04",
         "serie_codigo": "9",
@@ -14001,12 +14001,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Segundo especialistas, ler melhora a escrita.",
         "q": "'Segundo especialistas' indica:",
         "o": [
-          "Fonte",
           "Lugar",
           "Ironia",
-          "Ordem"
+          "Ordem",
+          "Fonte"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D14 — Reconhecer estratégia argumentativa/fonte de informação",
         "codigo_prova": "9P04",
         "serie_codigo": "9",
@@ -14033,12 +14033,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Ainda que chova, haverá aula.",
         "q": "A expressão indica:",
         "o": [
-          "Concessão",
           "Causa",
+          "Concessão",
           "Conclusão",
           "Adição"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P04",
         "serie_codigo": "9",
@@ -14049,12 +14049,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O aplicativo facilita o estudo, pois organiza conteúdos.",
         "q": "'Pois' introduz:",
         "o": [
-          "Explicação",
           "Contradição",
           "Exclusão",
+          "Explicação",
           "Tempo"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P04",
         "serie_codigo": "9",
@@ -14065,12 +14065,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Não apenas estudou, como também ajudou os colegas.",
         "q": "Há ideia de:",
         "o": [
-          "Adição",
           "Oposição",
           "Causa",
-          "Tempo"
+          "Tempo",
+          "Adição"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P04",
         "serie_codigo": "9",
@@ -14097,12 +14097,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Dados da pesquisa mostram aumento na frequência.",
         "q": "Os dados servem para:",
         "o": [
-          "Sustentar informação",
           "Criar personagem",
+          "Sustentar informação",
           "Fazer rima",
           "Dar ordem"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Reconhecer dados como argumento",
         "codigo_prova": "9P04",
         "serie_codigo": "9",
@@ -14121,12 +14121,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A palestra foi excelente.",
         "q": "Essa frase apresenta:",
         "o": [
-          "Fato",
           "Opinião",
+          "Fato",
           "Dado exato",
           "Ordem"
         ],
-        "c": 1,
+        "c": 0,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P05",
         "serie_codigo": "9",
@@ -14137,12 +14137,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Segundo especialistas, ler melhora a escrita.",
         "q": "'Segundo especialistas' indica:",
         "o": [
-          "Fonte",
           "Lugar",
+          "Fonte",
           "Ironia",
           "Ordem"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Reconhecer estratégia argumentativa/fonte de informação",
         "codigo_prova": "9P05",
         "serie_codigo": "9",
@@ -14153,12 +14153,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Um texto cita outro texto conhecido.",
         "q": "Isso é exemplo de:",
         "o": [
-          "Intertextualidade",
           "Pontuação",
           "Silabação",
+          "Intertextualidade",
           "Denotação"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D20 — Reconhecer diferentes formas de tratar uma informação em textos",
         "codigo_prova": "9P05",
         "serie_codigo": "9",
@@ -14169,12 +14169,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Ainda que chova, haverá aula.",
         "q": "A expressão indica:",
         "o": [
-          "Concessão",
           "Causa",
           "Conclusão",
-          "Adição"
+          "Adição",
+          "Concessão"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P05",
         "serie_codigo": "9",
@@ -14201,12 +14201,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Não apenas estudou, como também ajudou os colegas.",
         "q": "Há ideia de:",
         "o": [
-          "Adição",
           "Oposição",
+          "Adição",
           "Causa",
           "Tempo"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P05",
         "serie_codigo": "9",
@@ -14217,12 +14217,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Texto publicitário de uma escola.",
         "q": "Recurso comum é:",
         "o": [
-          "Persuasão",
           "Ausência de imagens",
           "Prova matemática",
+          "Persuasão",
           "Lista de chamada"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P05",
         "serie_codigo": "9",
@@ -14233,12 +14233,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Dados da pesquisa mostram aumento na frequência.",
         "q": "Os dados servem para:",
         "o": [
-          "Sustentar informação",
           "Criar personagem",
           "Fazer rima",
-          "Dar ordem"
+          "Dar ordem",
+          "Sustentar informação"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D14 — Reconhecer dados como argumento",
         "codigo_prova": "9P05",
         "serie_codigo": "9",
@@ -14249,12 +14249,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Embora estivesse cansado, continuou estudando.",
         "q": "'Embora' estabelece relação de:",
         "o": [
-          "Causa",
           "Concessão",
+          "Causa",
           "Conclusão",
           "Adição"
         ],
-        "c": 1,
+        "c": 0,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P05",
         "serie_codigo": "9",
@@ -14305,12 +14305,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Estudaram para que obtivessem bons resultados.",
         "q": "Há ideia de:",
         "o": [
-          "Finalidade",
           "Oposição",
+          "Finalidade",
           "Comparação",
           "Dúvida"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Identificar finalidade de textos de diferentes gêneros",
         "codigo_prova": "9P06",
         "serie_codigo": "9",
@@ -14321,12 +14321,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A notícia espalhou-se rapidamente.",
         "q": "'Rapidamente' indica:",
         "o": [
-          "Modo",
           "Lugar",
           "Pessoa",
+          "Modo",
           "Tempo fixo"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P06",
         "serie_codigo": "9",
@@ -14337,12 +14337,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Editorial de um jornal.",
         "q": "O editorial representa:",
         "o": [
-          "Opinião institucional",
           "Manual de uso",
           "Receita",
-          "Bilhete"
+          "Bilhete",
+          "Opinião institucional"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P06",
         "serie_codigo": "9",
@@ -14369,12 +14369,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O autor critica o consumo exagerado de tecnologia.",
         "q": "A palavra 'critica' indica que o autor:",
         "o": [
-          "Avalia negativamente",
           "Elogia sem limites",
+          "Avalia negativamente",
           "Ignora",
           "Conta piada"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D06 — Identificar o tema ou sentido global do texto",
         "codigo_prova": "9P06",
         "serie_codigo": "9",
@@ -14385,12 +14385,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A educação é a chave do futuro.",
         "q": "A frase apresenta:",
         "o": [
-          "Metáfora",
           "Onomatopeia",
           "Enumeração",
+          "Metáfora",
           "Hipérbole numérica"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P06",
         "serie_codigo": "9",
@@ -14401,12 +14401,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Resumo de um texto.",
         "q": "O resumo deve:",
         "o": [
-          "Apresentar ideias principais",
           "Copiar tudo",
           "Mudar sentido",
-          "Ter só opinião"
+          "Ter só opinião",
+          "Apresentar ideias principais"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D06 — Identificar tema/sentido global do texto",
         "codigo_prova": "9P06",
         "serie_codigo": "9",
@@ -14433,12 +14433,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Os estudantes, que participaram da feira, receberam certificados.",
         "q": "O trecho entre vírgulas é:",
         "o": [
-          "Explicativo",
           "Interrogativo",
+          "Explicativo",
           "Imperativo",
           "Contrário"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "Oração explicativa",
         "codigo_prova": "9P06",
         "serie_codigo": "9",
@@ -14473,12 +14473,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Editorial de um jornal.",
         "q": "O editorial representa:",
         "o": [
-          "Opinião institucional",
           "Manual de uso",
+          "Opinião institucional",
           "Receita",
           "Bilhete"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P07",
         "serie_codigo": "9",
@@ -14489,12 +14489,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Documento oficial.",
         "q": "A linguagem esperada é:",
         "o": [
-          "Norma-padrão",
           "Gíria",
           "Mensagem íntima",
+          "Norma-padrão",
           "Linguagem infantil"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D13 — Identificar marcas linguísticas e variação linguística",
         "codigo_prova": "9P07",
         "serie_codigo": "9",
@@ -14505,12 +14505,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O autor critica o consumo exagerado de tecnologia.",
         "q": "A palavra 'critica' indica que o autor:",
         "o": [
-          "Avalia negativamente",
           "Elogia sem limites",
           "Ignora",
-          "Conta piada"
+          "Conta piada",
+          "Avalia negativamente"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D06 — Identificar o tema ou sentido global do texto",
         "codigo_prova": "9P07",
         "serie_codigo": "9",
@@ -14537,12 +14537,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Resumo de um texto.",
         "q": "O resumo deve:",
         "o": [
-          "Apresentar ideias principais",
           "Copiar tudo",
+          "Apresentar ideias principais",
           "Mudar sentido",
           "Ter só opinião"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D06 — Identificar tema/sentido global do texto",
         "codigo_prova": "9P07",
         "serie_codigo": "9",
@@ -14553,12 +14553,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Uma reportagem aprofunda um fato de interesse público.",
         "q": "O principal objetivo é:",
         "o": [
-          "Informar com detalhes",
           "Ensinar receita",
           "Criar conto",
+          "Informar com detalhes",
           "Listar compras"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P07",
         "serie_codigo": "9",
@@ -14569,12 +14569,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Os estudantes, que participaram da feira, receberam certificados.",
         "q": "O trecho entre vírgulas é:",
         "o": [
-          "Explicativo",
           "Interrogativo",
           "Imperativo",
-          "Contrário"
+          "Contrário",
+          "Explicativo"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "Oração explicativa",
         "codigo_prova": "9P07",
         "serie_codigo": "9",
@@ -14601,12 +14601,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Ele tem um coração de pedra.",
         "q": "A linguagem usada é:",
         "o": [
-          "Conotativa",
           "Denotativa",
+          "Conotativa",
           "Técnica",
           "Numérica"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P07",
         "serie_codigo": "9",
@@ -14641,12 +14641,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O autor critica o consumo exagerado de tecnologia.",
         "q": "A palavra 'critica' indica que o autor:",
         "o": [
-          "Avalia negativamente",
           "Elogia sem limites",
+          "Avalia negativamente",
           "Ignora",
           "Conta piada"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D06 — Identificar o tema ou sentido global do texto",
         "codigo_prova": "9P08",
         "serie_codigo": "9",
@@ -14657,12 +14657,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A educação é a chave do futuro.",
         "q": "A frase apresenta:",
         "o": [
-          "Metáfora",
           "Onomatopeia",
           "Enumeração",
+          "Metáfora",
           "Hipérbole numérica"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P08",
         "serie_codigo": "9",
@@ -14673,12 +14673,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Resumo de um texto.",
         "q": "O resumo deve:",
         "o": [
-          "Apresentar ideias principais",
           "Copiar tudo",
           "Mudar sentido",
-          "Ter só opinião"
+          "Ter só opinião",
+          "Apresentar ideias principais"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D06 — Identificar tema/sentido global do texto",
         "codigo_prova": "9P08",
         "serie_codigo": "9",
@@ -14705,12 +14705,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Os estudantes, que participaram da feira, receberam certificados.",
         "q": "O trecho entre vírgulas é:",
         "o": [
-          "Explicativo",
           "Interrogativo",
+          "Explicativo",
           "Imperativo",
           "Contrário"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "Oração explicativa",
         "codigo_prova": "9P08",
         "serie_codigo": "9",
@@ -14721,12 +14721,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Artigo de opinião apresenta ponto de vista.",
         "q": "O que se espera encontrar?",
         "o": [
-          "Argumentos",
           "Ingredientes",
           "Personagens mágicos",
+          "Argumentos",
           "Tabela de preços"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P08",
         "serie_codigo": "9",
@@ -14737,12 +14737,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Ele tem um coração de pedra.",
         "q": "A linguagem usada é:",
         "o": [
-          "Conotativa",
           "Denotativa",
           "Técnica",
-          "Numérica"
+          "Numérica",
+          "Conotativa"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P08",
         "serie_codigo": "9",
@@ -14769,12 +14769,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Campanha educativa sobre trânsito.",
         "q": "A finalidade é:",
         "o": [
-          "Conscientizar",
           "Contar lenda",
+          "Conscientizar",
           "Vender sempre",
           "Descrever paisagem"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Identificar finalidade de textos de diferentes gêneros",
         "codigo_prova": "9P08",
         "serie_codigo": "9",
@@ -14809,12 +14809,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Texto publicitário de uma escola.",
         "q": "Recurso comum é:",
         "o": [
-          "Persuasão",
           "Ausência de imagens",
+          "Persuasão",
           "Prova matemática",
           "Lista de chamada"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P09",
         "serie_codigo": "9",
@@ -14825,12 +14825,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Dados da pesquisa mostram aumento na frequência.",
         "q": "Os dados servem para:",
         "o": [
-          "Sustentar informação",
           "Criar personagem",
           "Fazer rima",
+          "Sustentar informação",
           "Dar ordem"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D14 — Reconhecer dados como argumento",
         "codigo_prova": "9P09",
         "serie_codigo": "9",
@@ -14842,11 +14842,11 @@ window.SIMULADOS_FIXOS = {
         "q": "'Embora' estabelece relação de:",
         "o": [
           "Causa",
-          "Concessão",
           "Conclusão",
-          "Adição"
+          "Adição",
+          "Concessão"
         ],
-        "c": 1,
+        "c": 3,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P09",
         "serie_codigo": "9",
@@ -14857,12 +14857,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O projeto reduziu o desperdício de água.",
         "q": "'Reduziu' pode ser substituído por:",
         "o": [
-          "Aumentou",
           "Diminuiu",
+          "Aumentou",
           "Ignorou",
           "Repetiu"
         ],
-        "c": 1,
+        "c": 0,
         "hab": "D03 — Inferir o sentido de palavra ou expressão",
         "codigo_prova": "9P09",
         "serie_codigo": "9",
@@ -14873,12 +14873,12 @@ window.SIMULADOS_FIXOS = {
         "base": "É necessário preservar o meio ambiente.",
         "q": "A tese defendida é:",
         "o": [
-          "Preservar é necessário",
           "Não há problemas",
+          "Preservar é necessário",
           "Ambiente não muda",
           "Qualidade não importa"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Identificar tese/opinião defendida no texto",
         "codigo_prova": "9P09",
         "serie_codigo": "9",
@@ -14889,12 +14889,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Portanto, todos devem colaborar.",
         "q": "'Portanto' indica:",
         "o": [
-          "Conclusão",
           "Causa",
           "Oposição",
+          "Conclusão",
           "Tempo"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P09",
         "serie_codigo": "9",
@@ -14905,12 +14905,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A cidade acordou em festa.",
         "q": "A expressão apresenta:",
         "o": [
-          "Personificação",
           "Enumeração",
           "Citação",
-          "Comparação literal"
+          "Comparação literal",
+          "Personificação"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P09",
         "serie_codigo": "9",
@@ -14937,12 +14937,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A leitura amplia horizontes.",
         "q": "A frase sugere que a leitura:",
         "o": [
-          "Aumenta conhecimentos",
           "Diminui ideias",
+          "Aumenta conhecimentos",
           "Fecha caminhos",
           "Impede estudo"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D04 — Inferir uma informação implícita em um texto",
         "codigo_prova": "9P09",
         "serie_codigo": "9",
@@ -14994,11 +14994,11 @@ window.SIMULADOS_FIXOS = {
         "q": "'Reduziu' pode ser substituído por:",
         "o": [
           "Aumentou",
-          "Diminuiu",
           "Ignorou",
+          "Diminuiu",
           "Repetiu"
         ],
-        "c": 1,
+        "c": 2,
         "hab": "D03 — Inferir o sentido de palavra ou expressão",
         "codigo_prova": "9P10",
         "serie_codigo": "9",
@@ -15009,12 +15009,12 @@ window.SIMULADOS_FIXOS = {
         "base": "É necessário preservar o meio ambiente.",
         "q": "A tese defendida é:",
         "o": [
-          "Preservar é necessário",
           "Não há problemas",
           "Ambiente não muda",
-          "Qualidade não importa"
+          "Qualidade não importa",
+          "Preservar é necessário"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D14 — Identificar tese/opinião defendida no texto",
         "codigo_prova": "9P10",
         "serie_codigo": "9",
@@ -15041,12 +15041,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A cidade acordou em festa.",
         "q": "A expressão apresenta:",
         "o": [
-          "Personificação",
           "Enumeração",
+          "Personificação",
           "Citação",
           "Comparação literal"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P10",
         "serie_codigo": "9",
@@ -15057,12 +15057,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Muitos usam internet; entretanto, é preciso cuidado.",
         "q": "'Entretanto' indica:",
         "o": [
-          "Oposição",
           "Adição",
           "Causa",
+          "Oposição",
           "Tempo"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P10",
         "serie_codigo": "9",
@@ -15073,12 +15073,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A leitura amplia horizontes.",
         "q": "A frase sugere que a leitura:",
         "o": [
-          "Aumenta conhecimentos",
           "Diminui ideias",
           "Fecha caminhos",
-          "Impede estudo"
+          "Impede estudo",
+          "Aumenta conhecimentos"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D04 — Inferir uma informação implícita em um texto",
         "codigo_prova": "9P10",
         "serie_codigo": "9",
@@ -15089,12 +15089,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A palestra foi excelente.",
         "q": "Essa frase apresenta:",
         "o": [
-          "Fato",
           "Opinião",
+          "Fato",
           "Dado exato",
           "Ordem"
         ],
-        "c": 1,
+        "c": 0,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P10",
         "serie_codigo": "9",
@@ -15105,12 +15105,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Segundo especialistas, ler melhora a escrita.",
         "q": "'Segundo especialistas' indica:",
         "o": [
-          "Fonte",
           "Lugar",
+          "Fonte",
           "Ironia",
           "Ordem"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Reconhecer estratégia argumentativa/fonte de informação",
         "codigo_prova": "9P10",
         "serie_codigo": "9",
@@ -15129,12 +15129,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O projeto reduziu o desperdício de água.",
         "q": "'Reduziu' pode ser substituído por:",
         "o": [
-          "Aumentou",
           "Diminuiu",
+          "Aumentou",
           "Ignorou",
           "Repetiu"
         ],
-        "c": 1,
+        "c": 0,
         "hab": "D03 — Inferir o sentido de palavra ou expressão",
         "codigo_prova": "9P11",
         "serie_codigo": "9",
@@ -15145,12 +15145,12 @@ window.SIMULADOS_FIXOS = {
         "base": "É necessário preservar o meio ambiente.",
         "q": "A tese defendida é:",
         "o": [
-          "Preservar é necessário",
           "Não há problemas",
+          "Preservar é necessário",
           "Ambiente não muda",
           "Qualidade não importa"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Identificar tese/opinião defendida no texto",
         "codigo_prova": "9P11",
         "serie_codigo": "9",
@@ -15161,12 +15161,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Portanto, todos devem colaborar.",
         "q": "'Portanto' indica:",
         "o": [
-          "Conclusão",
           "Causa",
           "Oposição",
+          "Conclusão",
           "Tempo"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P11",
         "serie_codigo": "9",
@@ -15177,12 +15177,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A cidade acordou em festa.",
         "q": "A expressão apresenta:",
         "o": [
-          "Personificação",
           "Enumeração",
           "Citação",
-          "Comparação literal"
+          "Comparação literal",
+          "Personificação"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P11",
         "serie_codigo": "9",
@@ -15209,12 +15209,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A leitura amplia horizontes.",
         "q": "A frase sugere que a leitura:",
         "o": [
-          "Aumenta conhecimentos",
           "Diminui ideias",
+          "Aumenta conhecimentos",
           "Fecha caminhos",
           "Impede estudo"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D04 — Inferir uma informação implícita em um texto",
         "codigo_prova": "9P11",
         "serie_codigo": "9",
@@ -15226,11 +15226,11 @@ window.SIMULADOS_FIXOS = {
         "q": "Essa frase apresenta:",
         "o": [
           "Fato",
-          "Opinião",
           "Dado exato",
+          "Opinião",
           "Ordem"
         ],
-        "c": 1,
+        "c": 2,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P11",
         "serie_codigo": "9",
@@ -15241,12 +15241,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Segundo especialistas, ler melhora a escrita.",
         "q": "'Segundo especialistas' indica:",
         "o": [
-          "Fonte",
           "Lugar",
           "Ironia",
-          "Ordem"
+          "Ordem",
+          "Fonte"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D14 — Reconhecer estratégia argumentativa/fonte de informação",
         "codigo_prova": "9P11",
         "serie_codigo": "9",
@@ -15273,12 +15273,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Ainda que chova, haverá aula.",
         "q": "A expressão indica:",
         "o": [
-          "Concessão",
           "Causa",
+          "Concessão",
           "Conclusão",
           "Adição"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P11",
         "serie_codigo": "9",
@@ -15313,12 +15313,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Artigo de opinião apresenta ponto de vista.",
         "q": "O que se espera encontrar?",
         "o": [
-          "Argumentos",
           "Ingredientes",
+          "Argumentos",
           "Personagens mágicos",
           "Tabela de preços"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P12",
         "serie_codigo": "9",
@@ -15329,12 +15329,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Ele tem um coração de pedra.",
         "q": "A linguagem usada é:",
         "o": [
-          "Conotativa",
           "Denotativa",
           "Técnica",
+          "Conotativa",
           "Numérica"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P12",
         "serie_codigo": "9",
@@ -15345,12 +15345,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A crônica reflete situações do cotidiano.",
         "q": "Esse gênero geralmente apresenta:",
         "o": [
-          "Cotidiano e reflexão",
           "Normas técnicas",
           "Lista de produtos",
-          "Problemas matemáticos"
+          "Problemas matemáticos",
+          "Cotidiano e reflexão"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P12",
         "serie_codigo": "9",
@@ -15377,12 +15377,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A escola realizou reunião ontem.",
         "q": "Essa frase apresenta:",
         "o": [
-          "Fato",
           "Opinião",
+          "Fato",
           "Ironia",
           "Dúvida"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P12",
         "serie_codigo": "9",
@@ -15393,12 +15393,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Entrevista com um atleta.",
         "q": "Esse gênero normalmente apresenta:",
         "o": [
-          "Perguntas e respostas",
           "Versos",
           "Ingredientes",
+          "Perguntas e respostas",
           "Mapa"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P12",
         "serie_codigo": "9",
@@ -15409,12 +15409,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Estudaram para que obtivessem bons resultados.",
         "q": "Há ideia de:",
         "o": [
-          "Finalidade",
           "Oposição",
           "Comparação",
-          "Dúvida"
+          "Dúvida",
+          "Finalidade"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D09 — Identificar finalidade de textos de diferentes gêneros",
         "codigo_prova": "9P12",
         "serie_codigo": "9",
@@ -15441,12 +15441,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Editorial de um jornal.",
         "q": "O editorial representa:",
         "o": [
-          "Opinião institucional",
           "Manual de uso",
+          "Opinião institucional",
           "Receita",
           "Bilhete"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P12",
         "serie_codigo": "9",
@@ -15481,12 +15481,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A crônica reflete situações do cotidiano.",
         "q": "Esse gênero geralmente apresenta:",
         "o": [
-          "Cotidiano e reflexão",
           "Normas técnicas",
+          "Cotidiano e reflexão",
           "Lista de produtos",
           "Problemas matemáticos"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P13",
         "serie_codigo": "9",
@@ -15497,12 +15497,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Campanha educativa sobre trânsito.",
         "q": "A finalidade é:",
         "o": [
-          "Conscientizar",
           "Contar lenda",
           "Vender sempre",
+          "Conscientizar",
           "Descrever paisagem"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D09 — Identificar finalidade de textos de diferentes gêneros",
         "codigo_prova": "9P13",
         "serie_codigo": "9",
@@ -15513,12 +15513,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A escola realizou reunião ontem.",
         "q": "Essa frase apresenta:",
         "o": [
-          "Fato",
           "Opinião",
           "Ironia",
-          "Dúvida"
+          "Dúvida",
+          "Fato"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P13",
         "serie_codigo": "9",
@@ -15545,12 +15545,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Estudaram para que obtivessem bons resultados.",
         "q": "Há ideia de:",
         "o": [
-          "Finalidade",
           "Oposição",
+          "Finalidade",
           "Comparação",
           "Dúvida"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Identificar finalidade de textos de diferentes gêneros",
         "codigo_prova": "9P13",
         "serie_codigo": "9",
@@ -15561,12 +15561,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A notícia espalhou-se rapidamente.",
         "q": "'Rapidamente' indica:",
         "o": [
-          "Modo",
           "Lugar",
           "Pessoa",
+          "Modo",
           "Tempo fixo"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P13",
         "serie_codigo": "9",
@@ -15577,12 +15577,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Editorial de um jornal.",
         "q": "O editorial representa:",
         "o": [
-          "Opinião institucional",
           "Manual de uso",
           "Receita",
-          "Bilhete"
+          "Bilhete",
+          "Opinião institucional"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P13",
         "serie_codigo": "9",
@@ -15609,12 +15609,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O autor critica o consumo exagerado de tecnologia.",
         "q": "A palavra 'critica' indica que o autor:",
         "o": [
-          "Avalia negativamente",
           "Elogia sem limites",
+          "Avalia negativamente",
           "Ignora",
           "Conta piada"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D06 — Identificar o tema ou sentido global do texto",
         "codigo_prova": "9P13",
         "serie_codigo": "9",
@@ -15649,12 +15649,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A escola realizou reunião ontem.",
         "q": "Essa frase apresenta:",
         "o": [
-          "Fato",
           "Opinião",
+          "Fato",
           "Ironia",
           "Dúvida"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P14",
         "serie_codigo": "9",
@@ -15665,12 +15665,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Entrevista com um atleta.",
         "q": "Esse gênero normalmente apresenta:",
         "o": [
-          "Perguntas e respostas",
           "Versos",
           "Ingredientes",
+          "Perguntas e respostas",
           "Mapa"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P14",
         "serie_codigo": "9",
@@ -15681,12 +15681,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Estudaram para que obtivessem bons resultados.",
         "q": "Há ideia de:",
         "o": [
-          "Finalidade",
           "Oposição",
           "Comparação",
-          "Dúvida"
+          "Dúvida",
+          "Finalidade"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D09 — Identificar finalidade de textos de diferentes gêneros",
         "codigo_prova": "9P14",
         "serie_codigo": "9",
@@ -15713,12 +15713,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Editorial de um jornal.",
         "q": "O editorial representa:",
         "o": [
-          "Opinião institucional",
           "Manual de uso",
+          "Opinião institucional",
           "Receita",
           "Bilhete"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P14",
         "serie_codigo": "9",
@@ -15729,12 +15729,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Documento oficial.",
         "q": "A linguagem esperada é:",
         "o": [
-          "Norma-padrão",
           "Gíria",
           "Mensagem íntima",
+          "Norma-padrão",
           "Linguagem infantil"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D13 — Identificar marcas linguísticas e variação linguística",
         "codigo_prova": "9P14",
         "serie_codigo": "9",
@@ -15745,12 +15745,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O autor critica o consumo exagerado de tecnologia.",
         "q": "A palavra 'critica' indica que o autor:",
         "o": [
-          "Avalia negativamente",
           "Elogia sem limites",
           "Ignora",
-          "Conta piada"
+          "Conta piada",
+          "Avalia negativamente"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D06 — Identificar o tema ou sentido global do texto",
         "codigo_prova": "9P14",
         "serie_codigo": "9",
@@ -15777,12 +15777,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Resumo de um texto.",
         "q": "O resumo deve:",
         "o": [
-          "Apresentar ideias principais",
           "Copiar tudo",
+          "Apresentar ideias principais",
           "Mudar sentido",
           "Ter só opinião"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D06 — Identificar tema/sentido global do texto",
         "codigo_prova": "9P14",
         "serie_codigo": "9",
@@ -15833,12 +15833,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Segundo especialistas, ler melhora a escrita.",
         "q": "'Segundo especialistas' indica:",
         "o": [
-          "Fonte",
           "Lugar",
           "Ironia",
+          "Fonte",
           "Ordem"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D14 — Reconhecer estratégia argumentativa/fonte de informação",
         "codigo_prova": "9P15",
         "serie_codigo": "9",
@@ -15849,12 +15849,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Um texto cita outro texto conhecido.",
         "q": "Isso é exemplo de:",
         "o": [
-          "Intertextualidade",
           "Pontuação",
           "Silabação",
-          "Denotação"
+          "Denotação",
+          "Intertextualidade"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D20 — Reconhecer diferentes formas de tratar uma informação em textos",
         "codigo_prova": "9P15",
         "serie_codigo": "9",
@@ -15881,12 +15881,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O aplicativo facilita o estudo, pois organiza conteúdos.",
         "q": "'Pois' introduz:",
         "o": [
-          "Explicação",
           "Contradição",
+          "Explicação",
           "Exclusão",
           "Tempo"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P15",
         "serie_codigo": "9",
@@ -15897,12 +15897,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Não apenas estudou, como também ajudou os colegas.",
         "q": "Há ideia de:",
         "o": [
-          "Adição",
           "Oposição",
           "Causa",
+          "Adição",
           "Tempo"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P15",
         "serie_codigo": "9",
@@ -15913,12 +15913,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Texto publicitário de uma escola.",
         "q": "Recurso comum é:",
         "o": [
-          "Persuasão",
           "Ausência de imagens",
           "Prova matemática",
-          "Lista de chamada"
+          "Lista de chamada",
+          "Persuasão"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P15",
         "serie_codigo": "9",
@@ -15985,12 +15985,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Um texto cita outro texto conhecido.",
         "q": "Isso é exemplo de:",
         "o": [
-          "Intertextualidade",
           "Pontuação",
+          "Intertextualidade",
           "Silabação",
           "Denotação"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D20 — Reconhecer diferentes formas de tratar uma informação em textos",
         "codigo_prova": "9P16",
         "serie_codigo": "9",
@@ -16001,12 +16001,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Ainda que chova, haverá aula.",
         "q": "A expressão indica:",
         "o": [
-          "Concessão",
           "Causa",
           "Conclusão",
+          "Concessão",
           "Adição"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P16",
         "serie_codigo": "9",
@@ -16017,12 +16017,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O aplicativo facilita o estudo, pois organiza conteúdos.",
         "q": "'Pois' introduz:",
         "o": [
-          "Explicação",
           "Contradição",
           "Exclusão",
-          "Tempo"
+          "Tempo",
+          "Explicação"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P16",
         "serie_codigo": "9",
@@ -16049,12 +16049,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Texto publicitário de uma escola.",
         "q": "Recurso comum é:",
         "o": [
-          "Persuasão",
           "Ausência de imagens",
+          "Persuasão",
           "Prova matemática",
           "Lista de chamada"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P16",
         "serie_codigo": "9",
@@ -16065,12 +16065,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Dados da pesquisa mostram aumento na frequência.",
         "q": "Os dados servem para:",
         "o": [
-          "Sustentar informação",
           "Criar personagem",
           "Fazer rima",
+          "Sustentar informação",
           "Dar ordem"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D14 — Reconhecer dados como argumento",
         "codigo_prova": "9P16",
         "serie_codigo": "9",
@@ -16082,11 +16082,11 @@ window.SIMULADOS_FIXOS = {
         "q": "'Embora' estabelece relação de:",
         "o": [
           "Causa",
-          "Concessão",
           "Conclusão",
-          "Adição"
+          "Adição",
+          "Concessão"
         ],
-        "c": 1,
+        "c": 3,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P16",
         "serie_codigo": "9",
@@ -16097,12 +16097,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O projeto reduziu o desperdício de água.",
         "q": "'Reduziu' pode ser substituído por:",
         "o": [
-          "Aumentou",
           "Diminuiu",
+          "Aumentou",
           "Ignorou",
           "Repetiu"
         ],
-        "c": 1,
+        "c": 0,
         "hab": "D03 — Inferir o sentido de palavra ou expressão",
         "codigo_prova": "9P16",
         "serie_codigo": "9",
@@ -16113,12 +16113,12 @@ window.SIMULADOS_FIXOS = {
         "base": "É necessário preservar o meio ambiente.",
         "q": "A tese defendida é:",
         "o": [
-          "Preservar é necessário",
           "Não há problemas",
+          "Preservar é necessário",
           "Ambiente não muda",
           "Qualidade não importa"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Identificar tese/opinião defendida no texto",
         "codigo_prova": "9P16",
         "serie_codigo": "9",
@@ -16153,12 +16153,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O aplicativo facilita o estudo, pois organiza conteúdos.",
         "q": "'Pois' introduz:",
         "o": [
-          "Explicação",
           "Contradição",
+          "Explicação",
           "Exclusão",
           "Tempo"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P17",
         "serie_codigo": "9",
@@ -16169,12 +16169,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Não apenas estudou, como também ajudou os colegas.",
         "q": "Há ideia de:",
         "o": [
-          "Adição",
           "Oposição",
           "Causa",
+          "Adição",
           "Tempo"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D15 — Estabelecer relações lógico-discursivas no texto",
         "codigo_prova": "9P17",
         "serie_codigo": "9",
@@ -16185,12 +16185,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Texto publicitário de uma escola.",
         "q": "Recurso comum é:",
         "o": [
-          "Persuasão",
           "Ausência de imagens",
           "Prova matemática",
-          "Lista de chamada"
+          "Lista de chamada",
+          "Persuasão"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P17",
         "serie_codigo": "9",
@@ -16234,11 +16234,11 @@ window.SIMULADOS_FIXOS = {
         "q": "'Reduziu' pode ser substituído por:",
         "o": [
           "Aumentou",
-          "Diminuiu",
           "Ignorou",
+          "Diminuiu",
           "Repetiu"
         ],
-        "c": 1,
+        "c": 2,
         "hab": "D03 — Inferir o sentido de palavra ou expressão",
         "codigo_prova": "9P17",
         "serie_codigo": "9",
@@ -16249,12 +16249,12 @@ window.SIMULADOS_FIXOS = {
         "base": "É necessário preservar o meio ambiente.",
         "q": "A tese defendida é:",
         "o": [
-          "Preservar é necessário",
           "Não há problemas",
           "Ambiente não muda",
-          "Qualidade não importa"
+          "Qualidade não importa",
+          "Preservar é necessário"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D14 — Identificar tese/opinião defendida no texto",
         "codigo_prova": "9P17",
         "serie_codigo": "9",
@@ -16281,12 +16281,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A cidade acordou em festa.",
         "q": "A expressão apresenta:",
         "o": [
-          "Personificação",
           "Enumeração",
+          "Personificação",
           "Citação",
           "Comparação literal"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P17",
         "serie_codigo": "9",
@@ -16321,12 +16321,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Documento oficial.",
         "q": "A linguagem esperada é:",
         "o": [
-          "Norma-padrão",
           "Gíria",
+          "Norma-padrão",
           "Mensagem íntima",
           "Linguagem infantil"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D13 — Identificar marcas linguísticas e variação linguística",
         "codigo_prova": "9P18",
         "serie_codigo": "9",
@@ -16337,12 +16337,12 @@ window.SIMULADOS_FIXOS = {
         "base": "O autor critica o consumo exagerado de tecnologia.",
         "q": "A palavra 'critica' indica que o autor:",
         "o": [
-          "Avalia negativamente",
           "Elogia sem limites",
           "Ignora",
+          "Avalia negativamente",
           "Conta piada"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D06 — Identificar o tema ou sentido global do texto",
         "codigo_prova": "9P18",
         "serie_codigo": "9",
@@ -16353,12 +16353,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A educação é a chave do futuro.",
         "q": "A frase apresenta:",
         "o": [
-          "Metáfora",
           "Onomatopeia",
           "Enumeração",
-          "Hipérbole numérica"
+          "Hipérbole numérica",
+          "Metáfora"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P18",
         "serie_codigo": "9",
@@ -16385,12 +16385,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Uma reportagem aprofunda um fato de interesse público.",
         "q": "O principal objetivo é:",
         "o": [
-          "Informar com detalhes",
           "Ensinar receita",
+          "Informar com detalhes",
           "Criar conto",
           "Listar compras"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P18",
         "serie_codigo": "9",
@@ -16401,12 +16401,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Os estudantes, que participaram da feira, receberam certificados.",
         "q": "O trecho entre vírgulas é:",
         "o": [
-          "Explicativo",
           "Interrogativo",
           "Imperativo",
+          "Explicativo",
           "Contrário"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "Oração explicativa",
         "codigo_prova": "9P18",
         "serie_codigo": "9",
@@ -16417,12 +16417,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Artigo de opinião apresenta ponto de vista.",
         "q": "O que se espera encontrar?",
         "o": [
-          "Argumentos",
           "Ingredientes",
           "Personagens mágicos",
-          "Tabela de preços"
+          "Tabela de preços",
+          "Argumentos"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P18",
         "serie_codigo": "9",
@@ -16449,12 +16449,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A crônica reflete situações do cotidiano.",
         "q": "Esse gênero geralmente apresenta:",
         "o": [
-          "Cotidiano e reflexão",
           "Normas técnicas",
+          "Cotidiano e reflexão",
           "Lista de produtos",
           "Problemas matemáticos"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P18",
         "serie_codigo": "9",
@@ -16489,12 +16489,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A educação é a chave do futuro.",
         "q": "A frase apresenta:",
         "o": [
-          "Metáfora",
           "Onomatopeia",
+          "Metáfora",
           "Enumeração",
           "Hipérbole numérica"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P19",
         "serie_codigo": "9",
@@ -16505,12 +16505,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Resumo de um texto.",
         "q": "O resumo deve:",
         "o": [
-          "Apresentar ideias principais",
           "Copiar tudo",
           "Mudar sentido",
+          "Apresentar ideias principais",
           "Ter só opinião"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D06 — Identificar tema/sentido global do texto",
         "codigo_prova": "9P19",
         "serie_codigo": "9",
@@ -16521,12 +16521,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Uma reportagem aprofunda um fato de interesse público.",
         "q": "O principal objetivo é:",
         "o": [
-          "Informar com detalhes",
           "Ensinar receita",
           "Criar conto",
-          "Listar compras"
+          "Listar compras",
+          "Informar com detalhes"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P19",
         "serie_codigo": "9",
@@ -16553,12 +16553,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Artigo de opinião apresenta ponto de vista.",
         "q": "O que se espera encontrar?",
         "o": [
-          "Argumentos",
           "Ingredientes",
+          "Argumentos",
           "Personagens mágicos",
           "Tabela de preços"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P19",
         "serie_codigo": "9",
@@ -16569,12 +16569,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Ele tem um coração de pedra.",
         "q": "A linguagem usada é:",
         "o": [
-          "Conotativa",
           "Denotativa",
           "Técnica",
+          "Conotativa",
           "Numérica"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D16 — Identificar efeito de sentido de recursos expressivos",
         "codigo_prova": "9P19",
         "serie_codigo": "9",
@@ -16585,12 +16585,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A crônica reflete situações do cotidiano.",
         "q": "Esse gênero geralmente apresenta:",
         "o": [
-          "Cotidiano e reflexão",
           "Normas técnicas",
           "Lista de produtos",
-          "Problemas matemáticos"
+          "Problemas matemáticos",
+          "Cotidiano e reflexão"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P19",
         "serie_codigo": "9",
@@ -16617,12 +16617,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A escola realizou reunião ontem.",
         "q": "Essa frase apresenta:",
         "o": [
-          "Fato",
           "Opinião",
+          "Fato",
           "Ironia",
           "Dúvida"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P19",
         "serie_codigo": "9",
@@ -16657,12 +16657,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Uma reportagem aprofunda um fato de interesse público.",
         "q": "O principal objetivo é:",
         "o": [
-          "Informar com detalhes",
           "Ensinar receita",
+          "Informar com detalhes",
           "Criar conto",
           "Listar compras"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P20",
         "serie_codigo": "9",
@@ -16673,12 +16673,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Os estudantes, que participaram da feira, receberam certificados.",
         "q": "O trecho entre vírgulas é:",
         "o": [
-          "Explicativo",
           "Interrogativo",
           "Imperativo",
+          "Explicativo",
           "Contrário"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "Oração explicativa",
         "codigo_prova": "9P20",
         "serie_codigo": "9",
@@ -16689,12 +16689,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Artigo de opinião apresenta ponto de vista.",
         "q": "O que se espera encontrar?",
         "o": [
-          "Argumentos",
           "Ingredientes",
           "Personagens mágicos",
-          "Tabela de preços"
+          "Tabela de preços",
+          "Argumentos"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P20",
         "serie_codigo": "9",
@@ -16721,12 +16721,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A crônica reflete situações do cotidiano.",
         "q": "Esse gênero geralmente apresenta:",
         "o": [
-          "Cotidiano e reflexão",
           "Normas técnicas",
+          "Cotidiano e reflexão",
           "Lista de produtos",
           "Problemas matemáticos"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Reconhecer gênero discursivo e finalidade do texto",
         "codigo_prova": "9P20",
         "serie_codigo": "9",
@@ -16737,12 +16737,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Campanha educativa sobre trânsito.",
         "q": "A finalidade é:",
         "o": [
-          "Conscientizar",
           "Contar lenda",
           "Vender sempre",
+          "Conscientizar",
           "Descrever paisagem"
         ],
-        "c": 0,
+        "c": 2,
         "hab": "D09 — Identificar finalidade de textos de diferentes gêneros",
         "codigo_prova": "9P20",
         "serie_codigo": "9",
@@ -16753,12 +16753,12 @@ window.SIMULADOS_FIXOS = {
         "base": "A escola realizou reunião ontem.",
         "q": "Essa frase apresenta:",
         "o": [
-          "Fato",
           "Opinião",
           "Ironia",
-          "Dúvida"
+          "Dúvida",
+          "Fato"
         ],
-        "c": 0,
+        "c": 3,
         "hab": "D14 — Distinguir fato da opinião relativa a esse fato",
         "codigo_prova": "9P20",
         "serie_codigo": "9",
@@ -16785,12 +16785,12 @@ window.SIMULADOS_FIXOS = {
         "base": "Estudaram para que obtivessem bons resultados.",
         "q": "Há ideia de:",
         "o": [
-          "Finalidade",
           "Oposição",
+          "Finalidade",
           "Comparação",
           "Dúvida"
         ],
-        "c": 0,
+        "c": 1,
         "hab": "D09 — Identificar finalidade de textos de diferentes gêneros",
         "codigo_prova": "9P20",
         "serie_codigo": "9",
