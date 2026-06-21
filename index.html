@@ -1,1 +1,79 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta http-equiv="refresh" content="0; url=painel-coordenador.html"><title>Painel PQF — Gestão e Coordenação</title></head><body style="font-family:Arial;background:#071524;color:white;text-align:center;padding:40px"><div style="display:flex;justify-content:center;margin-bottom:14px"><img src="logotipo-olho-lupa.png" alt="Olho com lupa" style="width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(56,189,248,.25))"></div><h2>Redirecionando para o Painel PQF...</h2><p><a style="color:#38bdf8" href="painel-coordenador.html">Abrir Painel de Gestão e Coordenação</a></p><script>location.href='painel-coordenador.html';</script></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MATRIZ EDUCACIONAL | Layout Xyntropic</title>
+<style>
+:root{--bg:#05080f;--line:rgba(255,255,255,.14);--text:#f5f7fb;--muted:#b7c3d8;--green:#38f2a6;--blue:#42b7ff;--gold:#ffd36a;--red:#ff5f73;--shadow:0 24px 80px rgba(0,0,0,.38)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 15% 10%,rgba(56,242,166,.18),transparent 28%),radial-gradient(circle at 85% 15%,rgba(66,183,255,.17),transparent 30%),radial-gradient(circle at 50% 82%,rgba(255,211,106,.10),transparent 32%),linear-gradient(180deg,#05080f,#07121f 48%,#05080f);min-height:100vh}
+body:before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.033) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.033) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;mask-image:linear-gradient(to bottom,black,transparent 82%)}
+a{text-decoration:none;color:inherit}
+.container{width:min(1160px,calc(100% - 32px));margin:auto;position:relative;z-index:1}
+.nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);background:rgba(5,8,15,.72);backdrop-filter:blur(16px);position:sticky;top:0;z-index:5;padding-inline:16px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:950;text-transform:uppercase;letter-spacing:.09em}
+.brand-icon{width:44px;height:44px;border-radius:16px;background:linear-gradient(135deg,var(--green),var(--blue));box-shadow:0 0 30px rgba(56,242,166,.32)}
+.btn{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:14px 20px;font-weight:950;background:linear-gradient(135deg,var(--green),var(--blue));color:#031018;box-shadow:0 18px 48px rgba(56,242,166,.22)}
+.btn.secondary{background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--text);box-shadow:none}
+.hero{min-height:calc(100vh - 76px);display:grid;align-items:center;padding:72px 0}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}
+.eyebrow{display:inline-flex;padding:10px 14px;border-radius:999px;border:1px solid rgba(56,242,166,.28);background:rgba(56,242,166,.10);color:var(--green);font-size:.78rem;font-weight:950;text-transform:uppercase;letter-spacing:.06em;margin-bottom:22px}
+h1{font-size:clamp(3rem,9vw,7.5rem);line-height:.88;letter-spacing:-.08em;text-transform:uppercase;margin-bottom:20px;background:linear-gradient(135deg,#fff,var(--green),var(--blue),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.subtitle{font-size:clamp(1.1rem,2vw,1.55rem);font-weight:750;color:#dbeafe;line-height:1.45;max-width:760px;margin-bottom:18px}
+p{color:var(--muted);line-height:1.75}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.panel{border:1px solid var(--line);border-radius:34px;padding:22px;background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.045));box-shadow:var(--shadow)}
+.browser{border:1px solid rgba(255,255,255,.16);border-radius:26px;overflow:hidden;background:#07111d}
+.browser-top{height:48px;background:rgba(255,255,255,.08);border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center;padding:0 16px}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--red)}.dot:nth-child(2){background:var(--gold)}.dot:nth-child(3){background:var(--green)}
+.browser-body{padding:24px;display:grid;gap:14px}
+.mini{padding:20px;border-radius:22px;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.12)}
+.mini h3{font-size:1.3rem;margin-bottom:7px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding-bottom:70px}
+.card{border:1px solid var(--line);border-radius:28px;padding:26px;background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.045));transition:.25s;box-shadow:0 18px 48px rgba(0,0,0,.18)}
+.card:hover{transform:translateY(-6px);border-color:rgba(56,242,166,.42);box-shadow:0 26px 82px rgba(56,242,166,.12)}
+.icon{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:rgba(56,242,166,.12);border:1px solid rgba(56,242,166,.26);font-size:1.6rem;margin-bottom:16px}
+.card h2{font-size:1.6rem;margin-bottom:10px;letter-spacing:-.03em}
+@media(max-width:900px){.hero-grid,.cards{grid-template-columns:1fr}.hero{padding:48px 0}h1{font-size:3.7rem}.nav{height:auto;min-height:72px;flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="#"><span class="brand-icon"></span><span>MATRIZ Xyntropic</span></a>
+  <a class="btn secondary" href="painel-coordenador.html">Painel</a>
+</header>
+<main class="container">
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Sistema Escolar • Avaliações • Dashboards</div>
+        <h1>Matriz</h1>
+        <p class="subtitle">Treinamento, simulados, resultados e gestão pedagógica em um visual Xyntropic: organizado, moderno, escuro, responsivo e pronto para apresentação.</p>
+        <p>Escolha a área que deseja abrir. Os arquivos do sistema foram mantidos com os mesmos nomes principais para preservar compatibilidade com o projeto atual.</p>
+        <div class="actions">
+          <a class="btn" href="treinamento.html">Abrir treinamento</a>
+          <a class="btn secondary" href="painel-coordenador.html">Abrir painel coordenador</a>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="browser">
+          <div class="browser-top"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <div class="browser-body">
+            <div class="mini"><h3>📊 Painel de Gestão</h3><p>Dashboards, filtros, relatórios e acompanhamento por aluno, turma, série e componente.</p></div>
+            <div class="mini"><h3>🎯 Treinamento</h3><p>Simulados por descritores, questões fixas e registro de resultados para acompanhamento pedagógico.</p></div>
+            <div class="mini"><h3>🌱 Layout Xyntropic</h3><p>Cards, brilho, grid tecnológico, barra animada, botões modernos e responsividade mobile.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="cards">
+    <article class="card"><div class="icon">⚙️</div><h2>Compatível</h2><p>IDs, scripts e estrutura principal preservados para reduzir risco de quebra.</p></article>
+    <article class="card"><div class="icon">📚</div><h2>Completo</h2><p>Inclui questões, simulados fixos, treinamento, painel e página de entrada.</p></article>
+    <article class="card"><div class="icon">📱</div><h2>Responsivo</h2><p>Visual adaptado para celular, notebook e apresentação em tela grande.</p></article>
+  </section>
+</main>
+</body>
+</html>

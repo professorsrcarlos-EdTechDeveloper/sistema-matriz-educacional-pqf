@@ -1,0 +1,15 @@
+MATRIZ EDUCACIONAL — Layout Xyntropic
+
+Arquivos principais:
+- index.html
+- treinamento.html
+- painel-coordenador.html
+- painel-professor.html
+- questoes.js
+- simulados-fixos.js
+- painel-coordenador.js
+- painel-coordenador.html.js
+
+Observação:
+O layout visual foi atualizado para o padrão Xyntropic/Syntropic sem remover os IDs e scripts principais do sistema.
+Se o repositório já tiver logo-pqf.jpg, logotipo-olho-lupa.png e supabase-config.js, mantenha esses arquivos na raiz.

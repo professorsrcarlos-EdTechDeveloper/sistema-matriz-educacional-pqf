@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel de Gestão e Coordenação — Sistema MATRIZ EDUCACIONAL</title>
+<title>Painel Xyntropic — Sistema MATRIZ EDUCACIONAL</title>
 <style>
 :root{
   --bg:#071524;--card:#0f2335;--card2:#15344d;--blue:#38bdf8;--green:#22c55e;--gold:#fbbf24;
@@ -356,8 +356,273 @@ footer{text-align:center;color:#cbd5e1;font-size:.78rem;line-height:1.45;padding
 }
 
 </style>
+
+<style id="xyntropic-layout-v1">
+/* ==========================================================
+   LAYOUT XYNTROPIC / SYNTROPIC — PADRÃO VISUAL PREMIUM
+   Aplicado sem remover IDs/funções do sistema existente.
+   ========================================================== */
+:root{
+  --xy-bg:#05080f;
+  --xy-bg2:#07121f;
+  --xy-card:rgba(255,255,255,.075);
+  --xy-card2:rgba(255,255,255,.115);
+  --xy-line:rgba(255,255,255,.14);
+  --xy-text:#f5f7fb;
+  --xy-muted:#b7c3d8;
+  --xy-green:#38f2a6;
+  --xy-green2:#16c784;
+  --xy-blue:#42b7ff;
+  --xy-gold:#ffd36a;
+  --xy-red:#ff5f73;
+  --xy-purple:#a78bfa;
+  --xy-shadow:0 24px 80px rgba(0,0,0,.38);
+  --xy-radius:26px;
+}
+*{scrollbar-width:thin;scrollbar-color:rgba(56,242,166,.55) rgba(255,255,255,.07)}
+body{
+  background:
+    radial-gradient(circle at 14% 8%, rgba(56,242,166,.18), transparent 28%),
+    radial-gradient(circle at 86% 12%, rgba(66,183,255,.17), transparent 30%),
+    radial-gradient(circle at 50% 80%, rgba(255,211,106,.11), transparent 32%),
+    linear-gradient(180deg,#05080f 0%,#07121f 43%,#05080f 100%) !important;
+  color:var(--xy-text) !important;
+  font-family:"Segoe UI",Arial,Helvetica,sans-serif !important;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.033) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.033) 1px, transparent 1px);
+  background-size:48px 48px;
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.92),transparent 82%);
+}
+main,.wrap{position:relative;z-index:1}
+.xy-topbar{
+  position:sticky;
+  top:0;
+  z-index:90;
+  overflow:hidden;
+  background:rgba(2,5,9,.92);
+  border:1px solid var(--xy-line);
+  border-radius:0 0 22px 22px;
+  box-shadow:0 18px 60px rgba(0,0,0,.28);
+  backdrop-filter:blur(16px);
+  margin:-16px -12px 16px;
+}
+.xy-track{
+  display:inline-flex;
+  min-width:200%;
+  gap:42px;
+  white-space:nowrap;
+  padding:13px 0;
+  animation:xyTicker 30s linear infinite;
+  color:#d9e7f7;
+  font-weight:950;
+  letter-spacing:.045em;
+  text-transform:uppercase;
+  font-size:.82rem;
+}
+.xy-track span{color:var(--xy-green)}
+@keyframes xyTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.header,.panel,.card,.kpi,.mini-card,.rank-item,.plan-item,.box,.qbox,.final,.text-base,.notice,.legal,.restricted-warning,.login-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.095),rgba(255,255,255,.045)) !important;
+  border:1px solid var(--xy-line) !important;
+  border-radius:var(--xy-radius) !important;
+  box-shadow:0 18px 48px rgba(0,0,0,.22) !important;
+  backdrop-filter:blur(10px);
+  transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease,filter .25s ease !important;
+}
+.header{
+  padding:28px !important;
+  border-color:rgba(56,242,166,.28) !important;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(56,242,166,.20), transparent 28%),
+    radial-gradient(circle at 86% 18%, rgba(66,183,255,.17), transparent 30%),
+    linear-gradient(135deg,rgba(255,255,255,.11),rgba(255,255,255,.052)) !important;
+}
+.header:hover,.panel:hover,.card:hover,.kpi:hover,.mini-card:hover,.rank-item:hover,.plan-item:hover,.box:hover,.qbox:hover,.final:hover,.text-base:hover,.notice:hover{
+  transform:translateY(-5px) !important;
+  border-color:rgba(56,242,166,.42) !important;
+  box-shadow:0 26px 82px rgba(56,242,166,.12),0 18px 48px rgba(0,0,0,.30) !important;
+}
+.header h1,h1{
+  letter-spacing:-.055em !important;
+  line-height:.98 !important;
+  color:#fff !important;
+}
+.header h1,.panel-title-v61 .title-text-v61,h1{
+  background:linear-gradient(135deg,#ffffff,var(--xy-green),var(--xy-blue),var(--xy-gold));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent !important;
+}
+.subtitle,.header p,.section-head p,.legal,.restricted-warning,.notice,.text-base,small{
+  color:var(--xy-muted) !important;
+}
+.badge,.permissao-chip,.entry-label{
+  background:rgba(56,242,166,.12) !important;
+  border:1px solid rgba(56,242,166,.28) !important;
+  color:var(--xy-green) !important;
+  border-radius:999px !important;
+  font-weight:950 !important;
+  letter-spacing:.05em !important;
+}
+.school-logo,.book-mascot{
+  filter:drop-shadow(0 0 18px rgba(56,242,166,.28)) drop-shadow(0 0 24px rgba(66,183,255,.16)) !important;
+}
+.brand-mark,.logo{
+  background:
+    radial-gradient(circle at 30% 28%,rgba(255,255,255,.30),transparent 18%),
+    linear-gradient(135deg,var(--xy-green),var(--xy-blue)) !important;
+  color:#031018 !important;
+  border:1px solid rgba(56,242,166,.34) !important;
+  box-shadow:0 0 30px rgba(56,242,166,.26) !important;
+  border-radius:18px !important;
+}
+.brand-mark span,.logo span{color:#031018 !important}
+
+.btn,button,a.btn,select,input,textarea{
+  border-radius:16px !important;
+  border:1px solid rgba(56,242,166,.28) !important;
+  color:#f5f7fb !important;
+  background:rgba(255,255,255,.075) !important;
+  box-shadow:none !important;
+}
+.btn:hover,button:hover,a.btn:hover{
+  transform:translateY(-2px) !important;
+  filter:brightness(1.08);
+  border-color:rgba(56,242,166,.54) !important;
+  box-shadow:0 18px 48px rgba(56,242,166,.14) !important;
+}
+.btn.gold,.gold,button.secondary,.btn-primary,.btn-gold{
+  background:linear-gradient(135deg,var(--xy-green),var(--xy-blue)) !important;
+  color:#031018 !important;
+  border-color:rgba(56,242,166,.58) !important;
+  font-weight:950 !important;
+}
+button.danger,.danger{
+  background:rgba(255,95,115,.12) !important;
+  border-color:rgba(255,95,115,.38) !important;
+  color:#ffdbe1 !important;
+}
+select,input,textarea{
+  background:rgba(5,12,22,.82) !important;
+  color:#fff !important;
+}
+input::placeholder,textarea::placeholder{color:#8ea0ba !important}
+
+.dashboard,.kpis,.grid,.grid-wide,.cards-grid{
+  gap:18px !important;
+}
+.kpi{
+  min-height:132px;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(66,183,255,.14), transparent 38%),
+    linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045)) !important;
+}
+.kpi b{color:var(--xy-muted) !important}
+.kpi strong{
+  color:var(--xy-green) !important;
+  text-shadow:0 0 20px rgba(56,242,166,.16);
+}
+.kpi.good{border-left:4px solid var(--xy-green) !important}
+.kpi.warn{border-left:4px solid var(--xy-gold) !important}
+.kpi.bad{border-left:4px solid var(--xy-red) !important}
+.kpi.info{border-left:4px solid var(--xy-blue) !important}
+
+.bar-track,.progress{
+  background:rgba(255,255,255,.085) !important;
+  border-radius:999px !important;
+  overflow:hidden;
+}
+.bar-fill,.progress div{
+  background:linear-gradient(90deg,var(--xy-green),var(--xy-blue)) !important;
+}
+.vbar,.pie,.gauge,.area-fill,.combo-bar{
+  filter:drop-shadow(0 0 14px rgba(56,242,166,.14));
+}
+.option{
+  border-radius:18px !important;
+  background:rgba(255,255,255,.075) !important;
+  border:1px solid rgba(255,255,255,.14) !important;
+  color:#eef6ff !important;
+  transition:.22s !important;
+}
+.option:hover{
+  transform:translateY(-2px);
+  border-color:rgba(56,242,166,.45) !important;
+  background:rgba(56,242,166,.10) !important;
+}
+.option.selected,.option.marcada,.selecionada{
+  background:rgba(56,242,166,.18) !important;
+  border-color:rgba(56,242,166,.65) !important;
+  box-shadow:0 0 0 2px rgba(56,242,166,.08),0 18px 48px rgba(56,242,166,.10) !important;
+}
+
+.login-overlay{
+  background:
+    radial-gradient(circle at 20% 10%, rgba(56,242,166,.17), transparent 30%),
+    radial-gradient(circle at 80% 20%, rgba(66,183,255,.16), transparent 30%),
+    rgba(2,5,10,.88) !important;
+  backdrop-filter:blur(18px);
+}
+.login-card{
+  max-width:440px !important;
+  padding:30px !important;
+  border-color:rgba(56,242,166,.35) !important;
+}
+.login-card h2{
+  font-size:2rem;
+  letter-spacing:-.05em;
+  background:linear-gradient(135deg,#fff,var(--xy-green),var(--xy-blue));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent !important;
+}
+
+table,.matrix-table,.code-table{
+  background:rgba(255,255,255,.045) !important;
+  border-radius:18px !important;
+  overflow:hidden;
+}
+th{
+  background:rgba(56,242,166,.12) !important;
+  color:#eafff7 !important;
+}
+td{border-color:rgba(255,255,255,.08) !important}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.06)}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--xy-green),var(--xy-blue));border-radius:999px}
+
+@media(max-width:760px){
+  .xy-topbar{margin:-10px -10px 12px;border-radius:0 0 18px 18px}
+  .xy-track{font-size:.72rem;padding:11px 0}
+  .header{padding:20px !important}
+  .dashboard,.kpis,.grid,.grid-wide,.cards-grid{grid-template-columns:1fr !important}
+  .btn,button,a.btn{width:auto}
+}
+@media print{
+  .xy-topbar{display:none!important}
+  body{background:#fff!important;color:#000!important}
+  .header,.panel,.card,.box,.qbox,.final{box-shadow:none!important;background:#fff!important;color:#000!important}
+}
+</style>
+
 </head>
 <body>
+
+<div class="xy-topbar no-print" aria-label="Layout Xyntropic">
+  <div class="xy-track">
+    <div><span>MATRIZ EDUCACIONAL</span> • Painel Xyntropic • gestão pedagógica • simulados • descritores • dashboards • relatórios • acompanhamento escolar • <span>MATRIZ EDUCACIONAL</span> • Painel Xyntropic • gestão pedagógica • simulados • descritores • dashboards • relatórios • acompanhamento escolar •</div>
+  </div>
+</div>
+
 <div id="loginOverlay" class="login-overlay">
   <div class="login-card">
     <div class="brand-mark" style="margin:0 auto 12px"><span>MATRIZ</span></div>
